@@ -1,0 +1,26 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+.vite/
+
+# credentials — never committed, see docs/verification.md
+.env
+.env.*
+!.env.example
+
+# screenshots and reports made by the look loop
+shots/
+test-results/
+playwright-report/
+
+# tool caches
+.cache/
+*.tsbuildinfo
+
+# editors and the OS
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json

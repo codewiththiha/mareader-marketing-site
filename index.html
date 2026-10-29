@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mareader — a calm reader for PDF and EPUB</title>
+    <meta
+      name="description"
+      content="Mareader opens PDF and EPUB on your own machine: native, quiet, up to four panes, and pages that look like paper. Free, MIT licensed, for macOS, Windows and Linux."
+    />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#fbfaf8" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#101012" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Mareader — a calm reader for PDF and EPUB" />
+    <meta
+      property="og:description"
+      content="A native reader with no webview: 12 MiB of page memory where pdf.js wanted 128. Four panes, papers you can tint, your whole library offline."
+    />
+    <meta name="twitter:card" content="summary" />
+
+    <script>
+      // Resolves the theme before first paint, so the page never flashes white.
+      (() => {
+        const saved = localStorage.getItem('mareader.theme') || 'system';
+        const dark =
+          saved === 'dark' ||
+          (saved === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

@@ -1,8 +1,14 @@
 <script lang="ts">
   import DownloadBlock from '../DownloadBlock.svelte';
-  import ReaderPreview from '../ReaderPreview.svelte';
+  import AppWindow from '../AppWindow.svelte';
   import { reveal } from '../../lib/reveal';
+  import { device } from '../../lib/platform.svelte';
   import { VERSION } from '../../lib/content/downloads';
+
+  // The drawing wears the title bar of the system that is reading it.
+  const os = $derived(
+    device.value.os === 'macos' ? 'macos' : device.value.os === 'windows' ? 'windows' : 'gnome',
+  );
 </script>
 
 <section class="hero">
@@ -23,7 +29,7 @@
   </div>
 
   <div class="wrap hero__window" use:reveal={{ delay: 220 }}>
-    <ReaderPreview mode="light" tint="none" texture="paper" panes={2} />
+    <AppWindow {os} mode="light" tint="none" texture="paper" panes={2} sidebar />
   </div>
 </section>
 

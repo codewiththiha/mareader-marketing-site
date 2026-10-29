@@ -4,7 +4,8 @@
    * on a drawing of the app's window. Three controls, no more — each answers a
    * question a reader actually asks ("can I make it warm?", "can it be dark?").
    */
-  import ReaderPreview from '../ReaderPreview.svelte';
+  import AppWindow from '../AppWindow.svelte';
+  import BlendFigure from '../BlendFigure.svelte';
   import {
     modes,
     tints,
@@ -18,6 +19,7 @@
   let mode = $state<Mode>('light');
   let tint = $state<Tint>('sepia');
   let texture = $state<TextureKind | 'none'>('paper');
+  let blended = $state(false);
 
   const summary = $derived(
     [
@@ -97,13 +99,32 @@
       <p class="summary" aria-live="polite">{summary}</p>
     </div>
 
-    <figure class="lab__window" use:reveal={{ delay: 60 }}>
-      <ReaderPreview {mode} {tint} {texture} panes={1} />
-      <figcaption>
-        A drawing of the reader’s window, built from the app’s own colour tokens. The real one has
-        the same controls in its appearance popover.
-      </figcaption>
-    </figure>
+    <div class="lab__figures">
+      <figure class="lab__window" use:reveal={{ delay: 60 }}>
+        <AppWindow os="windows" {mode} {tint} {texture} />
+        <figcaption>
+          The reader’s window at 1200 × 800, drawn from the app’s own measurements: a 48 px bar, a
+          288 px rail, pages that meet the pane. Nothing here is a screenshot.
+        </figcaption>
+      </figure>
+
+      <figure class="lab__blend" use:reveal={{ delay: 100 }}>
+        <BlendFigure {blended} {mode} {tint} />
+        <figcaption>
+          <!-- The app's own row, named as it is in its Paper settings. -->
+          <button
+            type="button"
+            class="switch"
+            role="switch"
+            aria-checked={blended}
+            onclick={() => (blended = !blended)}
+          >
+            <span class="switch__track" aria-hidden="true"><i></i></span>
+            Blend mode
+          </button>
+        </figcaption>
+      </figure>
+    </div>
   </div>
 </section>
 
@@ -222,8 +243,59 @@
     min-height: 1.4em;
   }
 
-  .lab__window {
+  .lab__figures {
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-5);
+  }
+
+  .lab__window,
+  .lab__blend {
     margin: 0;
+  }
+
+  /* The switch is the caption: one control, its own words. */
+  .switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--ink-soft);
+  }
+
+  .switch__track {
+    position: relative;
+    width: 34px;
+    height: 20px;
+    flex: none;
+    border-radius: 999px;
+    background: var(--paper-sink);
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+    transition: background-color var(--dur-2) var(--ease);
+  }
+
+  .switch__track i {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--ink-muted);
+    transition:
+      transform var(--dur-2) var(--ease),
+      background-color var(--dur-2) var(--ease);
+  }
+
+  .switch[aria-checked='true'] .switch__track {
+    background: var(--accent-wash);
+    box-shadow: inset 0 0 0 1px var(--accent-line);
+  }
+
+  .switch[aria-checked='true'] .switch__track i {
+    transform: translateX(14px);
+    background: var(--accent);
   }
 
   figcaption {

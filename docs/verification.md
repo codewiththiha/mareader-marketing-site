@@ -93,6 +93,18 @@ The reveal animation hides everything below the fold, so the tool walks the page
 before shooting — worth remembering if you add a scroll effect that the walk
 cannot trigger.
 
+## The address gate
+
+`tools/address_check.py` recomputes the checksum each network defines for its own
+address format — EIP-55 (keccak-256) for EVM, bech32 for Bitcoin, Base58Check
+with SHA-256d for Tron, base58 as a 32-byte key for Solana, StrKey with a CRC16
+for Stellar — over every address-shaped string in `donations.ts`. Standard
+library only, so it runs anywhere Python does, and `--self-test` pins it against
+published vectors before it is trusted. It is not a linter for style: an address
+that fails it sends money nowhere, and the one it caught was live.
+
+Run it with `npm run addresses`; it is part of `npm run gate` and of CI.
+
 ## The QR gate
 
 `tools/qr_check.mjs` screenshots each donation code at 3× and decodes it with

@@ -7,14 +7,14 @@ Vite, three routes, no CSS framework and no component library.
 ```sh
 npm install                      # once
 npm run dev                      # http://localhost:5173
-npm run gate                     # format, lint, types, tests, build, assets, comments
+npm run gate                     # format, lint, types, tests, build, assets, comments, addresses
 ```
 
 ## What is here
 
 ```
 src/routes/            Home, Releases, Donate, NotFound
-src/components/        Header, Footer, ReaderPreview, QrCode, Link, ThemeToggle, icons/
+src/components/        Header, Footer, ReaderPreview, QrCode, DonationCard, Link, icons/
 src/components/sections/  the home page's six sections
 src/lib/               router, theme, platform, content/ (the words, as data)
 docs/                  design, architecture, donations, platform, verification, ai-slop, psychology

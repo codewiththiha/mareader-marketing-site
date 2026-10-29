@@ -186,9 +186,10 @@ npm run test                       # Playwright, desktop and phone
 npm run build                      # the bundle a host would serve
 npm run assets
 npm run comments
+npm run addresses
 ```
 
-`npm run gate` runs all seven. `node tools/shot.mjs` is the sixth gate for
+`npm run gate` runs all eight. `node tools/shot.mjs` is the sixth gate for
 anything visible, and it is the one a human has to look at.
 
 ## Commits and branches

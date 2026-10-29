@@ -145,22 +145,32 @@ for a reveal.
   dark. A track that sets a value for something visible below it (the appearance
   lab) fills its column with equal segments; a track that picks a variant of a
   control (the arch switch) hugs its labels.
-- **A wallet card** is two columns: the code at 148 px, then the network, its
-  one-line caveat, the address and a quiet explorer link. On a phone it stacks,
-  code first, up to 208 px wide — never smaller, or the code stops being
-  readable at arm's length.
+- **A donation card** is one address, and it is the same card whether that
+  address reaches one network or nine. Top to bottom: the family name with its
+  network count, the one-line caveat, then the code beside the address, then the
+  network chips and the fee line. A single-network card is that layout with no
+  chips — no second variant, no empty rail.
+- **The network chips are cells, not a tag cloud.** A grid of
+  `auto-fit minmax(96px, 1fr)`: nine of them fill one row at 1440 px and make a
+  3 × 3 block on a phone. Equal cells are what says "these are peers"; a ragged
+  flex row reads as an afterthought.
+- **The address bar takes the width it is given** on the wide card, because it is
+  the one thing being copied; a field that stops at 620 px leaves a hole in the
+  card's right half. On the single cards the address and the explorer link sit
+  level with the code's top and bottom edges.
 - **Focus** is a 2 px accent ring at 2 px offset, everywhere, including the skip
   link, which is otherwise off-screen.
 
 ## Breakpoints
 
-| Width       | What changes                                                                                          |
-| ----------- | ----------------------------------------------------------------------------------------------------- |
-| ≥ 1100 px   | Two-column heads, three-column download table, two-column wallets                                     |
-| 900–1100 px | Heads stack, the appearance lab stacks, wallets stay two                                              |
-| 720–900 px  | Feature grid to one column, download table stacks with rules                                          |
-| < 720 px    | Nav collapses to the menu, wallets to one column, the strip card stacks, the window drops to one page |
-| < 420 px    | The header's Download button goes; the hero's stays full width                                        |
+| Width       | What changes                                                                                        |
+| ----------- | --------------------------------------------------------------------------------------------------- |
+| ≥ 1100 px   | Two-column heads, three-column download table, two-column donation cards; the wide card spans both  |
+| 900–1100 px | Heads stack, the appearance lab stacks, cards stay two, chips to five per row                       |
+| 720–900 px  | Feature grid to one column, download table stacks with rules, cards to one                          |
+| < 720 px    | Nav collapses to the menu, cards to one column, the strip card stacks, the window drops to one page |
+| < 560 px    | A card's code goes above its address, up to 208 px; chips make a 3 × 3 block                        |
+| < 420 px    | The header's Download button goes; the hero's stays full width                                      |
 
 The page must not scroll sideways at any width; `tools/shot.mjs` fails the run if
 it does.

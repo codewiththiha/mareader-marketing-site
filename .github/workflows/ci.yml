@@ -1,0 +1,72 @@
+name: CI
+
+# The gates this repository runs on every push. A sandbox polls this with
+# `python3 tools/ci.py watch`; a workstation runs the same commands locally and
+# does not wait. docs/verification.md.
+
+on:
+  push:
+    branches:
+      - main
+      - 'feat/**'
+      - 'fix/**'
+      - 'perf/**'
+      - 'refactor/**'
+      - 'docs/**'
+      - 'test/**'
+      - 'build/**'
+      - 'ci/**'
+      - 'chore/**'
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: Checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+
+      - name: Format
+        run: npm run format:check
+      - name: Lint
+        run: npm run lint
+      - name: Types
+        run: npm run check
+
+      - name: Install a browser
+        run: npx playwright install --with-deps chromium
+      - name: Behaviour
+        run: npm run test
+      - name: Donation codes decode
+        run: node tools/qr_check.mjs
+      - name: Build
+        run: npm run build
+      - name: Assets
+        run: python3 tools/assets_check.py
+      - name: Comments
+        run: python3 tools/comment_check.py src tools
+      - name: Subjects
+        run: python3 tools/commit_check.py --range origin/main..HEAD || true
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shots
+          path: |
+            shots/*.png
+            shots/report.txt
+          if-no-files-found: ignore
+          retention-days: 7

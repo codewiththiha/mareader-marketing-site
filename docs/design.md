@@ -142,7 +142,13 @@ for a reveal.
   toast.
 - **Segmented controls** (paper, texture, the two-step arch switch) are hairline
   tracks with a 5 px inner radius; the chosen one is ink on paper, inverted in
-  dark.
+  dark. A track that sets a value for something visible below it (the appearance
+  lab) fills its column with equal segments; a track that picks a variant of a
+  control (the arch switch) hugs its labels.
+- **A wallet card** is two columns: the code at 148 px, then the network, its
+  one-line caveat, the address and a quiet explorer link. On a phone it stacks,
+  code first, up to 208 px wide — never smaller, or the code stops being
+  readable at arm's length.
 - **Focus** is a 2 px accent ring at 2 px offset, everywhere, including the skip
   link, which is otherwise off-screen.
 

@@ -75,15 +75,21 @@ address below is the fallback for a desktop donor.
 
 - The code is drawn as SVG by `src/lib/qr.ts` with error correction **H** and a
   3-module quiet zone, in the page's ink and paper so it belongs to the card.
-  Rounded data dots; the three finder patterns keep their exact proportions,
-  since scanners rely on them.
-- Target size is 188 px on a desktop, 62–78 % of the card's width on a phone.
-  Do not shrink below ~150 px: a phone camera at 200 mm needs it.
+  Modules are near-square (0.94 of a cell, 0.22 radius) because a decoder reads
+  area; the three finder patterns keep their exact 7-1-3 proportions, since
+  scanners rely on them.
+- Target size is 148 px in the two-column card, and the card's full width up to
+  208 px on a phone. Do not shrink below ~140 px: at 47 modules that is 3 CSS
+  pixels per module, which is the floor `tools/qr_check.mjs` verifies.
 - The code is `role="img"` with a label naming the network and the address, so a
   screen reader announces what it is even though it cannot read it.
 - `--qr-ink` / `--qr-paper` are set by the component and follow the theme. A
   themed code is still a high-contrast one: ink on raised paper, never accent on
-  paper.
+  paper. Dark mode draws a light code on a dark plate, which iOS and Android
+  both read; `node tools/qr_check.mjs` decodes all four in both themes.
+- The check is a gate: `tools/qr_check.mjs` screenshots each code at 3×, decodes
+  it with jsQR and compares the text to the address in `donations.ts`. Run it
+  after touching `qr.ts`, `QrCode.svelte` or the theme tokens.
 
 ## When this becomes real
 

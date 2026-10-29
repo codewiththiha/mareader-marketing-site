@@ -93,6 +93,15 @@ The reveal animation hides everything below the fold, so the tool walks the page
 before shooting — worth remembering if you add a scroll effect that the walk
 cannot trigger.
 
+## The QR gate
+
+`tools/qr_check.mjs` screenshots each donation code at 3× and decodes it with
+jsQR, comparing the text to the address in `src/lib/content/donations.ts` by
+hand — deliberately not importing the page's builder, or a bug in it would agree
+with itself. It runs after any change to `qr.ts`, `QrCode.svelte`, the theme
+tokens or the card's size, and it is the only evidence that a theme-aware,
+rounded code is still a readable one.
+
 ## The two git gates
 
 - **`tools/commit_check.py`** refuses a subject over 50 characters. Install once
@@ -121,6 +130,7 @@ cannot trigger.
   declare each other through peers that npm 10's arborist cannot resolve
   (`Cannot read properties of null (reading 'edgesOut')`). Remove the line when a
   plain `npm install` succeeds.
-- No CI workflow exists in this repository yet. CI mode therefore means "the
-  checks run on a machine that is not this one"; `tools/ci.py watch` is ready for
-  a `CI` workflow named as such and will say plainly when it finds no run.
+- `.github/workflows/ci.yml` runs the same gates on every push to a `<type>/`
+  branch or to `main`, and uploads the shot report as an artifact. It is what
+  `tools/ci.py watch` reads; a push that only touches `docs/` still runs it,
+  because the docs are part of the product here.

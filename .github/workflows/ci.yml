@@ -50,10 +50,23 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Behaviour
         run: npm run test
-      - name: Donation codes decode
-        run: node tools/qr_check.mjs
       - name: Build
         run: npm run build
+
+      # The bundle a host would serve, not the dev server: the codes and the
+      # screenshots are checked against what ships.
+      - name: Serve the bundle
+        run: |
+          npx vite preview --port 4173 --strictPort --host 127.0.0.1 &
+          for _ in $(seq 1 40); do
+            curl -sf http://127.0.0.1:4173/ > /dev/null && exit 0
+            sleep 1
+          done
+          echo "the preview never answered" && exit 1
+      - name: Donation codes decode
+        run: node tools/qr_check.mjs --url http://127.0.0.1:4173
+      - name: Screenshots
+        run: node tools/shot.mjs --url http://127.0.0.1:4173
       - name: Assets
         run: python3 tools/assets_check.py
       - name: Comments

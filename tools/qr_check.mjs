@@ -53,7 +53,13 @@ for (const theme of themes) {
   await context.addInitScript((value) => localStorage.setItem('mareader.theme', value), theme);
 
   const page = await context.newPage();
-  await page.goto(`${base}/donate`, { waitUntil: 'networkidle' });
+  try {
+    await page.goto(`${base}/donate`, { waitUntil: 'networkidle' });
+  } catch {
+    console.error(`nothing is serving ${base}; run \`npm run dev\` or pass --url`);
+    await browser.close();
+    process.exit(2);
+  }
   await page.evaluate(() => document.fonts.ready);
 
   const codes = page.locator('svg[role="img"]');

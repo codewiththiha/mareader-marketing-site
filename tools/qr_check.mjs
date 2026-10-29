@@ -24,8 +24,7 @@ const flag = (name, fallback) => {
 const base = flag('url', 'http://127.0.0.1:5173').replace(/\/$/, '');
 const themes = flag('theme', 'light,dark').split(',');
 
-// Kept in step with src/lib/content/donations.ts by hand: this tool must not
-// import the page's own builder, or a bug in it would agree with itself.
+// Matches donations.ts by hand, so a bug in the page cannot vouch for itself.
 const expected = [
   '0xFaC170C240dFC6419Ff8d9D8108E2e2D88f595d7',
   'bc1qg454fmqylphrzfqh2kvlq54dt8t2kqaz452wm',
@@ -45,8 +44,7 @@ let failures = 0;
 for (const theme of themes) {
   const context = await browser.newContext({
     viewport: { width: 1440, height: 1000 },
-    // 3× because jsQR wants ~6 pixels per module: a 47-module code drawn at
-    // 148 CSS px has 3 px each, and a phone camera resolves far more than 2×.
+    // jsQR wants ~6 px per module; 148 CSS px over 47 modules needs 3×.
     deviceScaleFactor: 3,
     colorScheme: theme,
   });

@@ -23,6 +23,10 @@
     title?: string;
     /** Second pane shows the app's empty state instead of a page. */
     emptySecond?: boolean;
+    /** Backdrop takes the page's paper, as the app's Blend mode row does. */
+    blend?: boolean;
+    /** Drawn smaller than the pane, so the window's colour rings the page. */
+    fitPage?: boolean;
   }
 
   let {
@@ -34,6 +38,8 @@
     sidebar = false,
     title = 'The Wind in the Willows',
     emptySecond = false,
+    blend = false,
+    fitPage = false,
   }: Props = $props();
 
   const palette = $derived(windowPalette(mode, tint));
@@ -57,6 +63,9 @@
 <div
   class="window"
   data-os={os}
+  class:window--fit={fitPage}
+  class:window--blend={blend}
+  data-blend={blend}
   style:--chrome={palette.chrome}
   style:--chrome-ink={palette.chromeInk}
   style:--chrome-muted={palette.chromeMuted}
@@ -422,13 +431,33 @@
     color: var(--accent);
   }
 
+  /* The backdrop: the window's own colour, until Blend mode joins it. */
   .stage {
     position: relative;
     display: flex;
     flex: 1;
     min-width: 0;
+    gap: 0;
+    background: var(--chrome);
+    transition:
+      background-color var(--dur-3) var(--ease),
+      padding var(--dur-3) var(--ease);
+  }
+
+  .window--blend .stage {
     background: var(--page);
-    transition: background-color var(--dur-3) var(--ease);
+  }
+
+  /* Fit page: the page pulls back, so the colour behind it can be seen. */
+  .window--fit .stage {
+    padding: 14px;
+    gap: 14px;
+  }
+
+  /* Blended, it pulls back a little further: the reveal is the point. */
+  .window--fit.window--blend .stage {
+    padding: 22px;
+    gap: 22px;
   }
 
   .pane {
@@ -439,7 +468,7 @@
   }
 
   /* Two panes meet at a hairline, the handle the app drags. */
-  .pane + .pane {
+  .window:not(.window--fit) .pane + .pane {
     border-left: 1px solid color-mix(in oklab, var(--accent) 22%, var(--line));
   }
 
@@ -463,7 +492,22 @@
     background: var(--page);
     color: var(--ink);
     overflow: hidden;
-    transition: background-color var(--dur-3) var(--ease);
+    transition:
+      background-color var(--dur-3) var(--ease),
+      box-shadow var(--dur-3) var(--ease);
+  }
+
+  /* Drawn at fit page, the sheet is a page lying on the backdrop. */
+  .window--fit .sheet {
+    border-radius: 2px;
+    box-shadow:
+      0 1px 2px rgb(0 0 0 / 0.1),
+      0 6px 18px rgb(0 0 0 / 0.08);
+  }
+
+  /* Blended, it stops being a sheet on a surface: the shadow goes. */
+  .window--fit.window--blend .sheet {
+    box-shadow: none;
   }
 
   .sheet__text {
@@ -513,6 +557,13 @@
     font-size: 2.4em;
     line-height: 0.86;
     color: var(--ink);
+  }
+
+  /* Nothing open: the pane is not a sheet, so it takes no shadow. */
+  .window--fit .pane:has(.empty) .empty,
+  .window--fit .pane:has(.empty) {
+    box-shadow: none;
+    background: transparent;
   }
 
   .empty {

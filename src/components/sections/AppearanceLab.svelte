@@ -1,11 +1,11 @@
 <script lang="ts">
   /**
    * The one interactive section: it does what the app's appearance popover does,
-   * on a drawing of the app's window. Three controls, no more — each answers a
-   * question a reader actually asks ("can I make it warm?", "can it be dark?").
+   * on a drawing of the app's window. Four controls, each answering a question a
+   * reader asks: can it be dark, warm, textured, and can the window get out of
+   * the way. The window is drawn at fit page so the backdrop has room to show.
    */
   import AppWindow from '../AppWindow.svelte';
-  import BlendFigure from '../BlendFigure.svelte';
   import {
     modes,
     tints,
@@ -26,6 +26,7 @@
       modes.find((entry) => entry.id === mode)?.label,
       tints.find((entry) => entry.id === tint)?.label,
       textures.find((entry) => entry.id === texture)?.label,
+      blended ? 'Blended backdrop' : '',
     ]
       .filter((word) => word && word !== 'None')
       .join(' · '),
@@ -38,8 +39,8 @@
       <h2 class="heading" id="lab-heading" use:reveal>The page is the app.</h2>
       <p class="body" use:reveal={{ delay: 70 }}>
         Chrome is translucent and quiet, and the paper fills everything the page does not. Change a
-        mode, a tint or a texture and the whole window follows in one frame — the pages are not
-        redrawn, so the book never jumps.
+        mode, a tint, a texture or the backdrop and the whole window follows in one frame — the
+        pages are not redrawn, so the book never jumps.
       </p>
 
       <div class="controls" use:reveal={{ delay: 120 }}>
@@ -94,24 +95,10 @@
             {/each}
           </div>
         </fieldset>
-      </div>
 
-      <p class="summary" aria-live="polite">{summary}</p>
-    </div>
-
-    <div class="lab__figures">
-      <figure class="lab__window" use:reveal={{ delay: 60 }}>
-        <AppWindow os="windows" {mode} {tint} {texture} />
-        <figcaption>
-          The reader’s window at 1200 × 800, drawn from the app’s own measurements: a 48 px bar, a
-          288 px rail, pages that meet the pane. Nothing here is a screenshot.
-        </figcaption>
-      </figure>
-
-      <figure class="lab__blend" use:reveal={{ delay: 100 }}>
-        <BlendFigure {blended} {mode} {tint} />
-        <figcaption>
-          <!-- The app's own row, named as it is in its Paper settings. -->
+        <!-- The app's own row, named as it is in its Paper settings. -->
+        <fieldset class="control">
+          <legend class="label">Backdrop</legend>
           <button
             type="button"
             class="switch"
@@ -122,9 +109,21 @@
             <span class="switch__track" aria-hidden="true"><i></i></span>
             Blend mode
           </button>
-        </figcaption>
-      </figure>
+        </fieldset>
+      </div>
+
+      <p class="summary" aria-live="polite">{summary}</p>
     </div>
+
+    <figure class="lab__window" use:reveal={{ delay: 60 }}>
+      <!-- Fit page, so the window's own colour shows around the page. -->
+      <AppWindow os="windows" {mode} {tint} {texture} fitPage blend={blended} />
+      <figcaption>
+        The reader’s window at 1200 × 800, zoomed to the page so the backdrop shows, drawn from the
+        app’s own measurements. Blended, that backdrop takes the paper’s colour and the page stops
+        being a sheet on it.
+      </figcaption>
+    </figure>
   </div>
 </section>
 
@@ -243,14 +242,7 @@
     min-height: 1.4em;
   }
 
-  .lab__figures {
-    display: flex;
-    flex-direction: column;
-    gap: var(--sp-5);
-  }
-
-  .lab__window,
-  .lab__blend {
+  .lab__window {
     margin: 0;
   }
 

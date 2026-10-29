@@ -136,16 +136,27 @@ Colours are sampled, not invented — `windowPalette()` in `src/lib/appearance.t
 
 ## Blend mode
 
-`BlendFigure.svelte` is the one place where the chrome is left out, because the
-switch is about the backdrop, not the bar. Off, the window behind the page is
-its own chrome colour and the page sits on it with a shadow. On, the backdrop
-takes the page's paper colour and the page's shadow goes: the page and the
-window become one surface.
+There is one window in the lab, not two. Blend mode is a titled control in the
+same row as Paper, Tint and Texture — the app has it as a row in its Paper
+settings, and a second drawing was a second thing to keep in step.
 
-It is named `Blend mode` because that is the app's row, in its Paper settings,
-with the same meaning — "the background takes the page's own paper colour"
-(`crates/ui/src/settings_window.rs`). The switch is a real `role="switch"`; the
-test asserts that on, the backdrop's computed colour equals the page's.
+What it changes is the backdrop behind the page, so the lab window is drawn at
+**fit page**: the page pulls back and the window's own colour shows around it,
+the way the app looks zoomed to fit. The switch does what the app's does:
+
+|     | Backdrop                    | The page                               | Inset |
+| --- | --------------------------- | -------------------------------------- | ----- |
+| Off | the window's chrome colour  | a sheet on it, soft shadow             | 20 px |
+| On  | the page's own paper colour | no shadow: one surface with the window | 28 px |
+
+- The inset grows when blended, because the reveal is the point: the ring of
+  colour behind the page changes from chrome to paper, and the page stops
+  reading as a card lying on a surface.
+- The switch is a real `role="switch"` named `Blend mode`. The test asserts the
+  stage's computed colour equals the sheet's when on, differs when off, and that
+  the sheet's shadow goes.
+- Every other control repaints the same window: mode, tint and texture are its
+  palette now, so one drawing shows all four questions.
 
 ## Texture
 

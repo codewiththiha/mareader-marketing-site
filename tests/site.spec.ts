@@ -84,24 +84,28 @@ test('the theme switch paints, remembers, and announces itself', async ({ page }
   await expect(page.locator('html')).toHaveAttribute('data-theme', after!);
 });
 
-test('the backdrop blends into the page, and back', async ({ page }) => {
+test('blend mode pours the page into the backdrop, and back', async ({ page }) => {
   await page.goto('/');
-  const frame = page.locator('.lab__blend .frame');
-  const page_ = page.locator('.lab__blend .page');
-  const paper = await page_.evaluate((node) => getComputedStyle(node).backgroundColor);
-  expect(await frame.evaluate((node) => getComputedStyle(node).backgroundColor)).not.toBe(paper);
+  const win = page.locator('.lab__window .window');
+  const stage = win.locator('.stage');
+  const sheet = win.locator('.sheet').first();
+
+  // Off, the window keeps its own colour behind the page.
+  const paper = await sheet.evaluate((node) => getComputedStyle(node).backgroundColor);
+  expect(await stage.evaluate((node) => getComputedStyle(node).backgroundColor)).not.toBe(paper);
 
   const blend = page.getByRole('switch', { name: 'Blend mode' });
   await expect(blend).toHaveAttribute('aria-checked', 'false');
   await blend.click();
   await expect(blend).toHaveAttribute('aria-checked', 'true');
 
-  // On, the backdrop takes the page's own colour; the page loses its shadow.
-  await expect(frame).toHaveCSS('background-color', paper);
-  await expect(page_).toHaveCSS('box-shadow', 'none');
+  // On, the backdrop is the page's colour and the page loses its shadow.
+  await expect(stage).toHaveCSS('background-color', paper);
+  await expect(sheet).toHaveCSS('box-shadow', 'none');
+  await expect(page.getByText(/Blended backdrop/)).toBeVisible();
 
   await blend.click();
-  await expect(frame).not.toHaveCSS('background-color', paper);
+  await expect(stage).not.toHaveCSS('background-color', paper);
 });
 
 test('the drawing wears the title bar of the system asking', async ({ page }) => {

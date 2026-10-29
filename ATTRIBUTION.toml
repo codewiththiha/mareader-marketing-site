@@ -33,6 +33,15 @@ sha256 = "48bc8861b9b2ca9300747cad4fd6a3b4ac3028d364df00bd1b72097baa75e509"
 usage = "The italic half of the hero line, and quoted titles"
 
 [[asset]]
+path = "src/assets/brand/logo.svg"
+title = "The Mareader mark: an onyx squircle tile with an ivory book, gilt edges and a ribbon"
+author = "codewiththiha (contributor-original)"
+source = "apps/mareader/icons/logo.svg in github.com/codewiththiha/mareader2"
+license = "MIT"
+sha256 = "SELF"
+usage = "The app's own mark, in the header and the footer"
+
+[[asset]]
 path = "public/favicon.svg"
 title = "Mareader mark, an open book with a gilt ribbon"
 author = "codewiththiha (contributor-original)"
@@ -42,6 +51,12 @@ sha256 = "SELF"
 usage = "Browser tab and bookmark icon"
 
 # --- Bundled, not files: libraries whose code ships inside the build. ---
+
+[[bundled]]
+package = "Lucide icons"
+version = "1.34.0 (shapes redrawn as SVG)"
+license = "ISC"
+usage = "The app window's chrome icons (src/components/icons/Chrome.svelte)"
 
 [[bundled]]
 package = "qrcode"

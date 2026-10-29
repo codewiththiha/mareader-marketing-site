@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Book from './icons/Book.svelte';
+  import Logo from './Logo.svelte';
   import Icon from './icons/Icon.svelte';
   import Link from './Link.svelte';
   import { sourceRepo, releasesPage } from '../lib/content/downloads';
@@ -9,7 +9,7 @@
   <div class="wrap foot__inner">
     <div class="foot__brand">
       <Link href="/" class="foot__logo" aria-label="Mareader, home">
-        <Book size={22} />
+        <Logo size={24} />
         <span>Mareader</span>
       </Link>
       <p class="foot__note">A calm reader for PDF and EPUB. MIT licensed, built in the open.</p>

@@ -87,18 +87,65 @@ Rules:
 
 ## The reader window
 
-`ReaderPreview.svelte` draws the app at a fixed aspect, sized by height
-(`clamp(300px, 31vw, 452px)`), with the rail, two pages, folios and the app's
-chrome at 36 px. Its palette is the app's four base modes; a tint mixes the paper
-toward its hue at 13 % (light) or 9 % (dark), and the ink toward it as well, which
-is the app's own rule.
+`AppWindow.svelte` draws the app, and it is checked against the app rather than
+remembered. mareader2 ships its own shot tool; a drawing that has drifted from
+the product is a claim, not an illustration:
 
-- It is a drawing: no screenshot, no bitmap, so it follows this page's theme and
-  can be repainted by the appearance lab.
-- Its small chrome text uses `--page-faint`, a mix of the page's muted and ink, so
-  it clears 4.5:1 on light chrome. Do not use `--page-muted` for 10 px text there.
-- Below 760 px the rail goes and one page stays: two columns of 130 px type are
-  not reading, they are texture.
+```sh
+cd ../mareader2
+python3 tools/ci.py shots --rev HEAD \
+  "reader pdf=sample:12 workers=0 pinned=true platform=mac" \
+  "dim pdf=sample:12 workers=0 pinned=true theme=dim" \
+  "side pdf=sample:12 workers=0 pinned=true sidebar=outline"
+```
+
+Every number below came out of those PNGs, at 2× `pixels_per_point`, so a pixel
+in the shot is half a CSS point.
+
+| Part             | The app                                                              | The drawing                                    |
+| ---------------- | -------------------------------------------------------------------- | ---------------------------------------------- |
+| Title bar height | 48 px                                                                | 40 px, cropped to fit                          |
+| Rail width       | 288 px                                                               | 232 px, same reason                            |
+| Rail header      | lights, panel, search, gear, panel icon                              | the same, in 40 px                             |
+| Reader bar       | library, dictionary left; search, palette, menu right; title centred | the same                                       |
+| Captions         | macOS none; Windows 46 px each; GNOME circles                        | Windows and GNOME, from `device.value.os`      |
+| Page             | meets the pane, no card                                              | the same: `flex: 1`, no margin, no radius      |
+| Chapter label    | floats at the pane's top left                                        | the same, 10 px, ink mixed 52 % into the paper |
+| Page indicator   | a pill at the bottom right                                           | the same                                       |
+| Heading rule     | 2 px of `#d97333` under the title                                    | the same                                       |
+
+Colours are sampled, not invented — `windowPalette()` in `src/lib/appearance.ts`:
+
+| Mode  | Bar       | Rail      | Page      | Ink       |
+| ----- | --------- | --------- | --------- | --------- |
+| Light | `#f3f4f6` | `#ebedef` | `#ffffff` | `#000000` |
+| Dark  | `#17181b` | `#141518` | `#131316` | `#e9eaec` |
+| Dim   | `#1d2126` | `#202328` | `#35383d` | `#050606` |
+| Black | `#000000` | `#060607` | `#000000` | `#e6e7e9` |
+
+- **Dim is not dark.** The app dims the page and leaves the ink black, so the
+  page is grey and the type is black on it. Drawing it like dark mode — light
+  ink on a dark page — is the one error that makes the example wrong.
+- The icons are Lucide's, the set `crates/ui/src/icons.rs` names, redrawn as SVG
+  in `src/components/icons/Chrome.svelte` and attributed in `ATTRIBUTION.toml`.
+- The mark is the app's own file, `apps/mareader/icons/logo.svg`, copied into
+  `src/assets/brand` and inlined by `Logo.svelte` so it needs no request.
+- On a phone the rail and the title go: 350 px of rail and page is furniture.
+- Text inside the drawing is decoration and marked `aria-hidden`; the caption
+  says what it is, and the appearance summary says what is chosen.
+
+## Blend mode
+
+`BlendFigure.svelte` is the one place where the chrome is left out, because the
+switch is about the backdrop, not the bar. Off, the window behind the page is
+its own chrome colour and the page sits on it with a shadow. On, the backdrop
+takes the page's paper colour and the page's shadow goes: the page and the
+window become one surface.
+
+It is named `Blend mode` because that is the app's row, in its Paper settings,
+with the same meaning — "the background takes the page's own paper colour"
+(`crates/ui/src/settings_window.rs`). The switch is a real `role="switch"`; the
+test asserts that on, the backdrop's computed colour equals the page's.
 
 ## Texture
 

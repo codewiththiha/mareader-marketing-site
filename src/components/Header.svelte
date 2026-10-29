@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Book from './icons/Book.svelte';
+  import Logo from './Logo.svelte';
   import Icon from './icons/Icon.svelte';
   import Link from './Link.svelte';
   import ThemeToggle from './ThemeToggle.svelte';
@@ -22,7 +22,7 @@
 <header class="bar" class:scrolled>
   <div class="wrap bar__inner">
     <Link href="/" class="brand" aria-label="Mareader, home">
-      <Book size={24} />
+      <Logo size={26} />
       <span class="brand__word">Mareader</span>
     </Link>
 

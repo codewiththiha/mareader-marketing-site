@@ -26,7 +26,7 @@ export const wallets: Wallet[] = [
     id: 'bitcoin',
     name: 'Bitcoin',
     note: 'SegWit and legacy addresses both work.',
-    address: 'bc1qg454fmqylphrzfqh2kvlq54dt8t2kqaz452wm',
+    address: 'bc1qg454fmqylphrzfqh2kdvlq54dt8t2kqaz452wm',
     explorer: (address) => `https://mempool.space/address/${address}`,
   },
   {

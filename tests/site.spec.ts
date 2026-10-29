@@ -128,18 +128,19 @@ test('an unknown address says so and offers the three that exist', async ({ page
   await expect(page.getByRole('link', { name: 'Release notes' }).first()).toBeVisible();
 });
 
-test('the donation page draws every wallet as a code, and copies an address', async ({
+test('the donation page draws one code per address, and copies the address', async ({
   page,
   context,
 }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await page.goto('/donate');
 
-  await expect(page.locator('svg[role="img"]')).toHaveCount(4);
-  await expect(page.getByRole('heading', { level: 2, name: 'Ethereum' })).toBeVisible();
+  // Five families, five codes: the nine EVM networks share one address.
+  await expect(page.locator('svg[role="img"]')).toHaveCount(5);
+  await expect(page.getByRole('heading', { level: 2, name: 'EVM networks' })).toBeVisible();
 
-  for (const network of ['Ethereum', 'Bitcoin', 'Solana', 'Polygon']) {
-    await expect(page.getByRole('button', { name: `Copy ${network} address` })).toBeVisible();
+  for (const family of ['EVM networks', 'Bitcoin', 'Tron', 'Solana', 'Stellar']) {
+    await expect(page.getByRole('button', { name: `Copy ${family} address` })).toBeVisible();
   }
 
   const copy = page.getByRole('button', { name: 'Copy Bitcoin address' });
@@ -147,7 +148,51 @@ test('the donation page draws every wallet as a code, and copies an address', as
   await expect(page.getByRole('button', { name: 'Bitcoin address copied' })).toBeVisible();
 
   const clipboard = await page.evaluate(() => navigator.clipboard.readText());
-  expect(clipboard).toBe('bc1qg454fmqylphrzfqh2kvlq54dt8t2kqaz452wm');
+  expect(clipboard).toBe('bc1qg454fmqylphrzfqh2kdvlq54dt8t2kqaz452wm');
+});
+
+test('picking an EVM network moves the explorer and the fee line, not the address', async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.goto('/donate');
+
+  const family = page.locator('article').filter({ hasText: 'EVM networks' });
+  const evm = '0xFaC170C240dFC6419Ff8d9D8108E2e2D88f595d7';
+
+  // Ethereum leads, because it is where a donation is most likely to start.
+  await expect(family.getByRole('button', { name: 'Ethereum' })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await expect(family.getByRole('link', { name: /Etherscan/ })).toHaveAttribute(
+    'href',
+    `https://etherscan.io/address/${evm}`,
+  );
+
+  await family.getByRole('button', { name: 'BNB Chain' }).click();
+  await expect(family.getByRole('button', { name: 'BNB Chain' })).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await expect(family.getByRole('link', { name: /BscScan/ })).toHaveAttribute(
+    'href',
+    `https://bscscan.com/address/${evm}`,
+  );
+  await expect(family.getByText('Fees are paid in BNB.')).toBeVisible();
+
+  // Nine networks, still one code and one address to copy.
+  await expect(page.locator('svg[role="img"]')).toHaveCount(5);
+  await family.getByRole('button', { name: 'Copy EVM networks address' }).click();
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(evm);
+
+  await family.getByRole('button', { name: 'Arc' }).click();
+  await expect(family.getByText(/Fees are paid in USDC/)).toBeVisible();
+  await expect(family.getByRole('link', { name: /Arc Explorer/ })).toHaveAttribute(
+    'href',
+    `https://explorer.arc.io/address/${evm}`,
+  );
 });
 
 test('the Myanmar view is one press away and says it is not ready', async ({ page }) => {

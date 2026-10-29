@@ -24,12 +24,13 @@ const flag = (name, fallback) => {
 const base = flag('url', 'http://127.0.0.1:5173').replace(/\/$/, '');
 const themes = flag('theme', 'light,dark').split(',');
 
-// Matches donations.ts by hand, so a bug in the page cannot vouch for itself.
+// Copied from donations.ts by hand: one code per family, in card order.
 const expected = [
   '0xFaC170C240dFC6419Ff8d9D8108E2e2D88f595d7',
-  'bc1qg454fmqylphrzfqh2kvlq54dt8t2kqaz452wm',
+  'bc1qg454fmqylphrzfqh2kdvlq54dt8t2kqaz452wm',
+  'TGdk1Y2rsd2Rm1Nh79d7KSBDyNrRQ5Xhau',
   'FJKswEYdwJufp978ycwCcVbSVhZvrEnchoEbWcuKi1Zy',
-  '0xFaC170C240dFC6419Ff8d9D8108E2e2D88f595d7',
+  'GBFFH6S4R2VFSU7O5YAB3IWCLEHMSLWNYSKEYKUNV5O7C5ZESHI63QVQ',
 ];
 
 function decode(buffer) {
@@ -68,6 +69,9 @@ for (const theme of themes) {
   }
 
   for (let index = 0; index < count; index += 1) {
+    // Below the fold the reveal still has it faded, so scroll first.
+    await codes.nth(index).scrollIntoViewIfNeeded();
+    await page.waitForTimeout(760);
     const shot = await codes.nth(index).screenshot();
     const decoded = decode(shot);
     const want = expected[index];

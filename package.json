@@ -18,7 +18,8 @@
     "shots:paged": "node tools/shot.mjs --paged --themes light",
     "assets": "python3 tools/assets_check.py",
     "comments": "python3 tools/comment_check.py src tools",
-    "gate": "npm run format:check && npm run lint && npm run check && npm run test && npm run build && npm run assets && npm run comments",
+    "addresses": "python3 tools/address_check.py",
+    "gate": "npm run format:check && npm run lint && npm run check && npm run test && npm run build && npm run assets && npm run comments && npm run addresses",
     "ci:watch": "python3 tools/ci.py watch",
     "ci:mode": "python3 tools/ci.py mode",
     "qr:check": "node tools/qr_check.mjs"

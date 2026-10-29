@@ -84,11 +84,6 @@
             </li>
           {/each}
         </ul>
-
-        <p class="advice" use:reveal>
-          One address covers every EVM network, so the network you pick in your wallet is the only
-          choice that matters — and a transfer on the wrong one cannot be recalled.
-        </p>
       </div>
     {:else}
       <div

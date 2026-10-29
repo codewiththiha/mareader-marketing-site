@@ -84,6 +84,41 @@ test('the theme switch paints, remembers, and announces itself', async ({ page }
   await expect(page.locator('html')).toHaveAttribute('data-theme', after!);
 });
 
+test('the backdrop blends into the page, and back', async ({ page }) => {
+  await page.goto('/');
+  const frame = page.locator('.lab__blend .frame');
+  const page_ = page.locator('.lab__blend .page');
+  const paper = await page_.evaluate((node) => getComputedStyle(node).backgroundColor);
+  expect(await frame.evaluate((node) => getComputedStyle(node).backgroundColor)).not.toBe(paper);
+
+  const blend = page.getByRole('switch', { name: 'Blend mode' });
+  await expect(blend).toHaveAttribute('aria-checked', 'false');
+  await blend.click();
+  await expect(blend).toHaveAttribute('aria-checked', 'true');
+
+  // On, the backdrop takes the page's own colour; the page loses its shadow.
+  await expect(frame).toHaveCSS('background-color', paper);
+  await expect(page_).toHaveCSS('box-shadow', 'none');
+
+  await blend.click();
+  await expect(frame).not.toHaveCSS('background-color', paper);
+});
+
+test('the drawing wears the title bar of the system asking', async ({ page }) => {
+  await asSystem(page, 'macOS');
+  await page.goto('/');
+  const win = page.locator('.hero__window .window');
+  await expect(win).toHaveAttribute('data-os', 'macos');
+  // Traffic lights, and no Windows captions on the right.
+  await expect(win.locator('.lights i')).toHaveCount(3);
+  await expect(win.locator('.captions')).toHaveCount(0);
+
+  await asSystem(page, 'Windows');
+  await page.goto('/');
+  await expect(page.locator('.hero__window .window')).toHaveAttribute('data-os', 'windows');
+  await expect(page.locator('.hero__window .window .captions')).toHaveCount(1);
+});
+
 test('the appearance controls repaint the window drawing', async ({ page }) => {
   await page.goto('/');
   const sheet = page.locator('.lab__window .sheet').first();
@@ -151,7 +186,7 @@ test('the donation page draws one code per address, and copies the address', asy
   expect(clipboard).toBe('bc1qg454fmqylphrzfqh2kdvlq54dt8t2kqaz452wm');
 });
 
-test('picking an EVM network moves the explorer and the fee line, not the address', async ({
+test('picking an EVM network moves the explorer link, not the address', async ({
   page,
   context,
 }) => {
@@ -180,7 +215,6 @@ test('picking an EVM network moves the explorer and the fee line, not the addres
     'href',
     `https://bscscan.com/address/${evm}`,
   );
-  await expect(family.getByText('Fees are paid in BNB.')).toBeVisible();
 
   // Nine networks, still one code and one address to copy.
   await expect(page.locator('svg[role="img"]')).toHaveCount(5);
@@ -188,7 +222,6 @@ test('picking an EVM network moves the explorer and the fee line, not the addres
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(evm);
 
   await family.getByRole('button', { name: 'Arc' }).click();
-  await expect(family.getByText(/Fees are paid in USDC/)).toBeVisible();
   await expect(family.getByRole('link', { name: /Arc Explorer/ })).toHaveAttribute(
     'href',
     `https://explorer.arc.io/address/${evm}`,

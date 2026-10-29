@@ -21,7 +21,6 @@
   // Nothing is chosen on arrival, so the first network leads by being first.
   let chosen = $state<string | null>(null);
   const picked = $derived(wallet.networks.find((one) => one.id === chosen) ?? wallet.networks[0]);
-  const fees = $derived(`Fees are paid in ${picked.gas}.${picked.note ? ` ${picked.note}` : ''}`);
 </script>
 
 <article class="card" class:wide>
@@ -59,11 +58,6 @@
     {/if}
 
     <div class="card__meta">
-      {#if many}
-        {#key picked.id}
-          <p class="card__fees">{fees}</p>
-        {/key}
-      {/if}
       <a class="card__explorer" href={picked.url(wallet.address)} target="_blank" rel="noreferrer">
         View on {picked.explorer}
         <Icon name="arrow-up-right" size={13} />
@@ -204,27 +198,6 @@
   .card__meta {
     grid-area: meta;
     align-self: end;
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: var(--sp-2) var(--sp-4);
-    flex-wrap: wrap;
-  }
-
-  .card__fees {
-    font-size: var(--text-sm);
-    color: var(--ink-soft);
-    line-height: 1.45;
-    max-width: 58ch;
-    animation: settle var(--dur-2) var(--ease) both;
-  }
-
-  /* The line that changes when the pick changes; it arrives, it does not jump. */
-  @keyframes settle {
-    from {
-      opacity: 0;
-      transform: translateY(3px);
-    }
   }
 
   .card__explorer {
@@ -249,10 +222,6 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .card__fees {
-      animation: none;
-    }
-
     .card__explorer :global(svg) {
       transition: none;
     }

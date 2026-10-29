@@ -55,17 +55,22 @@ has one code path instead of two.
 
 ## The picker
 
-Each network in the list carries the fee token and an explorer link. Only one is
-shown at a time, because nine explorer links under one address is nine ways to
-leave the page by accident:
+Each network in the list carries its explorer and nothing else: no fee token, no
+per-chain caveat. Nine explorer links under one address is nine ways to leave
+the page by accident, so only the picked one is a link:
 
 - **Chips, not a select.** Every network is visible, so a donor can see at once
   whether the chain they hold a balance on is covered. Nine chips fill one row at
   1440 px and make a 3 × 3 block on a phone; the rail is a grid with
   `auto-fit minmax(96px, 1fr)`, so ten or twelve networks wrap without a change.
-- **The chip changes the fee line and the explorer link. Never the address.**
-  There is one address, one code and one copy button per card, and the picker
-  cannot touch them. `tests/site.spec.ts` asserts that on BNB Chain, then Arc.
+- **The chip changes the explorer link. Never the address.** There is one
+  address, one code and one copy button per card, and the picker cannot touch
+  them. `tests/site.spec.ts` asserts that on BNB Chain, then Arc.
+- **No labels telling people how chains work.** A card says the address, the
+  code, the networks and where to check the transfer. "Fees are paid in BNB" and
+  a closing paragraph about wrong-chain transfers were removed: a donor who
+  knows what BNB is does not need them, and one who does not is not served by a
+  sentence in a marketing page.
 - The chosen chip is `aria-pressed="true"` inside a `role="group"` named
   `Network on EVM networks`; a screen reader hears the same fact the ink fill
   shows.
@@ -74,9 +79,8 @@ leave the page by accident:
 
 ## Adding a network
 
-1. Add one entry to the family's `networks` array: `id`, `name`, the fee token
-   (`gas`), a `note` if that chain has a trap, the explorer's name and a `url`
-   built from the address.
+1. Add one entry to the family's `networks` array: `id`, `name`, the explorer's
+   name and a `url` built from the address.
 2. Run `npm run addresses` — the address is checked, not the new entry, but the
    gate proves nothing else moved.
 3. Run `npm run qr:check` and `npm test`; the family's code is unchanged, which
@@ -99,9 +103,9 @@ One file: `src/lib/content/donations.ts`. Rules:
   typo that changes one character fails it. The tool found a real one: the
   Bitcoin address shipped for a day with a missing `d`.
 - The explorer links are built from the address so they cannot drift.
-- The page says once, at the bottom, that the network you pick in your wallet is
-  the only choice that matters — because one address on nine networks makes a
-  wrong-chain transfer easier to make, and it cannot be recalled.
+- The address is the whole message. Do not add per-chain fee notes or a
+  paragraph about wrong-chain transfers; the picker's explorer link is the one
+  thing that changes, and it is enough.
 
 ## Reading the card
 
@@ -111,8 +115,7 @@ three zones.
 1. **The code** at 168 px on the wide card and 148 px on the others, then up to
    208 px on a phone.
 2. **The address** in a copy field, level with the code.
-3. **The networks** — the chip rail, then the fee line and the explorer link,
-   which change with the pick.
+3. **The networks** — the chip rail, and the explorer link it changes.
 
 - The code is drawn as SVG by `src/lib/qr.ts` with error correction **H** and a
   3-module quiet zone, in the page's ink and paper so it belongs to the card.

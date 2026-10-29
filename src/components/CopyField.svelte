@@ -62,7 +62,7 @@
 
   .copy__value {
     flex: 1;
-    font-size: 0.76rem;
+    font-size: 0.72rem;
     line-height: 1.35;
     color: var(--ink-soft);
     overflow-wrap: anywhere;

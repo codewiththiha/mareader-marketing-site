@@ -76,6 +76,12 @@ export function assetUrl(file: string): string {
   return `${ASSETS}/${file}`;
 }
 
+/** Where a compact "Download" button should go: the file, or the list. */
+export function downloadHref(os: Os, arch: Arch): string {
+  const { primary } = pick(os, arch);
+  return primary ? assetUrl(primary.file) : latestRelease;
+}
+
 /** The single file to lead with, plus the rest for that system. */
 export function pick(os: Os, arch: Arch): { primary: DownloadFile | null; others: DownloadFile[] } {
   const forOs = files.filter((entry) => entry.os === os);
@@ -86,4 +92,5 @@ export function pick(os: Os, arch: Arch): { primary: DownloadFile | null; others
 
 export const releasesPage = 'https://github.com/codewiththiha/mareader2/releases';
 export const latestRelease = `${releasesPage}/latest`;
+
 export const sourceRepo = 'https://github.com/codewiththiha/mareader2';

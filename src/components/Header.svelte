@@ -3,7 +3,10 @@
   import Icon from './icons/Icon.svelte';
   import Link from './Link.svelte';
   import ThemeToggle from './ThemeToggle.svelte';
-  import { sourceRepo, latestRelease } from '../lib/content/downloads';
+  import { downloadHref, sourceRepo } from '../lib/content/downloads';
+  import { device } from '../lib/platform.svelte';
+
+  const target = $derived(downloadHref(device.value.os, device.value.arch));
 
   let scrolled = $state(false);
   let menuOpen = $state(false);
@@ -40,7 +43,7 @@
         <Icon name="github" size={18} />
       </a>
       <ThemeToggle />
-      <a class="btn btn--primary bar__cta" href={latestRelease}>Download</a>
+      <a class="btn btn--primary bar__cta" href={target} download>Download</a>
       <button
         class="icon-link menu-button"
         type="button"

@@ -3,7 +3,8 @@
  * instead of arriving as a black PNG. Modules are dots and the three finder
  * patterns keep their exact 7-1-3 proportions, which is what scanners read;
  * error correction is high, since these codes sit in a card that a phone may
- * photograph at an angle. docs/donations.md § Codes.
+ * photograph at an angle. Modules stay nearly square: a decoder reads area, and
+ * a dotted grid costs it margin for nothing. docs/donations.md § Codes.
  */
 
 import QRCode from 'qrcode';
@@ -48,7 +49,7 @@ export function buildQr(value: string): QrDrawing {
   for (let y = 0; y < size; y += 1) {
     for (let x = 0; x < size; x += 1) {
       if (!symbol.modules.get(y, x) || inFinder(x, y, size)) continue;
-      parts.push(rounded(QUIET + x + 0.075, QUIET + y + 0.075, 0.85, 0.33));
+      parts.push(rounded(QUIET + x + 0.03, QUIET + y + 0.03, 0.94, 0.22));
     }
   }
 

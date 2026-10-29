@@ -77,27 +77,29 @@
         <ul class="wallets">
           {#each wallets as wallet, index (wallet.id)}
             <li class="wallet" use:reveal={{ delay: index * 50 }}>
-              <header class="wallet__head">
-                <h2 class="wallet__name">{wallet.name}</h2>
-                <p class="wallet__note">{wallet.note}</p>
-              </header>
               <div class="wallet__qr">
                 <QrCode
                   value={wallet.address}
-                  size={188}
+                  size={148}
                   label={`${wallet.name} address, as a QR code`}
                 />
               </div>
-              <CopyField value={wallet.address} what={`${wallet.name} address`} />
-              <a
-                class="wallet__explorer"
-                href={wallet.explorer(wallet.address)}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Open in an explorer
-                <Icon name="arrow-up-right" size={13} />
-              </a>
+              <div class="wallet__details">
+                <header class="wallet__head">
+                  <h2 class="wallet__name">{wallet.name}</h2>
+                  <p class="wallet__note">{wallet.note}</p>
+                </header>
+                <CopyField value={wallet.address} what={`${wallet.name} address`} />
+                <a
+                  class="wallet__explorer"
+                  href={wallet.explorer(wallet.address)}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Open in an explorer
+                  <Icon name="arrow-up-right" size={13} />
+                </a>
+              </div>
             </li>
           {/each}
         </ul>
@@ -161,8 +163,9 @@
     padding-block: clamp(36px, 6vw, 80px) clamp(56px, 8vw, 104px);
   }
 
+  /* `ch` would be measured in the body face here, not the display one. */
   .head {
-    max-width: 40ch;
+    max-width: min(100%, 700px);
   }
 
   .head .lede {
@@ -255,15 +258,12 @@
     gap: var(--sp-5);
   }
 
+  /* Code where a thumb expects it, words beside it; stacked on a phone. */
   .wallet {
     display: grid;
-    grid-template-columns: 1fr auto;
-    grid-template-areas:
-      'head head'
-      'qr qr'
-      'copy copy'
-      'link link';
-    gap: var(--sp-3);
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--sp-4);
+    align-items: start;
     padding: var(--sp-4);
     border: 1px solid var(--line);
     border-radius: var(--r-md);
@@ -275,12 +275,18 @@
     border-color: var(--line-strong);
   }
 
-  .wallet__head {
-    grid-area: head;
+  .wallet__details {
     display: flex;
-    align-items: baseline;
-    gap: 0.6rem;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 0.7rem;
+    min-width: 0;
+    padding-top: 2px;
+  }
+
+  .wallet__head {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
   }
 
   .wallet__name {
@@ -296,22 +302,15 @@
 
   /* The code is what people point a phone at; the address is the fallback. */
   .wallet__qr {
-    grid-area: qr;
-    display: grid;
-    place-items: center;
-    padding: var(--sp-3) 0;
+    width: 148px;
+    flex: none;
   }
 
   .wallet__qr :global(svg) {
-    width: min(188px, 62%);
-  }
-
-  .wallet :global(.copy) {
-    grid-area: copy;
+    width: 100%;
   }
 
   .wallet__explorer {
-    grid-area: link;
     display: inline-flex;
     align-items: center;
     gap: 0.3rem;
@@ -387,7 +386,7 @@
   .thanks {
     display: flex;
     align-items: flex-end;
-    justify-content: space-between;
+    justify-content: flex-start;
     gap: var(--sp-5);
     flex-wrap: wrap;
     margin-top: clamp(40px, 6vw, 72px);
@@ -418,8 +417,14 @@
   }
 
   @media (max-width: 520px) {
-    .wallet__qr :global(svg) {
-      width: min(188px, 78%);
+    .wallet {
+      grid-template-columns: 1fr;
+    }
+
+    .wallet__qr {
+      width: 100%;
+      max-width: 208px;
+      margin-inline: auto;
     }
   }
 </style>

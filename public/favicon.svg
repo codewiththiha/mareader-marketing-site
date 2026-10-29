@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <title>Mareader</title>
+  <!-- An open book with a gilt ribbon: the app's own mark, reduced to one
+       silhouette so it survives a 16 px tab. -->
+  <rect width="32" height="32" rx="7" fill="#fbfaf8" />
+  <g fill="none" stroke="#191a1c" stroke-width="1.8" stroke-linejoin="round">
+    <path d="M5.5 9.2c3.2-1.1 6.4-1.1 10.5 0v14.6c-4.1-1.1-7.3-1.1-10.5 0V9.2Z" />
+    <path d="M26.5 9.2c-3.2-1.1-6.4-1.1-10.5 0v14.6c4.1-1.1 7.3-1.1 10.5 0V9.2Z" />
+  </g>
+  <path d="M16 11.4v9.4" stroke="#9a7440" stroke-width="1.8" stroke-linecap="round" />
+  <g fill="#191a1c" opacity="0.22">
+    <path d="M5.5 9.2c3.2-1.1 6.4-1.1 10.5 0v14.6c-4.1-1.1-7.3-1.1-10.5 0V9.2Z" />
+    <path d="M26.5 9.2c-3.2-1.1-6.4-1.1-10.5 0v14.6c4.1-1.1 7.3-1.1 10.5 0V9.2Z" />
+  </g>
+</svg>

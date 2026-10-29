@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Not found — Mareader</title>
+    <meta name="robots" content="noindex" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <script>
+      /*
+       * Static hosts answer a deep link they do not have a file for with this
+       * document. Hand the path back to the app, which puts it into history
+       * before mounting (src/main.ts). Same origin, no network: a reader never
+       * sees this page.
+       */
+      const path = location.pathname + location.hash;
+      location.replace('/?p=' + encodeURIComponent(path));
+    </script>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        font-family: ui-sans-serif, system-ui, sans-serif;
+        background: #fbfaf8;
+        color: #191a1c;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        body {
+          background: #101012;
+          color: #ecebe7;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <p>Opening the page…</p>
+  </body>
+</html>

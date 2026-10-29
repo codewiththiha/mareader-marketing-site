@@ -27,6 +27,18 @@ test('the hero offers this machine’s file, and nothing else first', async ({ p
   await expect(page.getByRole('button', { name: 'Intel' })).toHaveCount(0);
 });
 
+test('the header offers the same file as the hero', async ({ page, isMobile }) => {
+  // Below 420 px the header's button is hidden; the hero's is the one there.
+  test.skip(!!isMobile, 'the header button is hidden on a phone');
+  await asSystem(page, 'Linux');
+  await page.goto('/');
+
+  const header = page.getByRole('banner').getByRole('link', { name: 'Download' });
+  const hero = page.getByRole('link', { name: 'Download for Linux' });
+  await expect(header).toHaveAttribute('href', /mareader_0\.0\.5_amd64\.deb$/);
+  await expect(hero).toHaveAttribute('href', /mareader_0\.0\.5_amd64\.deb$/);
+});
+
 test('a Windows visitor is offered the installer', async ({ page }) => {
   await asSystem(page, 'Windows');
   await page.goto('/');
@@ -125,6 +137,10 @@ test('the donation page draws every wallet as a code, and copies an address', as
 
   await expect(page.locator('svg[role="img"]')).toHaveCount(4);
   await expect(page.getByRole('heading', { level: 2, name: 'Ethereum' })).toBeVisible();
+
+  for (const network of ['Ethereum', 'Bitcoin', 'Solana', 'Polygon']) {
+    await expect(page.getByRole('button', { name: `Copy ${network} address` })).toBeVisible();
+  }
 
   const copy = page.getByRole('button', { name: 'Copy Bitcoin address' });
   await copy.click();

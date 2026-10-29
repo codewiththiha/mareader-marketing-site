@@ -142,9 +142,12 @@
   }
 
   .segmented {
-    display: inline-flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
     gap: 2px;
+    width: 100%;
+    max-width: 460px;
     padding: 3px;
     border: 1px solid var(--line);
     border-radius: var(--r-sm);
@@ -152,7 +155,7 @@
   }
 
   .segmented button {
-    padding: 0.36rem 0.68rem;
+    padding: 0.36rem 0.4rem;
     border-radius: 5px;
     font-size: var(--text-sm);
     color: var(--ink-soft);
@@ -224,6 +227,7 @@
   }
 
   figcaption {
+    hyphens: none;
     margin-top: 0.9rem;
     font-size: var(--text-sm);
     line-height: 1.5;

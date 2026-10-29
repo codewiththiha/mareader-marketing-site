@@ -76,14 +76,17 @@
   .stat__label {
     font-size: var(--text-base);
     color: var(--ink);
-    max-width: 24ch;
+    max-width: 26ch;
+    hyphens: none;
+    text-wrap: pretty;
   }
 
   .stat__note {
     font-size: var(--text-sm);
     color: var(--ink-muted);
     line-height: 1.5;
-    max-width: 26ch;
+    max-width: 28ch;
+    hyphens: none;
   }
 
   .source {

@@ -94,7 +94,7 @@
   }
 
   .head {
-    max-width: 60ch;
+    max-width: min(100%, 760px);
     margin-bottom: clamp(32px, 5vw, 60px);
   }
 

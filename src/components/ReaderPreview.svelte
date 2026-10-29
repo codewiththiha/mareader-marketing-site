@@ -271,14 +271,17 @@
 
   .thumb {
     display: flex;
+    flex: 1 1 0;
+    min-height: 0;
     flex-direction: column;
     gap: 3px;
     align-items: center;
   }
 
   .thumb__page {
+    flex: 1;
+    min-height: 0;
     width: 100%;
-    aspect-ratio: 1 / 1.34;
     border-radius: 2px;
     background: var(--page-paper);
     border: 1px solid var(--chrome-line);

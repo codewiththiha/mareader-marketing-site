@@ -4,8 +4,7 @@
    * works today; the local view is a mock until the owner supplies the accounts
    * and says so on the card. docs/donations.md.
    */
-  import QrCode from '../components/QrCode.svelte';
-  import CopyField from '../components/CopyField.svelte';
+  import DonationCard from '../components/DonationCard.svelte';
   import Icon from '../components/icons/Icon.svelte';
   import { reveal } from '../lib/reveal';
   import { localMethods, wallets } from '../lib/content/donations';
@@ -74,39 +73,21 @@
         aria-labelledby="tab-crypto"
         use:reveal={{ delay: 40 }}
       >
-        <ul class="wallets">
+        <ul class="families">
           {#each wallets as wallet, index (wallet.id)}
-            <li class="wallet" use:reveal={{ delay: index * 50 }}>
-              <div class="wallet__qr">
-                <QrCode
-                  value={wallet.address}
-                  size={148}
-                  label={`${wallet.name} address, as a QR code`}
-                />
-              </div>
-              <div class="wallet__details">
-                <header class="wallet__head">
-                  <h2 class="wallet__name">{wallet.name}</h2>
-                  <p class="wallet__note">{wallet.note}</p>
-                </header>
-                <CopyField value={wallet.address} what={`${wallet.name} address`} />
-                <a
-                  class="wallet__explorer"
-                  href={wallet.explorer(wallet.address)}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Open in an explorer
-                  <Icon name="arrow-up-right" size={13} />
-                </a>
-              </div>
+            <li
+              class="family"
+              class:family--wide={wallet.networks.length > 1}
+              use:reveal={{ delay: index * 50 }}
+            >
+              <DonationCard {wallet} wide={wallet.networks.length > 1} />
             </li>
           {/each}
         </ul>
 
         <p class="advice" use:reveal>
-          Send on the network named on each card. A transfer on the wrong chain cannot be recalled,
-          and Polygon and Ethereum share an address, so the network is the choice that matters.
+          One address covers every EVM network, so the network you pick in your wallet is the only
+          choice that matters — and a transfer on the wrong one cannot be recalled.
         </p>
       </div>
     {:else}
@@ -252,75 +233,18 @@
     margin-top: clamp(24px, 3vw, 34px);
   }
 
-  .wallets {
+  .families {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--sp-5);
+    list-style: none;
+    padding: 0;
+    margin: 0;
   }
 
-  /* Code where a thumb expects it, words beside it; stacked on a phone. */
-  .wallet {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    gap: var(--sp-4);
-    align-items: start;
-    padding: var(--sp-4);
-    border: 1px solid var(--line);
-    border-radius: var(--r-md);
-    background: var(--paper-raised);
-    transition: border-color var(--dur-2) var(--ease);
-  }
-
-  .wallet:hover {
-    border-color: var(--line-strong);
-  }
-
-  .wallet__details {
-    display: flex;
-    flex-direction: column;
-    gap: 0.7rem;
-    min-width: 0;
-    padding-top: 2px;
-  }
-
-  .wallet__head {
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
-  }
-
-  .wallet__name {
-    font-size: var(--text-lg);
-    font-weight: 500;
-  }
-
-  .wallet__note {
-    font-size: var(--text-sm);
-    color: var(--ink-muted);
-    line-height: 1.45;
-  }
-
-  /* The code is what people point a phone at; the address is the fallback. */
-  .wallet__qr {
-    width: 148px;
-    flex: none;
-  }
-
-  .wallet__qr :global(svg) {
-    width: 100%;
-  }
-
-  .wallet__explorer {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
-    font-size: var(--text-sm);
-    color: var(--ink-muted);
-    text-decoration: none;
-  }
-
-  .wallet__explorer:hover {
-    color: var(--ink);
+  /* The family whose networks share one address gets the whole row. */
+  .family--wide {
+    grid-column: 1 / -1;
   }
 
   .advice {
@@ -407,24 +331,12 @@
   }
 
   @media (max-width: 860px) {
-    .wallets {
+    .families {
       grid-template-columns: 1fr;
     }
 
     .locals {
       grid-template-columns: 1fr;
-    }
-  }
-
-  @media (max-width: 520px) {
-    .wallet {
-      grid-template-columns: 1fr;
-    }
-
-    .wallet__qr {
-      width: 100%;
-      max-width: 208px;
-      margin-inline: auto;
     }
   }
 </style>

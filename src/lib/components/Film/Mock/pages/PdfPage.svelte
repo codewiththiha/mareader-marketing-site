@@ -18,7 +18,7 @@
     <div class="mk-pdf-auth">E. Marlowe &nbsp;·&nbsp; J. Okafor &nbsp;·&nbsp; R. Lindqvist</div>
     <div class="mk-pdf-abs"><b>Abstract.</b> We follow readers as they tune colour, paper and layout, and ask which choices make a long session easier to start and harder to leave.</div>
     <div class="mk-pdf-cols">
-      {#each PAPER_TEXT.slice(0,3) as [h,t], i}
+      {#each PAPER_TEXT.slice(0,3) as [h,t]}
         <div>
           {#if h}<h4>{h}</h4>{/if}
           <p>{t}</p>
@@ -41,7 +41,7 @@
         </svg>
         <figcaption>Figure 1. Median minutes per session, before and after a theme is chosen.</figcaption>
       </figure>
-      {#each PAPER_TEXT.slice(3) as [h,t], i}
+      {#each PAPER_TEXT.slice(3) as [h,t]}
         <div>
           {#if h}<h4>{h}</h4>{/if}
           <p>{t}</p>

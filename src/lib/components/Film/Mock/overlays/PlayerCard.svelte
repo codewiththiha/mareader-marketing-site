@@ -20,7 +20,7 @@
       <div class="mk-player-place">Chapter 1 · Loomings</div>
       <div class="mk-lyrics">
         <div class="before">Some years ago, never mind how long precisely.</div>
-        <div class="now">{#each words as w,i}<span class={i <= lit && i >= start ? "lit" : ""}>{w} </span>{/each}</div>
+        <div class="now">{#each words as w,i}<span class={i <= lit && i >= start ? "lit" : ""}>{w}{#if i < words.length - 1}{" "}{/if}</span>{/each}</div>
         <div class="after">Whenever I find myself growing grim about the mouth.</div>
       </div>
       <div class="mk-player-ctl">

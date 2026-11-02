@@ -29,10 +29,7 @@
         <span class={reading ? "mk-read" : undefined} data-focus={reading ? "read" : undefined}>
           {#each READ_SENTENCE as w, i}
             {@const isWord = w === "spleen"}
-            <span>
-              {#if lit(i)}<span class="mk-read-w">{#if isWord}<span class="mk-w mk-w-{mark}" data-focus="word">spleen{@render children?.()}</span>{:else}{w}{/if}</span>{:else}{#if isWord}<span class="mk-w mk-w-{mark}" data-focus="word">spleen{@render children?.()}</span>{:else}{w}{/if}{/if}
-              {#if i < READ_SENTENCE.length - 1}&nbsp;{/if}
-            </span>
+            <span>{#if lit(i)}<span class="mk-read-w">{#if isWord}<span class="mk-w mk-w-{mark}" data-focus="word">spleen{@render children?.()}</span>{:else}{w}{/if}</span>{:else}{#if isWord}<span class="mk-w mk-w-{mark}" data-focus="word">spleen{@render children?.()}</span>{:else}{w}{/if}{/if}{#if i < READ_SENTENCE.length - 1}{" "}{/if}</span>
           {/each}
         </span>
         Whenever I find myself growing grim about the mouth; whenever it is a damp, drizzly November in my soul; whenever I find myself involuntarily pausing before coffin warehouses, and bringing up the rear of every funeral I meet&mdash;then, I account it high time to get to sea as soon as I can.

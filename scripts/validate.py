@@ -7,7 +7,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 INCLUDE_EXTS = {".ts", ".js", ".svelte", ".css", ".py", ".sh", ".md", ".json", ".html"}
-SKIP_DIRS = {"node_modules", "dist", ".git", ".svelte-kit", "coverage", "test-results", "playwright-report"}
+SKIP_DIRS = {"node_modules", "dist", ".git", ".svelte-kit", "coverage", "test-results", "playwright-report", ".cache", ".npm", "screenshots", "dist-ssr"}
 
 def fail(msg):
     print(f"[validate] FAIL: {msg}")

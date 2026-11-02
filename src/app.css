@@ -1,0 +1,206 @@
+@import "tailwindcss";
+@import "./lib/components/Film/Mock/mock.css";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@font-face {
+  font-family: "Inter Variable";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url("../node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2") format("woff2-variations");
+}
+@font-face {
+  font-family: "Literata Variable";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 900;
+  src: url("../node_modules/@fontsource-variable/literata/files/literata-latin-wght-normal.woff2") format("woff2-variations");
+}
+@font-face {
+  font-family: "Literata Variable";
+  font-style: italic;
+  font-display: swap;
+  font-weight: 200 900;
+  src: url("../node_modules/@fontsource-variable/literata/files/literata-latin-wght-italic.woff2") format("woff2-variations");
+}
+
+@theme {
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Literata Variable", Georgia, serif;
+}
+
+:root {
+  --bg: #f7f4ed;
+  --bg-rgb: 247, 244, 237;
+  --fg: #1d1a15;
+  --fg2: rgba(29, 26, 21, 0.68);
+  --hair: rgba(29, 26, 21, 0.11);
+  --gold: #9c6b1a;
+  --btn: #1d1a15;
+  --btn-fg: #f7f4ed;
+  color-scheme: light;
+}
+.dark {
+  --bg: #0b0b0d;
+  --bg-rgb: 11, 11, 13;
+  --fg: #f4f0e7;
+  --fg2: rgba(244, 240, 231, 0.66);
+  --hair: rgba(244, 240, 231, 0.13);
+  --gold: #e3bd69;
+  --btn: #f4f0e7;
+  --btn-fg: #0b0b0d;
+  color-scheme: dark;
+}
+
+html {
+  background: var(--bg);
+  -webkit-text-size-adjust: 100%;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.5s, color 0.5s;
+  overflow-x: clip;
+}
+
+.film-stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  background: var(--bg);
+  transition: background-color 0.5s;
+}
+.film-cam {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+  opacity: 0;
+  transition: opacity 0.9s;
+}
+.film-cam.ready {
+  opacity: 1;
+}
+
+.film-wash-bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    rgba(var(--bg-rgb), 1) 0,
+    rgba(var(--bg-rgb), 0.99) calc(var(--zone) - 18px),
+    rgba(var(--bg-rgb), 0.93) var(--zone),
+    rgba(var(--bg-rgb), 0.72) calc(var(--zone) + 12px),
+    rgba(var(--bg-rgb), 0.4) calc(var(--zone) + 26px),
+    rgba(var(--bg-rgb), 0.14) calc(var(--zone) + 40px),
+    rgba(var(--bg-rgb), 0) calc(var(--zone) + 54px)
+  );
+}
+.film-wash-top {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 76px;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(var(--bg-rgb), 1) 0%,
+    rgba(var(--bg-rgb), 0.92) 40%,
+    rgba(var(--bg-rgb), 0.5) 72%,
+    rgba(var(--bg-rgb), 0) 100%
+  );
+}
+
+.cap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0;
+  transform: translateY(14px);
+  filter: blur(6px);
+  pointer-events: none;
+  transition:
+    opacity 0.35s ease,
+    transform 0.45s cubic-bezier(0.32, 0.72, 0, 1),
+    filter 0.35s ease;
+}
+.cap.on {
+  opacity: 1;
+  transform: none;
+  filter: none;
+  pointer-events: auto;
+  transition:
+    opacity 0.7s ease 0.2s,
+    transform 0.9s cubic-bezier(0.32, 0.72, 0, 1) 0.2s,
+    filter 0.7s ease 0.2s;
+}
+.cap.gone {
+  transform: translateY(-12px);
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 46px;
+  padding: 0 22px;
+  border-radius: 999px;
+  background: var(--btn);
+  color: var(--btn-fg);
+  font-weight: 500;
+  font-size: 15px;
+  transition: transform 0.25s, opacity 0.25s;
+}
+.btn-primary:hover {
+  transform: translateY(-1px);
+  opacity: 0.92;
+}
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 46px;
+  padding: 0 20px;
+  border-radius: 999px;
+  border: 1px solid var(--hair);
+  color: var(--fg);
+  font-weight: 500;
+  font-size: 15px;
+  transition: background-color 0.25s;
+}
+.btn-ghost:hover {
+  background: var(--hair);
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.8s ease,
+    transform 1s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.reveal.in {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cap,
+  .cap.on,
+  .reveal {
+    transition-duration: 0.01s !important;
+    transition-delay: 0s !important;
+    filter: none !important;
+  }
+}

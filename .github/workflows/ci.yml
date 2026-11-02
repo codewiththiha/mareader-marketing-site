@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install deps
+        run: npm ci
+      - name: Validate commits and comments
+        run: python3 scripts/validate.py
+      - name: Build
+        run: npm run build
+      - name: Install playwright
+        run: npx playwright install --with-deps chromium
+      - name: Take screenshots
+        run: npm run screenshots
+      - name: Eval review
+        run: python3 scripts/eval.py
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: screenshots/
+      - name: Upload eval report
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-report
+          path: eval-report.md

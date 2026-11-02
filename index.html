@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mareader — a calm PDF and EPUB reader</title>
+    <meta name="description" content="Mareader is a calm, native reader for PDF and EPUB: limitless themes, up to four panes, a bring-your-own-model AI dictionary and fully offline read aloud." />
+    <script>
+      try {
+        var t = localStorage.getItem("mareader-theme");
+        var d = t ? t === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+        if (d) document.documentElement.classList.add("dark");
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,15 @@
+node_modules
+dist
+.svelte-kit
+.env
+*.log
+.DS_Store
+.idea
+coverage
+playwright-report
+test-results
+screenshots
+source-repo
+.npm
+eval-report.md
+.cache

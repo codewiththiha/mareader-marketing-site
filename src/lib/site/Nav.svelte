@@ -1,7 +1,7 @@
 <script lang="ts">
   import GithubMark from "$lib/icons/GithubMark.svelte";
-  import Icon from "$lib/icons/Icon.svelte";
-  import { Moon, Sun } from "$lib/icons/nodes";
+  import SunMoon from "$lib/icons/lively/SunMoon.svelte";
+  import { router } from "$lib/site/router.svelte";
   import { theme } from "$lib/site/theme.svelte";
   import icon from "../../assets/icon.png";
 
@@ -18,14 +18,34 @@
   });
 
   const GH = "https://github.com/codewiththiha/mareader2";
+
+  const goHome = (e: Event) => {
+    e.preventDefault();
+    router.go("home");
+    window.scrollTo({ top: 0 });
+  };
+
+  const toDownload = (e: Event) => {
+    if (router.current !== "home") {
+      e.preventDefault();
+      router.go("home");
+      window.setTimeout(() => document.getElementById("download")?.scrollIntoView(), 60);
+    }
+  };
 </script>
 
 <header class="nav" class:solid>
-  <a href="#top" class="flex items-center gap-2.5" aria-label="Mareader, back to top">
+  <a href="#/" class="flex items-center gap-2.5" aria-label="Mareader, back to top" onclick={goHome}>
     <img src={icon} alt="" width={30} height={30} class="h-[30px] w-[30px] rounded-[8px]" />
     <span class="text-[16px] font-semibold tracking-[-0.01em]">Mareader</span>
   </a>
   <nav class="flex items-center gap-1.5">
+    <a href={router.href("releases")} class="nav-link max-md:hidden" aria-current={router.current === "releases" ? "page" : undefined}
+      >Releases</a
+    >
+    <a href={router.href("donate")} class="nav-link max-md:hidden" aria-current={router.current === "donate" ? "page" : undefined}
+      >Support</a
+    >
     <a href={GH} class="icon-btn" aria-label="Mareader on GitHub">
       <GithubMark />
     </a>
@@ -37,12 +57,8 @@
       }}
       aria-label={theme.current === "dark" ? "Switch to light theme" : "Switch to dark theme"}
     >
-      {#if theme.current === "dark"}
-        <Icon node={Sun} size={18} strokeWidth={1.9} />
-      {:else}
-        <Icon node={Moon} size={18} strokeWidth={1.9} />
-      {/if}
+      <SunMoon dark={theme.current === "dark"} />
     </button>
-    <a href="#download" class="btn btn-accent btn-sm ml-1.5">Download</a>
+    <a href="#download" class="btn btn-accent btn-sm ml-1.5" onclick={toDownload}>Download</a>
   </nav>
 </header>

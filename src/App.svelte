@@ -2,9 +2,12 @@
   import Bake from "./Bake.svelte";
   import Film from "$lib/film/Film.svelte";
   import Details from "$lib/site/Details.svelte";
+  import DonatePage from "$lib/pages/DonatePage.svelte";
   import Footer from "$lib/site/Footer.svelte";
   import Get from "$lib/site/Get.svelte";
   import Nav from "$lib/site/Nav.svelte";
+  import ReleasesPage from "$lib/pages/ReleasesPage.svelte";
+  import { router } from "$lib/site/router.svelte";
   import { theme } from "$lib/site/theme.svelte";
   import favicon from "./assets/icon32.png";
 
@@ -36,10 +39,18 @@
   <Bake />
 {:else}
   <Nav />
-  <main id="top">
-    <Film site={theme.current} />
-    <Details />
-    <Get />
-  </main>
+  {#key router.current}
+    {#if router.current === "releases"}
+      <main id="top"><ReleasesPage /></main>
+    {:else if router.current === "donate"}
+      <main id="top"><DonatePage /></main>
+    {:else}
+      <main id="top">
+        <Film site={theme.current} />
+        <Details />
+        <Get />
+      </main>
+    {/if}
+  {/key}
   <Footer />
 {/if}

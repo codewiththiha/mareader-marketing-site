@@ -1,8 +1,8 @@
 <script lang="ts">
+  import { router } from "$lib/site/router.svelte";
   import icon from "../../assets/icon.png";
 
   const GH = "https://github.com/codewiththiha/mareader2";
-  const RELEASES = `${GH}/releases/latest`;
 </script>
 
 <footer
@@ -13,7 +13,8 @@
     <span>Mareader · MIT licensed</span>
   </div>
   <div class="flex items-center gap-5">
-    <a href={RELEASES} class="hover:text-[var(--ink)]">Releases</a>
+    <a href={router.href("releases")} class="hover:text-[var(--ink)]">Release notes</a>
+    <a href={router.href("donate")} class="hover:text-[var(--ink)]">Support</a>
     <a href={GH} class="hover:text-[var(--ink)]">Source</a>
   </div>
 </footer>

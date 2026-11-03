@@ -26,7 +26,7 @@ export const INIT = ({ theme }) => {
 };
 
 export const SNAP = () => {
-  window.scrollTo(0, Math.round(window.scrollY));
+  window.scrollTo(0, 0);
   for (const el of document.querySelectorAll("*")) {
     if (el === document.scrollingElement || el === document.body) continue;
     if (el.scrollTop !== 0) el.scrollTop = 0;

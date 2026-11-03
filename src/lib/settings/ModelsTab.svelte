@@ -34,8 +34,8 @@
 
 <div class="flex h-full flex-col overflow-hidden">
   <Section title="Models">
-    {#each models as m, i (m.name)}
-      <SettingsRow focus={`model-${m.id}`} style={i === 0 ? styles({ borderTop: "none" }) : ""}>
+    {#each models as m (m.name)}
+      <SettingsRow focus={`model-${m.id}`} style={styles({ borderTop: "none" })}>
         <ProviderLogo id={m.id} size={18} />
         <div class="min-w-0 flex-1">
           <div class="truncate" style={styles({ fontSize: 13 })}>{m.name}</div>

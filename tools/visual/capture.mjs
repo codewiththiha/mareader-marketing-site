@@ -41,6 +41,8 @@ for (const shot of shots) {
   await page.goto(url, { waitUntil: "load" });
   await page.addStyleTag({ content: "html{overflow-anchor:none;scroll-behavior:auto}" });
   await page.waitForSelector(shot.scene.selector, { timeout: 15000 });
+  await page.evaluate(() => document.fonts.ready);
+  await page.waitForTimeout(300);
   await page.evaluate((sel) => {
     const el = document.querySelector(sel);
     if (!el) return;

@@ -11,7 +11,6 @@
     w: number;
     h: number;
     r: number;
-    step: number;
   }
 
   let { scene, children, ring = true }: { scene: StageView; children?: Snippet; ring?: boolean } = $props();
@@ -56,7 +55,7 @@
     const step = scene.index;
     const width = design.w;
     const host = zoomer;
-    if (!host || !focus) {
+    if (!host || !focus || step < 0) {
       box = null;
       return;
     }
@@ -75,12 +74,10 @@
         w: er.width / s,
         h: er.height / s,
         r: parseFloat(getComputedStyle(el).borderTopLeftRadius) || 0,
-        step,
       };
       const seen = untrack(() => box);
       const settled =
         seen !== null &&
-        seen.step === step &&
         Math.abs(seen.x - next.x) < 1.5 &&
         Math.abs(seen.y - next.y) < 1.5 &&
         Math.abs(seen.w - next.w) < 1.5 &&

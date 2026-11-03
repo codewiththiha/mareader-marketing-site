@@ -173,42 +173,31 @@
 }
 .mk-w-sel {
   background: color-mix(in srgb, var(--accent) 30%, transparent);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 30%, transparent);
 }
 .mk-w-ai {
-  background: linear-gradient(transparent 52%, rgba(167, 139, 250, 0.55) 52%);
+  background: color-mix(in srgb, #a58af0 50%, transparent);
 }
-.mk-read {
-  background: color-mix(in srgb, var(--accent) 13%, transparent);
+/* one continuous wash over the phrase the voice is on, as a pen on paper */
+.mk-phrase {
+  background: color-mix(in srgb, var(--accent) 30%, transparent);
   border-radius: 3px;
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
-}
-.mk-read-w {
-  background: color-mix(in srgb, var(--accent) 36%, transparent);
-  border-radius: 3px;
 }
 
 /* ───────── a PDF page: fixed, two columns ───────── */
 .mk-pdf {
   position: absolute;
   inset: 0;
-  display: flex;
-  justify-content: center;
-  padding: 30px 20px 0;
   overflow: hidden;
 }
+/* fit-width: blend spreads paper to backdrop, no edge or shadow */
 .mk-pdf-sheet {
-  flex: none;
-  width: min(500px, 100%);
-  height: 780px;
-  padding: 36px 38px;
-  background: var(--paper);
+  width: 100%;
+  height: 100%;
+  padding: 34px 38px;
   color: var(--ink);
   font-family: "Literata Variable", Georgia, serif;
-  box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--ink) 13%, transparent),
-    0 14px 34px -14px var(--shadow);
 }
 .mk-pdf-title {
   font:

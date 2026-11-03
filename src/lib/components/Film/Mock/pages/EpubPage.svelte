@@ -33,8 +33,17 @@
     "circulation."
   ];
 
-  let lit = (i: number) => reading && i >= reading[0] && i <= reading[1];
+  const SP = " ";
 </script>
+
+<!-- one span per word, as before; the lit phrase shares one wash -->
+{#snippet wordAt(w: string, i: number)}
+  {@const isWord = w === "spleen"}
+  <span
+    >{#if isWord}<span class="mk-w mk-w-{mark}" data-focus="word">spleen{@render children?.()}</span
+      >{:else}{w}{/if}{#if i < READ_SENTENCE.length - 1}{SP}{/if}</span
+  >
+{/snippet}
 
 {#if book === "b"}
   <div class="mk-epub" data-focus={focusName}>
@@ -66,21 +75,19 @@
         Call me Ishmael. Some years ago&mdash;never mind how long precisely&mdash;having little or
         no money in my purse, and nothing particular to interest me on shore, I thought I would sail
         about a little and see the watery part of the world.
-        <span class={reading ? "mk-read" : undefined} data-focus={reading ? "read" : undefined}>
-          {#each READ_SENTENCE as w, i (i)}
-            {@const isWord = w === "spleen"}
-            {@const sp = " "}
-            <span
-              >{#if lit(i)}<span class="mk-read-w"
-                  >{#if isWord}<span class="mk-w mk-w-{mark}" data-focus="word"
-                      >spleen{@render children?.()}</span
-                    >{:else}{w}{/if}</span
-                >{:else}{#if isWord}<span class="mk-w mk-w-{mark}" data-focus="word"
-                    >spleen{@render children?.()}</span
-                  >{:else}{w}{/if}{/if}{#if i < READ_SENTENCE.length - 1}{sp}{/if}</span
-            >
-          {/each}
-        </span>
+        {#if reading}
+          {@const a = reading[0]}
+          {@const b = reading[1]}
+          {#each READ_SENTENCE.slice(0, a) as w, i (i)}{@render wordAt(w, i)}{/each}
+          <span class="mk-phrase" data-focus="read"
+            >{#each READ_SENTENCE.slice(a, b + 1) as w, j (j)}{@render wordAt(
+                w,
+                a + j
+              )}{/each}</span
+          >{#each READ_SENTENCE.slice(b + 1) as w, k (k)}{@render wordAt(w, b + 1 + k)}{/each}
+        {:else}
+          {#each READ_SENTENCE as w, i (i)}{@render wordAt(w, i)}{/each}
+        {/if}
         Whenever I find myself growing grim about the mouth; whenever it is a damp, drizzly November in
         my soul; whenever I find myself involuntarily pausing before coffin warehouses, and bringing up
         the rear of every funeral I meet&mdash;then, I account it high time to get to sea as soon as I

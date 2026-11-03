@@ -52,7 +52,8 @@
     return () => window.removeEventListener("resize", measure);
   });
 
-  const PENS = ["#fde047", "#86efac", "#f9a8d4"];
+  const FULL = "#ffff00";
+  const UNDER = "#1677ff";
 </script>
 
 {#if mounted}
@@ -66,19 +67,15 @@
       <span class="mk-ibtn"><Copy size={17} strokeWidth={1.75} /></span>
       <span class="mk-ibtn on"><Sparkles size={17} strokeWidth={1.75} /></span>
       <span class="mk-ibtn"><BookOpenText size={17} strokeWidth={1.75} /></span>
-      <span class="mk-ibtn"><StickyNote size={17} strokeWidth={1.75} /></span>
       <span class="mk-ibtn"><Volume2 size={17} strokeWidth={1.75} /></span>
+      <span class="mk-ibtn"><StickyNote size={17} strokeWidth={1.75} /></span>
       <i class="mk-vrule"></i>
       <span class="mk-ibtn"
-        ><Highlighter size={17} strokeWidth={1.75} /><i class="mk-pen" style="background:{PENS[0]}"
+        ><Highlighter size={17} strokeWidth={1.75} /><i class="mk-pen" style="background:{FULL}"
         ></i></span
       >
       <span class="mk-ibtn"
-        ><Highlighter size={17} strokeWidth={1.75} /><i class="mk-pen" style="background:{PENS[1]}"
-        ></i></span
-      >
-      <span class="mk-ibtn"
-        ><Underline size={17} strokeWidth={1.75} /><i class="mk-pen" style="background:{PENS[2]}"
+        ><Underline size={17} strokeWidth={1.75} /><i class="mk-pen" style="background:{UNDER}"
         ></i></span
       >
     </div>

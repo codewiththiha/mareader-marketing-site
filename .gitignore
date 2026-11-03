@@ -13,3 +13,5 @@ source-repo
 .npm
 eval-report.md
 .cache
+core
+probe-*.mjs

@@ -9,6 +9,7 @@ test.describe.configure({ retries: 2 });
 
 test.beforeEach(async ({ page }) => {
   await page.goto("/", { waitUntil: "networkidle" });
+  await page.evaluate(() => document.fonts.ready.then(() => 1));
   await page.waitForTimeout(600);
 });
 

@@ -1,6 +1,6 @@
 <script lang="ts">
   // PlayerCard — read-aloud lyrics
-  import { SkipBack, SkipForward, Pause, Square } from "@lucide/svelte";
+  import { SkipBack, SkipForward, Pause, X } from "@lucide/svelte";
   let { open, tick }: { open: boolean; tick: number } = $props();
   let mounted = $state(false);
   let show = $state(false);
@@ -64,7 +64,7 @@
         <span class="mk-sbtn"><SkipForward size={16} strokeWidth={1.75} /></span>
         <div class="mk-seek"><i style="width:34%"></i></div>
         <small>4:12</small><small class="mk-speed">1.0×</small>
-        <span class="mk-sbtn"><Square size={13} strokeWidth={1.75} /></span>
+        <span class="mk-sbtn"><X size={15} strokeWidth={1.75} /></span>
       </div>
     </div>
   </div>

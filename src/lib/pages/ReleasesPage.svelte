@@ -9,7 +9,7 @@
 </script>
 
 {#snippet inlines(list: Inline[])}
-  {#each list as inl}
+  {#each list as inl, i (i)}
     {#if inl.k === "b"}
       <strong>{inl.text}</strong>
     {:else if inl.k === "c"}
@@ -36,14 +36,14 @@
         <span class="rel-date">{release.published}</span>
       </div>
       <div class="md-body">
-        {#each mdBlocks(release.body) as block}
+        {#each mdBlocks(release.body) as block, bi (bi)}
           {#if block.k === "h3"}
             <h3>{@render inlines(block.inlines)}</h3>
           {:else if block.k === "h4"}
             <h4>{@render inlines(block.inlines)}</h4>
           {:else if block.k === "ul"}
             <ul>
-              {#each block.items ?? [] as item}
+              {#each block.items ?? [] as item, ii (ii)}
                 <li>{@render inlines(item)}</li>
               {/each}
             </ul>

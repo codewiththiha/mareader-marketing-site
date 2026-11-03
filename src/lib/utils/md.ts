@@ -17,7 +17,7 @@ export function inline(text: string): Inline[] {
   const out: Inline[] = [];
   let at = 0;
   for (const m of text.matchAll(INLINE)) {
-    const i = m.index ?? 0;
+    const i = m.index;
     if (i > at) out.push({ k: "t", text: text.slice(at, i) });
     if (m[1]) out.push({ k: "b", text: m[1] });
     else if (m[2]) out.push({ k: "c", text: m[2] });
@@ -41,23 +41,23 @@ export function mdBlocks(src: string): Block[] {
       flush();
       continue;
     }
-    const h = t.match(/^(#{2,4})\s+(.*)$/);
+    const h = /^(#{2,4})\s+(.*)$/.exec(t);
     if (h) {
       flush();
       out.push({ k: h[1].length === 2 ? "h3" : "h4", inlines: inline(h[2]) });
       continue;
     }
-    const b = t.match(/^[-*]\s+(.*)$/);
+    const b = /^[-*]\s+(.*)$/.exec(t);
     if (b) {
       flush();
-      const last = out[out.length - 1];
+      const last = out.at(-1);
       if (last?.k === "ul") last.items?.push(inline(b[1]));
       else out.push({ k: "ul", inlines: [], items: [inline(b[1])] });
       continue;
     }
-    if (out[out.length - 1]?.k === "ul" && /^\s{2,}/.test(raw)) {
-      const items = out[out.length - 1].items;
-      const tail = items?.[items.length - 1];
+    const cont = out.at(-1);
+    if (cont?.k === "ul" && /^\s{2,}/.test(raw)) {
+      const tail = cont.items?.at(-1);
       if (tail) tail.push({ k: "t", text: " " + t });
       continue;
     }

@@ -1,0 +1,55 @@
+{
+  "name": "mareader-marketing-site",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "svelte-check --tsconfig ./tsconfig.json --output human-verbose",
+    "lint": "eslint . --max-warnings 0",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "gate": "python3 tools/check_comments.py --all",
+    "gate:commit": "python3 tools/check_commit_message.py --head",
+    "hooks": "python3 tools/install_hooks.py",
+    "audit": "npm audit --audit-level=low",
+    "shots": "node tools/visual/capture.mjs",
+    "verify": "npm run format:check && npm run lint && npm run check && npm run gate && npm audit --audit-level=low && npm run build"
+  },
+  "dependencies": {
+    "@lucide/svelte": "1.66.0",
+    "svelte": "5.57.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@playwright/test": "1.64.1",
+    "@sveltejs/vite-plugin-svelte": "7.3.1",
+    "@tailwindcss/vite": "4.3.4",
+    "@types/node": "24.19.2",
+    "eslint": "10.14.0",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-svelte": "3.23.1",
+    "globals": "17.14.0",
+    "pixelmatch": "8.0.0",
+    "pngjs": "7.0.0",
+    "prettier": "3.9.10",
+    "prettier-plugin-svelte": "4.1.1",
+    "svelte-check": "4.7.8",
+    "svelte-eslint-parser": "1.10.0",
+    "tailwindcss": "4.3.4",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.72.1",
+    "vite": "8.3.5",
+    "vite-plugin-singlefile": "2.3.4"
+  },
+  "overrides": {
+    "minimatch": "^11.0.4",
+    "deepmerge": "4.1.2"
+  }
+}

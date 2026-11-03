@@ -1,0 +1,6 @@
+#!/bin/sh
+set -eu
+python3 tools/check_comments.py
+npm run format:check
+npm run lint
+npm run check

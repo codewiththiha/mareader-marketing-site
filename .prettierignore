@@ -1,0 +1,8 @@
+dist
+coverage
+evidence
+shots
+node_modules
+package-lock.json
+tools/reference
+*.md

@@ -1,0 +1,14 @@
+node_modules
+dist
+dist-ssr
+coverage
+evidence
+shots
+tools/reference
+__pycache__
+*.pyc
+*.log
+.DS_Store
+.env
+.env.*
+!.env.example

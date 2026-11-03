@@ -31,9 +31,10 @@ if (!/^https?:/.test(target)) {
 const ARGS = ["--font-render-hinting=none", "--force-color-profile=srgb", "--disable-lcd-text"];
 const browser = await chromium.launch({ args: ARGS });
 
-async function newPage(viewport, dark) {
+async function newPage(viewport, dark, ls) {
   const ctx = await browser.newContext({ viewport: { width: viewport[0], height: viewport[1] }, deviceScaleFactor: 1 });
   if (dark) await ctx.addInitScript(() => localStorage.setItem("mr-site", "dark"));
+  if (ls) await ctx.addInitScript((items) => Object.entries(items).forEach(([k, v]) => localStorage.setItem(k, v)), ls);
   const page = await ctx.newPage();
   page.on("pageerror", (e) => console.log("PAGEERROR", e.message));
   return { ctx, page };
@@ -54,8 +55,8 @@ const scrollTo = (page, view) =>
 
 if (which !== "bake") {
   for (const v of VIEWS) {
-    const { ctx, page } = await newPage(v.viewport, v.dark);
-    await page.goto(url);
+    const { ctx, page } = await newPage(v.viewport, v.dark, v.ls);
+    await page.goto(url + (v.hash ?? ""));
     await page.waitForFunction(() => document.fonts.status === "loaded");
     await scrollTo(page, v);
     await page.waitForTimeout(v.wait);

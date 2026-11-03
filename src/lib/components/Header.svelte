@@ -37,7 +37,7 @@
   <div
     aria-hidden="true"
     class="hdr-wash"
-    style="background: linear-gradient(to bottom, rgba(var(--bg-rgb),0.94) 0%, rgba(var(--bg-rgb),0.7) 50%, rgba(var(--bg-rgb),0) 100%)"
+    style="background: linear-gradient(to bottom, rgba(var(--bg-rgb),1) 0, rgba(var(--bg-rgb),1) 56px, rgba(var(--bg-rgb),0) 100%)"
   ></div>
   <div class="hdr-in">
     <a href={href("home")} class="hdr-brand" aria-label="Mareader — home">

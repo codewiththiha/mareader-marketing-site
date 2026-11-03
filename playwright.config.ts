@@ -17,5 +17,7 @@ export default defineConfig({
   },
   testDir: "tests",
   outputDir: "test-results",
-  timeout: 60_000
+  timeout: 60_000,
+  // one renderer at a time: headless shell SEGVs under parallel memory pressure
+  workers: 1
 });

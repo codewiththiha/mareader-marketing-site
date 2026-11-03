@@ -8,6 +8,7 @@
   <p class="local-hello">
     <span lang="my" class="mm-text">မင်္ဂလာပါ</span>
     <span>— local ways to send support, from Myanmar.</span>
+    <span class="soon">{LOCAL_STATUS}</span>
   </p>
   <div class="local-grid">
     {#each LOCAL_METHODS as m (m.id)}
@@ -17,7 +18,6 @@
           <b>{m.name}</b>
           <small>{m.hint}</small>
         </div>
-        <span class="soon">{LOCAL_STATUS}</span>
         <div class="local-mock" aria-hidden="true">
           {m.kind === "wallet" ? "09 ••• ••• •••" : "Account •••• •••• ••"}
         </div>

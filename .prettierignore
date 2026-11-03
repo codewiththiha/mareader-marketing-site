@@ -1,0 +1,9 @@
+node_modules
+dist
+screenshots
+test-results
+playwright-report
+eval-report.md
+package-lock.json
+src/lib/releases/data.ts
+PLAN.md

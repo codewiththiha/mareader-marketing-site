@@ -68,20 +68,135 @@ const FOUR: DocKind[] = ["epub-a", "pdf-a", "epub-b", "pdf-b"];
 
 export const SCENES: Scene[] = [
   { id: "intro", caption: "hero", focus: ["window"], layout: 1, themes: ["base"] },
-  { id: "themes-sepia", caption: "themes", focus: ["popover", "col0"], focusCompact: ["popover"], layout: 1, themes: ["sepia"], bar: true, popover: { theme: "sepia", open: ["presets", "colour"] } },
-  { id: "themes-custom", caption: "themes", focus: ["popover", "col0"], focusCompact: ["popover"], layout: 1, themes: ["ocean"], bar: true, popover: { theme: "ocean", open: ["presets", "colour"] } },
-  { id: "themes-parchment", caption: "themes", focus: ["popover", "col0"], focusCompact: ["popover"], layout: 1, themes: ["parchment"], bar: true, popover: { theme: "parchment", open: ["colour", "texture"] } },
-  { id: "same-look", caption: "same", focus: ["window"], layout: 2, themes: ["night", "night"], docs: FOUR },
-  { id: "four", caption: "four", focus: ["window"], layout: 4, themes: ["night", "night", "night", "night"], docs: FOUR },
-  { id: "per-pane-on", caption: "perPane", focus: ["popover", "pane1"], focusCompact: ["popover"], zoomMax: 1.2, layout: 4, themes: ["night", "night", "night", "night"], docs: FOUR, bar: true, popover: { theme: "night", open: ["colour"], perPane: true } },
-  { id: "per-pane", caption: "perPane", focus: ["window"], layout: 4, themes: ["sepia", "night", "ocean", "parchment"], docs: FOUR },
-  { id: "ai-select", caption: "ai", focus: ["word", "bubble"], zoomMax: 1.6, layout: 1, themes: ["warm"], ai: "bar" },
-  { id: "ai-card", caption: "ai", focus: ["word", "bubble"], zoomMax: 1.35, layout: 1, themes: ["warm"], ai: "card" },
-  { id: "models", caption: "models", focus: ["settings"], zoomMax: 1.6, layout: 1, themes: ["base"], settings: { tab: "models", step: 0 } },
-  { id: "keys-1", caption: "keys", focus: ["keys"], zoomMax: 1.45, layout: 1, themes: ["base"], settings: { tab: "models", step: 1 } },
-  { id: "keys-2", caption: "keys", focus: ["keys"], zoomMax: 1.45, layout: 1, themes: ["base"], settings: { tab: "models", step: 2 } },
-  { id: "voices", caption: "voices", focus: ["settings"], zoomMax: 1.6, layout: 1, themes: ["base"], settings: { tab: "voices", step: 0 } },
-  { id: "player", caption: "voices", focus: ["read", "player"], zoomMax: 1.5, layout: 1, themes: ["warm"], player: true }
+  {
+    id: "themes-sepia",
+    caption: "themes",
+    focus: ["popover", "col0"],
+    focusCompact: ["popover"],
+    layout: 1,
+    themes: ["sepia"],
+    bar: true,
+    popover: { theme: "sepia", open: ["presets", "colour"] }
+  },
+  {
+    id: "themes-custom",
+    caption: "themes",
+    focus: ["popover", "col0"],
+    focusCompact: ["popover"],
+    layout: 1,
+    themes: ["ocean"],
+    bar: true,
+    popover: { theme: "ocean", open: ["presets", "colour"] }
+  },
+  {
+    id: "themes-parchment",
+    caption: "themes",
+    focus: ["popover", "col0"],
+    focusCompact: ["popover"],
+    layout: 1,
+    themes: ["parchment"],
+    bar: true,
+    popover: { theme: "parchment", open: ["colour", "texture"] }
+  },
+  {
+    id: "same-look",
+    caption: "same",
+    focus: ["window"],
+    layout: 2,
+    themes: ["night", "night"],
+    docs: FOUR
+  },
+  {
+    id: "four",
+    caption: "four",
+    focus: ["window"],
+    layout: 4,
+    themes: ["night", "night", "night", "night"],
+    docs: FOUR
+  },
+  {
+    id: "per-pane-on",
+    caption: "perPane",
+    focus: ["popover", "pane1"],
+    focusCompact: ["popover"],
+    zoomMax: 1.2,
+    layout: 4,
+    themes: ["night", "night", "night", "night"],
+    docs: FOUR,
+    bar: true,
+    popover: { theme: "night", open: ["colour"], perPane: true }
+  },
+  {
+    id: "per-pane",
+    caption: "perPane",
+    focus: ["window"],
+    layout: 4,
+    themes: ["sepia", "night", "ocean", "parchment"],
+    docs: FOUR
+  },
+  {
+    id: "ai-select",
+    caption: "ai",
+    focus: ["word", "bubble"],
+    zoomMax: 1.6,
+    layout: 1,
+    themes: ["warm"],
+    ai: "bar"
+  },
+  {
+    id: "ai-card",
+    caption: "ai",
+    focus: ["word", "bubble"],
+    zoomMax: 1.35,
+    layout: 1,
+    themes: ["warm"],
+    ai: "card"
+  },
+  {
+    id: "models",
+    caption: "models",
+    focus: ["settings"],
+    zoomMax: 1.6,
+    layout: 1,
+    themes: ["base"],
+    settings: { tab: "models", step: 0 }
+  },
+  {
+    id: "keys-1",
+    caption: "keys",
+    focus: ["keys"],
+    zoomMax: 1.45,
+    layout: 1,
+    themes: ["base"],
+    settings: { tab: "models", step: 1 }
+  },
+  {
+    id: "keys-2",
+    caption: "keys",
+    focus: ["keys"],
+    zoomMax: 1.45,
+    layout: 1,
+    themes: ["base"],
+    settings: { tab: "models", step: 2 }
+  },
+  {
+    id: "voices",
+    caption: "voices",
+    focus: ["settings"],
+    zoomMax: 1.6,
+    layout: 1,
+    themes: ["base"],
+    settings: { tab: "voices", step: 0 }
+  },
+  {
+    id: "player",
+    caption: "voices",
+    focus: ["read", "player"],
+    zoomMax: 1.5,
+    layout: 1,
+    themes: ["warm"],
+    player: true
+  }
 ];
 
 export const CAPTION_ORDER = Object.keys(CAPTIONS);

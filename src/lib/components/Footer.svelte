@@ -1,18 +1,21 @@
 <script lang="ts">
-  // Footer — minimal links
+  // Footer — the quiet end of the page
   import Logo from "./Logo.svelte";
+  import { href } from "@/lib/router.svelte";
   import { RELEASES, REPO } from "@/lib/constants";
 </script>
 
-<footer class="border-t border-[var(--hair)] px-5 py-8 sm:px-10">
-  <div class="mx-auto flex max-w-[1100px] flex-col items-center justify-between gap-3 text-[13px] text-[var(--fg2)] sm:flex-row">
-    <div class="flex items-center gap-2.5">
+<footer class="ftr">
+  <div class="ftr-in">
+    <div class="ftr-brand">
       <Logo size={20} />
       <span>Mareader · MIT licensed</span>
     </div>
-    <div class="flex gap-5">
-      <a href={REPO} class="hover:text-[var(--fg)]">GitHub</a>
-      <a href={RELEASES} class="hover:text-[var(--fg)]">Releases</a>
-    </div>
+    <nav class="ftr-links" aria-label="Footer">
+      <a href={href("releases")}>Release notes</a>
+      <a href={href("support")}>Support</a>
+      <a href={REPO}>GitHub</a>
+      <a href={RELEASES}>Downloads</a>
+    </nav>
   </div>
 </footer>

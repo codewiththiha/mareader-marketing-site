@@ -1,36 +1,58 @@
 {
   "name": "mareader-marketing-site",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
+  "engines": {
+    "node": ">=20.19"
+  },
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host 0.0.0.0",
     "build": "vite build",
-    "preview": "vite preview",
+    "preview": "vite preview --host 0.0.0.0",
     "check": "svelte-check --tsconfig ./tsconfig.json",
-    "test": "playwright test",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "validate": "python3 scripts/validate.py",
-    "screenshots": "playwright test --config playwright.config.ts"
+    "releases": "python3 scripts/pull_releases.py",
+    "ci:watch": "python3 scripts/ci_watch.py watch",
+    "test": "playwright test",
+    "screenshots": "playwright test --config playwright.config.ts",
+    "ci": "npm run validate && npm run lint && npm run format:check && npm run check && npm run build && npm run test"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",
     "@fontsource-variable/literata": "^5.3.0",
     "@lucide/svelte": "^1.66.0",
-    "clsx": "2.1.1",
-    "tailwind-merge": "3.4.0"
+    "dompurify": "^3.4.17",
+    "marked": "^18.1.3",
+    "qrcode-generator": "^2.0.4"
   },
   "devDependencies": {
-    "@playwright/test": "^1.56.0",
-    "@sveltejs/vite-plugin-svelte": "^6.2.4",
-    "@tailwindcss/vite": "4.1.17",
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.64.1",
+    "@sveltejs/vite-plugin-svelte": "^7.3.1",
+    "@tailwindcss/vite": "^4.3.4",
     "@tsconfig/svelte": "^5.0.8",
-    "@types/node": "22.19.17",
-    "playwright": "^1.56.0",
-    "svelte": "^5.28.0",
-    "svelte-check": "^4.7.7",
-    "tailwindcss": "4.1.17",
-    "typescript": "5.9.3",
-    "vite": "^7.3.7",
-    "vite-plugin-singlefile": "2.3.0"
+    "@types/node": "^22.19.17",
+    "eslint": "^10.14.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-svelte": "^3.23.1",
+    "globals": "^17.14.0",
+    "playwright": "^1.64.1",
+    "prettier": "^3.9.10",
+    "prettier-plugin-svelte": "^4.1.1",
+    "prettier-plugin-tailwindcss": "^0.8.1",
+    "svelte": "^5.57.3",
+    "svelte-check": "^4.7.8",
+    "tailwindcss": "^4.3.4",
+    "typescript": "6.0.3",
+    "typescript-eslint": "^8.72.1",
+    "vite": "^8.3.5",
+    "vite-plugin-singlefile": "^2.3.4"
+  },
+  "overrides": {
+    "minimatch": "^11.0.4"
   }
 }

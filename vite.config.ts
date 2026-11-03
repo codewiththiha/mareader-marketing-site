@@ -1,3 +1,4 @@
+// vite — single file build, sandbox-friendly dev server
 import path from "path";
 import { fileURLToPath } from "url";
 import tailwindcss from "@tailwindcss/vite";
@@ -14,5 +15,13 @@ export default defineConfig({
     alias: {
       "@": path.resolve(__dirname, "src")
     }
+  },
+  server: {
+    host: "0.0.0.0",
+    allowedHosts: true
+  },
+  preview: {
+    host: "0.0.0.0",
+    allowedHosts: true
   }
 });

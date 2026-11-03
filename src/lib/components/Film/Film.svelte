@@ -3,9 +3,14 @@
   import { Download } from "@lucide/svelte";
   import { CAPTIONS, SCENES } from "@/lib/scenes";
   import MockWindow from "./Mock/MockWindow.svelte";
-  import { RELEASES, REPO } from "@/lib/constants";
+  import { useTheme } from "@/lib/stores/theme.svelte";
+  import { platform } from "@/lib/platform.svelte";
+  import { bestFor, OS_LABEL } from "@/lib/downloads";
+  import { href } from "@/lib/router.svelte";
 
-  let { dark }: { dark: boolean } = $props();
+  const theme = useTheme();
+  let dark = $derived(theme.dark);
+  let heroBest = $derived(platform.mobile ? null : bestFor(platform.os, platform.arch));
 
   const PER_BEAT = 0.6;
   const capKeys = Object.keys(CAPTIONS);
@@ -28,10 +33,20 @@
 
   function capAction(node: HTMLElement, key: string) {
     capRefs[key] = node as HTMLDivElement;
-    return { destroy() { capRefs[key] = null; } };
+    return {
+      destroy() {
+        capRefs[key] = null;
+      }
+    };
   }
 
-  function smoothDamp(cur: number, target: number, vel: { v: number }, smoothTime: number, dt: number) {
+  function smoothDamp(
+    cur: number,
+    target: number,
+    vel: { v: number },
+    smoothTime: number,
+    dt: number
+  ) {
     const omega = 2 / smoothTime;
     const x = omega * dt;
     const e = 1 / (1 + x + 0.48 * x * x + 0.235 * x * x * x);
@@ -44,7 +59,9 @@
   $effect(() => {
     const stage = stageRef;
     if (!stage) return;
-    const measure = () => { compact = stage.clientWidth < 760 || stage.clientWidth / stage.clientHeight < 0.95; };
+    const measure = () => {
+      compact = stage.clientWidth < 760 || stage.clientWidth / stage.clientHeight < 0.95;
+    };
     measure();
     const ro = new ResizeObserver(measure);
     ro.observe(stage);
@@ -63,7 +80,9 @@
       const p = Math.min(0.9999, Math.max(0, top / span));
       beat = Math.floor(p * SCENES.length);
     };
-    const onScroll = () => { if (!raf) raf = requestAnimationFrame(read); };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(read);
+    };
     read();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
@@ -75,8 +94,12 @@
   });
 
   $effect(() => {
-    void scene.caption; void compact;
-    const measure = () => { const el = capRefs[scene.caption]; if (el) capH = el.offsetHeight; };
+    void scene.caption;
+    void compact;
+    const measure = () => {
+      const el = capRefs[scene.caption];
+      if (el) capH = el.offsetHeight;
+    };
     measure();
     document.fonts?.ready.then(measure);
     const onResize = () => measure();
@@ -98,7 +121,10 @@
     const frame = (now: number) => {
       raf = requestAnimationFrame(frame);
       const el = camRef;
-      if (!el || !visible) { last = now; return; }
+      if (!el || !visible) {
+        last = now;
+        return;
+      }
       const dt = Math.min(0.05, (now - last) / 1000);
       last = now;
       const st = { beat, W, H, capH, compact };
@@ -118,12 +144,19 @@
         const root = el.firstElementChild as HTMLElement | null;
         const wr = root?.getBoundingClientRect();
         const k0 = wr ? wr.width / st.W : 1;
-        const found = names.map((n) => {
-          const t = root?.querySelector(`[data-focus="${n}"]`) as HTMLElement | null;
-          if (!t || !wr) return null;
-          const r = t.getBoundingClientRect();
-          return { x: (r.left - wr.left) / k0, y: (r.top - wr.top) / k0, w: r.width / k0, h: r.height / k0 };
-        }).filter((r) => r && r.w > 0) as { x: number; y: number; w: number; h: number }[];
+        const found = names
+          .map((n) => {
+            const t = root?.querySelector(`[data-focus="${n}"]`) as HTMLElement | null;
+            if (!t || !wr) return null;
+            const r = t.getBoundingClientRect();
+            return {
+              x: (r.left - wr.left) / k0,
+              y: (r.top - wr.top) / k0,
+              w: r.width / k0,
+              h: r.height / k0
+            };
+          })
+          .filter((r) => r && r.w > 0) as { x: number; y: number; w: number; h: number }[];
         if (found.length) {
           const x0 = Math.min(...found.map((r) => r.x));
           const y0 = Math.min(...found.map((r) => r.y));
@@ -140,8 +173,13 @@
       const tcy = whole ? st.H / 2 : rect.y + rect.h / 2;
       const tls = Math.log(s);
       if (!cam.init || reduce) {
-        cam.cx = tcx; cam.cy = tcy; cam.ls = tls;
-        if (!cam.init) { cam.init = true; ready = true; }
+        cam.cx = tcx;
+        cam.cy = tcy;
+        cam.ls = tls;
+        if (!cam.init) {
+          cam.init = true;
+          ready = true;
+        }
       } else {
         const T = 0.82;
         cam.cx = smoothDamp(cam.cx, tcx, cam.x, T, dt);
@@ -154,46 +192,65 @@
       el.style.transform = `translate3d(${tx.toFixed(2)}px,${ty.toFixed(2)}px,0) scale(${k.toFixed(4)})`;
     };
     raf = requestAnimationFrame(frame);
-    return () => { cancelAnimationFrame(raf); io.disconnect(); };
+    return () => {
+      cancelAnimationFrame(raf);
+      io.disconnect();
+    };
   });
 </script>
 
 <div bind:this={wrapRef} style="height: calc(100svh * {1 + (SCENES.length - 1) * PER_BEAT + 0.35})">
   <div bind:this={stageRef} class="film-stage">
-    <div bind:this={camRef} class="film-cam {ready ? 'ready' : ''}" style="width: {W}px; height: {H}px">
-      <MockWindow {scene} siteDark={dark} W={W} H={H} />
+    <div
+      bind:this={camRef}
+      class="film-cam {ready ? 'ready' : ''}"
+      style="width: {W}px; height: {H}px"
+    >
+      <MockWindow {scene} siteDark={dark} {W} {H} />
     </div>
     <div class="film-wash-bottom" style="height: {zoneH + 54}px; --zone: {zoneH}px"></div>
     <div class="absolute inset-x-0 bottom-0" style="height: {zoneH}px">
       <div class="relative mx-auto h-full w-full max-w-[1240px]">
-        {#each capKeys as k, i}
+        {#each capKeys as k, i (k)}
           {@const c = CAPTIONS[k]}
           {@const on = k === scene.caption}
           <div
             use:capAction={k}
-            class="cap px-5 sm:px-10 {on ? 'on' : ''} {(!on && i < order) ? 'gone' : ''}"
+            class="cap px-5 sm:px-10 {on ? 'on' : ''} {!on && i < order ? 'gone' : ''}"
             style="padding-bottom: {compact ? 30 : 44}px"
             aria-hidden={!on}
           >
             <div class="px-0 {compact ? 'text-center' : ''}">
               <h2
-                class="font-serif font-medium tracking-[-0.015em] text-[var(--fg)] {c.hero ? 'text-[34px] leading-[1.05] sm:text-[56px]' : 'text-[26px] leading-[1.12] sm:text-[42px]'} {compact ? 'mx-auto' : ''}"
+                class="font-serif font-medium tracking-[-0.015em] text-[var(--fg)] {c.hero
+                  ? 'text-[34px] leading-[1.05] sm:text-[56px]'
+                  : 'text-[26px] leading-[1.12] sm:text-[42px]'} {compact ? 'mx-auto' : ''}"
                 style="max-width: {c.hero ? 760 : 680}px; text-wrap: balance"
               >
                 {c.title}
               </h2>
               <p
-                class="mt-2.5 text-[14.5px] leading-[1.55] text-[var(--fg2)] sm:mt-3.5 sm:text-[17px] {compact ? 'mx-auto' : ''}"
+                class="mt-2.5 text-[14.5px] leading-[1.55] text-[var(--fg2)] sm:mt-3.5 sm:text-[17px] {compact
+                  ? 'mx-auto'
+                  : ''}"
                 style="max-width: 540px; text-wrap: pretty"
               >
                 {c.body}
               </p>
               {#if c.hero}
                 <div class="mt-5 flex flex-wrap gap-3 sm:mt-7 {compact ? 'justify-center' : ''}">
-                  <a href={RELEASES} class="btn-primary" tabindex={on ? 0 : -1}>
-                    <Download size={17} strokeWidth={2} /> Download free
+                  <a
+                    href={heroBest ? heroBest.asset.url : href("releases")}
+                    class="btn-primary"
+                    tabindex={on ? 0 : -1}
+                    data-testid="hero-dl"
+                  >
+                    <Download size={17} strokeWidth={2} />
+                    {heroBest ? `Download for ${OS_LABEL[heroBest.os]}` : "Download free"}
                   </a>
-                  <a href={REPO} class="btn-ghost" tabindex={on ? 0 : -1}>View on GitHub</a>
+                  <a href={href("releases")} class="btn-ghost" tabindex={on ? 0 : -1}>
+                    Other systems
+                  </a>
                 </div>
               {/if}
             </div>

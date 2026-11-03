@@ -18,7 +18,11 @@ export function createMount(open: () => boolean, ms = 360) {
   });
 
   return {
-    get mounted() { return mounted; },
-    get show() { return show; }
+    get mounted() {
+      return mounted;
+    },
+    get show() {
+      return show;
+    }
   };
 }

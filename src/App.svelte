@@ -1,26 +1,46 @@
 <script lang="ts">
-  // App — main page layout
+  // App — routes, theme and the page frame
   import Header from "@/lib/components/Header.svelte";
   import Footer from "@/lib/components/Footer.svelte";
-  import Film from "@/lib/components/Film/Film.svelte";
-  import Facts from "@/lib/sections/Facts.svelte";
-  import Cta from "@/lib/sections/Cta.svelte";
-  import { reveal } from "@/lib/actions/reveal.svelte";
+  import Home from "@/lib/sections/Home.svelte";
+  import Releases from "@/lib/sections/Releases.svelte";
+  import Support from "@/lib/sections/Support.svelte";
+  import { router, type Route } from "@/lib/router.svelte";
   import { useTheme, applyThemeClass } from "@/lib/stores/theme.svelte";
+  import { platform } from "@/lib/platform.svelte";
+  import { support } from "@/lib/support/geo.svelte";
+  import { releases } from "@/lib/releases/refresh.svelte";
   import { onMount } from "svelte";
 
   const theme = useTheme();
   let dark = $state(false);
+  let route = $derived(router.route);
+  let dir = $derived(router.direction);
+
+  const TITLES: Record<Route, string> = {
+    home: "Mareader — a calm PDF and EPUB reader",
+    releases: "Release notes — Mareader",
+    support: "Support — Mareader"
+  };
 
   onMount(() => {
     theme.init();
     dark = theme.dark;
     applyThemeClass(dark);
+    platform.init();
+    support.init();
+    void releases.refresh();
   });
 
   $effect(() => {
     dark = theme.dark;
     applyThemeClass(dark);
+    document.title = TITLES[route];
+  });
+
+  $effect(() => {
+    void route;
+    window.scrollTo(0, 0);
   });
 
   function toggle() {
@@ -32,21 +52,17 @@
 <div class="min-h-screen">
   <Header {dark} onToggle={toggle} />
   <main id="top">
-    <Film {dark} />
-    <section class="relative px-5 pb-24 pt-20 sm:px-10 sm:pt-28">
-      <div class="mx-auto max-w-[1100px]">
-        <div use:reveal class="reveal text-center">
-          <h2 class="mx-auto max-w-[760px] font-serif text-[32px] font-medium leading-[1.1] tracking-[-0.015em] sm:text-[52px]" style="text-wrap: balance">
-            Made for the long read.
-          </h2>
-          <p class="mx-auto mt-4 max-w-[520px] text-[15.5px] leading-[1.6] text-[var(--fg2)] sm:text-[17px]">
-            Everything you saw runs on your machine, quietly, so the book is the only thing asking for attention.
-          </p>
-        </div>
-        <Facts />
-        <Cta />
+    {#key route}
+      <div class="page" data-dir={dir}>
+        {#if route === "releases"}
+          <Releases />
+        {:else if route === "support"}
+          <Support />
+        {:else}
+          <Home />
+        {/if}
       </div>
-    </section>
+    {/key}
   </main>
   <Footer />
 </div>

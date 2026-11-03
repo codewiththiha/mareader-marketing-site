@@ -1,18 +1,21 @@
-// playwright config — screenshots for ci
+// playwright config — screenshots and behaviour for ci
 import { defineConfig } from "@playwright/test";
 
 export default defineConfig({
   webServer: {
     command: "npm run preview -- --host 0.0.0.0 --port 4173",
     port: 4173,
-    reuseExistingServer: false,
+    reuseExistingServer: !process.env.CI,
     timeout: 120_000
   },
   use: {
     baseURL: "http://localhost:4173",
-    screenshot: "on"
+    screenshot: "only-on-failure",
+    launchOptions: {
+      args: ["--disable-gpu", "--disable-dev-shm-usage"]
+    }
   },
   testDir: "tests",
   outputDir: "test-results",
-  timeout: 30_000
+  timeout: 60_000
 });

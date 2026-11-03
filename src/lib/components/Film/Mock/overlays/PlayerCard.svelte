@@ -5,8 +5,33 @@
   let mounted = $state(false);
   let show = $state(false);
   let timer: ReturnType<typeof setTimeout> | undefined;
-  $effect(() => { if(open){mounted=true; requestAnimationFrame(()=>requestAnimationFrame(()=>show=true));} else {show=false; timer=setTimeout(()=>mounted=false,360);} return()=>clearTimeout(timer); });
-  const words = ["It","is","a","way","I","have","of","driving","off","the","spleen","and","regulating","the","circulation."];
+  $effect(() => {
+    if (open) {
+      mounted = true;
+      requestAnimationFrame(() => requestAnimationFrame(() => (show = true)));
+    } else {
+      show = false;
+      timer = setTimeout(() => (mounted = false), 360);
+    }
+    return () => clearTimeout(timer);
+  });
+  const words = [
+    "It",
+    "is",
+    "a",
+    "way",
+    "I",
+    "have",
+    "of",
+    "driving",
+    "off",
+    "the",
+    "spleen",
+    "and",
+    "regulating",
+    "the",
+    "circulation."
+  ];
   let start = 7;
   let lit = $derived(start + 1 + (tick % 4));
   const BARS = [0.5, 0.9, 0.35, 0.75];
@@ -16,11 +41,21 @@
   <div class="mk-player {show ? 'on' : ''}" data-focus="player">
     <div class="mk-cover"><span>M</span></div>
     <div class="mk-player-main">
-      <div class="mk-player-title"><b>Moby-Dick</b><span class="mk-eq" aria-hidden="true">{#each BARS as b,i}<i style="animation-delay:{i*0.13}s;height:{b*100}%"></i>{/each}</span></div>
+      <div class="mk-player-title">
+        <b>Moby-Dick</b><span class="mk-eq" aria-hidden="true"
+          >{#each BARS as b, i (i)}<i style="animation-delay:{i * 0.13}s;height:{b * 100}%"
+            ></i>{/each}</span
+        >
+      </div>
       <div class="mk-player-place">Chapter 1 · Loomings</div>
       <div class="mk-lyrics">
         <div class="before">Some years ago, never mind how long precisely.</div>
-        <div class="now">{#each words as w,i}<span class={i <= lit && i >= start ? "lit" : ""}>{w}{#if i < words.length - 1}{" "}{/if}</span>{/each}</div>
+        <div class="now">
+          {#each words as w, i (i)}{@const sp = " "}<span
+              class={i <= lit && i >= start ? "lit" : ""}
+              >{w}{#if i < words.length - 1}{sp}{/if}</span
+            >{/each}
+        </div>
         <div class="after">Whenever I find myself growing grim about the mouth.</div>
       </div>
       <div class="mk-player-ctl">

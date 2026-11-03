@@ -1,139 +1,69 @@
 #!/usr/bin/env python3
-# validate — commit and comment checks
-import re
+"""The local gate: comments, commit subjects and the armed hook.
+
+  python3 scripts/validate.py            # what CI runs
+  python3 scripts/validate.py --range main..HEAD
+
+Comment brevity is comment_check.py's job (AGENTS.md); subject length is
+commit_check.py's. This script only sequences them and fails on any red.
+"""
+
+from __future__ import annotations
+
+import argparse
+import pathlib
 import subprocess
 import sys
-from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
-INCLUDE_EXTS = {".ts", ".js", ".svelte", ".css", ".py", ".sh", ".md", ".json", ".html"}
-SKIP_DIRS = {"node_modules", "dist", ".git", ".svelte-kit", "coverage", "test-results", "playwright-report", ".cache", ".npm", "screenshots", "dist-ssr"}
+ROOT = pathlib.Path(__file__).resolve().parents[1]
 
-def fail(msg):
-    print(f"[validate] FAIL: {msg}")
-    return False
 
-def ok(msg):
-    print(f"[validate] OK: {msg}")
+def run(name: str, argv: list[str], warn_only: bool = False) -> bool:
+    print(f"== {name}")
+    r = subprocess.run(argv, cwd=ROOT)
+    if r.returncode != 0:
+        if warn_only:
+            print(f"[validate] WARN: {name} failed (not gating)")
+            return True
+        print(f"[validate] FAIL: {name}")
+        return False
     return True
 
-def check_commit_msg():
+
+def last_subject() -> bool:
     try:
-        msg = subprocess.check_output(["git", "log", "-1", "--pretty=%B"], cwd=ROOT, text=True).strip()
-    except Exception as e:
-        print(f"[validate] skip commit check: {e}")
+        msg = subprocess.run(["git", "log", "-1", "--pretty=%s"], cwd=ROOT,
+                             capture_output=True, text=True, check=True).stdout.strip()
+    except subprocess.CalledProcessError:
+        print("[validate] no commits yet, subject skipped")
         return True
-    if not msg:
-        return ok("empty commit message skipped")
-    lines = msg.splitlines()
-    subject = lines[0] if lines else ""
-    length = len(subject)
-    if length > 50:
-        fail(f'commit subject {length} chars >50: "{subject}"')
-        print("       keep subject short: <=50 inc spaces")
+    if len(msg) > 50:
+        print(f"[validate] FAIL: last subject is {len(msg)} chars: {msg}")
         return False
-    if subject.endswith("."):
-        fail("commit subject should not end with period")
+    if msg.endswith("."):
+        print(f"[validate] FAIL: last subject ends with a period: {msg}")
         return False
-    ok(f'commit subject {length}/50 chars: "{subject}"')
+    print(f"[validate] last subject ok ({len(msg)}/50): {msg}")
     return True
 
-def header_comment_lines(path: Path):
-    try:
-        text = path.read_text(encoding="utf-8", errors="ignore")
-    except Exception:
-        return 0, False
-    lines = text.splitlines()
-    count = 0
-    in_block = False
-    for line in lines[:10]:
-        s = line.strip()
-        if not s:
-            continue
-        if s.startswith("//") or s.startswith("#") or s.startswith("<!--") or s.startswith("/*"):
-            count += 1
-            if count > 4:
-                break
-        else:
-            break
-    return count, False
 
-def has_multiline_block(path: Path):
-    if path.suffix.lower() not in {".svelte", ".ts", ".js", ".css"}:
-        return False
-    try:
-        raw = path.read_text(encoding="utf-8", errors="ignore")
-    except Exception:
-        return False
-    if path.suffix.lower() == ".css":
-        if "/*" in raw and "*/" in raw:
-            for m in re.finditer(r"/\*.*?\*/", raw, flags=re.DOTALL):
-                block = m.group(0)
-                if "\n" in block:
-                    stripped = block.strip()
-                    if "font-face" not in stripped.lower() and "@import" not in stripped:
-                        if "mock.css" not in path.name.lower():
-                            return True
-        return False
-    cleaned = re.sub(r'"[^"]*"', '""', raw)
-    cleaned = re.sub(r"'[^']*'", "''", cleaned)
-    cleaned = re.sub(r"`[^`]*`", "``", cleaned)
-    if "/*" in cleaned and "*/" in cleaned:
-        for m in re.finditer(r"/\*.*?\*/", cleaned, flags=re.DOTALL):
-            block = m.group(0)
-            if "\n" in block:
-                return True
-    if "<!--" in cleaned and "-->" in cleaned:
-        for m in re.finditer(r"<!--.*?-->", cleaned, flags=re.DOTALL):
-            block = m.group(0)
-            if "\n" in block:
-                return True
-    return False
-
-def check_comments():
-    ok_count = 0
-    fail_count = 0
-    for p in ROOT.rglob("*"):
-        if not p.is_file():
-            continue
-        if any(d in p.parts for d in SKIP_DIRS):
-            continue
-        if "source-repo" in p.parts:
-            continue
-        if p.suffix.lower() not in INCLUDE_EXTS:
-            continue
-        if p.name in {"package-lock.json", "pnpm-lock.yaml"}:
-            continue
-        rel = p.relative_to(ROOT)
-        c, _ = header_comment_lines(p)
-        if c > 4:
-            fail(f"{rel}: header comments {c} lines >4")
-            fail_count += 1
-        elif c > 0:
-            ok_count += 1
-        if has_multiline_block(p):
-            fail(f"{rel}: multiline block comment (use single-line)")
-            fail_count += 1
-    if fail_count:
-        print(f"[validate] {fail_count} comment issues found")
-        return False
-    ok(f"comment headers checked, {ok_count} files with header")
-    return True
-
-def check_single_line_rule():
-    pattern = re.compile(r"^\s*//\s*\S+.*\n\s*//.*", re.MULTILINE)
-    return True
-
-def main():
-    a = check_commit_msg()
-    b = check_comments()
-    c = check_single_line_rule()
-    if a and b and c:
-        print("[validate] all checks passed")
-        sys.exit(0)
+def main() -> int:
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("--range", dest="rev_range", metavar="REV",
+                    help="audit subjects in a git range instead of the last one")
+    args = ap.parse_args()
+    py = sys.executable or "python3"
+    ok = run("comments", [py, "scripts/comment_check.py"])
+    if args.rev_range:
+        ok &= run("subjects", [py, "scripts/commit_check.py", "--range", args.rev_range])
     else:
-        print("[validate] checks failed — fix before commit")
-        sys.exit(1)
+        ok &= last_subject()
+    ok &= run("commit gate status", [py, "scripts/commit_check.py", "--status"],
+              warn_only=True)
+    ok &= run("comment checker self-test", [py, "scripts/comment_check.py", "--self-test"])
+    print("[validate] all checks passed" if ok else "[validate] checks failed")
+    return 0 if ok else 1
+
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

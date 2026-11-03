@@ -10,5 +10,9 @@ export function reveal(node: HTMLElement) {
     { threshold: 0.15 }
   );
   io.observe(node);
-  return { destroy() { io.disconnect(); } };
+  return {
+    destroy() {
+      io.disconnect();
+    }
+  };
 }

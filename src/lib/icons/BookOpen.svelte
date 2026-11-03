@@ -1,6 +1,6 @@
 <!-- Glyph data pinned to lucide-react 1.66; lucide-svelte 1.0.1 ships an older book-open. -->
 <script lang="ts">
-	let { size = 24, strokeWidth = 2 }: { size?: number; strokeWidth?: number } = $props();
+	let { size = 24, strokeWidth = 2 }: { size?: number | string; strokeWidth?: number | string } = $props();
 </script>
 
 <svg

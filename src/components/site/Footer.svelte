@@ -10,6 +10,10 @@
 		<img src={icon} alt="" width={18} height={18} class="rounded-[5px]" />
 		<span>Mareader</span>
 	</div>
+	<nav class="flex gap-4">
+		<a href="#/releases" class="transition-colors hover:text-ink">Release notes</a>
+		<a href="#/donate" class="transition-colors hover:text-ink">Donate</a>
+	</nav>
 	<span class="sm:ml-auto">
 		MIT licence ·
 		<a href={REPO} class="hover:text-ink" target="_blank" rel="noreferrer">github.com/codewiththiha/mareader2</a>

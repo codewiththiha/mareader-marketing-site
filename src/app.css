@@ -161,3 +161,53 @@ body {
 	scrollbar-width: thin;
 	scrollbar-color: var(--line) transparent;
 }
+
+@keyframes drop {
+	0%,
+	100% {
+		transform: translateY(-1px);
+	}
+	50% {
+		transform: translateY(2.5px);
+	}
+}
+
+@keyframes beat {
+	0%,
+	100% {
+		transform: scale(1);
+	}
+	12% {
+		transform: scale(1.16);
+	}
+	24% {
+		transform: scale(1);
+	}
+	36% {
+		transform: scale(1.1);
+	}
+	48% {
+		transform: scale(1);
+	}
+}
+
+@keyframes rise-soft {
+	from {
+		opacity: 0;
+		transform: translateY(9px);
+	}
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+.anim-rise {
+	animation: rise-soft 0.5s var(--ease-out-quint) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.anim-rise {
+		animation-duration: 0.01s;
+	}
+}

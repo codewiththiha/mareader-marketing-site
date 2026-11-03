@@ -1,10 +1,13 @@
 <script lang="ts">
-	import { ArrowUpRight, Download } from "lucide-svelte";
+	import { ArrowUpRight } from "lucide-svelte";
+	import DownloadAlive from "$lib/icons/DownloadAlive.svelte";
 	import { clientName } from "$lib/os";
-	import { REPO, RELEASES } from "$lib/links";
+	import { REPO } from "$lib/links";
+	import { CURRENT, assetUrl } from "$lib/releases";
 	import HeroWindow from "./HeroWindow.svelte";
 
 	const os = clientName();
+	const primary = os === "macOS" ? CURRENT.assets[0] : os === "Windows" ? CURRENT.assets[2] : CURRENT.assets[4];
 </script>
 
 <section id="top" class="mx-auto max-w-6xl px-5 pt-16 pb-10 sm:px-8 sm:pt-24">
@@ -18,12 +21,10 @@
 		</p>
 		<div class="mt-8 flex flex-wrap items-center gap-3">
 			<a
-				href={RELEASES}
-				target="_blank"
-				rel="noreferrer"
-				class="inline-flex h-11 items-center gap-2 rounded-[10px] bg-ink px-5 text-[15px] font-medium text-paper transition-opacity hover:opacity-90"
+				href={assetUrl(CURRENT, primary)}
+				class="group inline-flex h-11 items-center gap-2 rounded-[10px] bg-ink px-5 text-[15px] font-medium text-paper transition-opacity hover:opacity-90"
 			>
-				<Download size={16} /> Download for {os}
+				<DownloadAlive size={16} /> Download for {os}
 			</a>
 			<a
 				href={REPO}
@@ -33,7 +34,13 @@
 			>
 				View on GitHub <ArrowUpRight size={15} class="text-muted" />
 			</a>
-			<span class="text-[13px] text-muted">v0.0.5 · macOS, Windows, Linux · MIT</span>
+			<a
+				href="#download"
+				class="text-[13px] text-muted underline decoration-line underline-offset-4 transition-colors hover:text-ink"
+			>
+				All platforms
+			</a>
+			<span class="text-[13px] text-muted">v{CURRENT.version.slice(1)} · macOS, Windows, Linux · MIT</span>
 		</div>
 	</div>
 	<div class="mt-14 sm:mt-20">

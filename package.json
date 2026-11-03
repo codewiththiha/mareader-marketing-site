@@ -18,7 +18,7 @@
     "releases": "python3 scripts/pull_releases.py",
     "ci:watch": "python3 scripts/ci_watch.py watch",
     "test": "playwright test",
-    "screenshots": "playwright test --config playwright.config.ts",
+    "screenshots": "playwright test tests/screenshots.spec.ts",
     "ci": "npm run validate && npm run lint && npm run format:check && npm run check && npm run build && npm run test"
   },
   "dependencies": {

@@ -30,6 +30,10 @@ def check_structure():
         "src/lib/components/Film/Film.svelte",
         "src/lib/components/Film/Mock/MockWindow.svelte",
         "src/lib/stores/theme.svelte.ts",
+        "src/lib/support/wallets.ts",
+        "src/lib/releases/data.ts",
+        "src/lib/router.svelte.ts",
+        "tests/site.spec.ts",
         "AGENTS.md",
         "scripts/validate.py"
     ]
@@ -38,8 +42,24 @@ def check_structure():
         return False, f"missing {missing}"
     return True, "structure ok: modular svelte idioms"
 
+# verified on-chain formats; guards typos and truncation regressions
+ADDRS = [
+    "0xFaC170C240dFC6419Ff8d9D8108E2e2D88f595d7",
+    "bc1qg454fmqylphrzfqh2kdvlq54dt8t2kqaz452wm",
+    "FJKswEYdwJufp978ycwCcVbSVhZvrEnchoEbWcuKi1Zy",
+    "TGdk1Y2rsd2Rm1Nh79d7KSBDyNrRQ5Xhau",
+    "GBFFH6S4R2VFSU7O5YAB3IWCLEHMSLWNYSKEYKUNV5O7C5ZESHI63QVQ"
+]
+
+def check_addresses():
+    src = (ROOT / "src/lib/support/wallets.ts").read_text()
+    bad = [a[:10] for a in ADDRS if a not in src]
+    if bad:
+        return False, f"wallets.ts missing addresses {bad}"
+    return True, "addresses ok: all five verified forms present"
+
 def main():
-    checks = [check_build(), check_screenshots(), check_structure()]
+    checks = [check_build(), check_screenshots(), check_structure(), check_addresses()]
     passed = all(c[0] for c in checks)
     lines = ["# Eval Report", ""]
     for ok, msg in checks:

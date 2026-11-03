@@ -23,10 +23,12 @@ jobs:
         run: python3 scripts/validate.py
       - name: Build
         run: npm run build
+      - name: Static checks
+        run: npm run lint && npm run format:check && npm run check
       - name: Install playwright
         run: npx playwright install --with-deps chromium
-      - name: Take screenshots
-        run: npm run screenshots
+      - name: Playwright tests and screenshots
+        run: npm run test
       - name: Eval review
         run: python3 scripts/eval.py
       - name: Upload screenshots

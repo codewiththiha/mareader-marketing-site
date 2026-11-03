@@ -23,6 +23,7 @@
 <style>
   :global(.btn:hover) .lv-heart,
   :global(.btn:focus-visible) .lv-heart,
+  :global(.more-card:hover) .lv-heart,
   :global(.nav-link:hover) .lv-heart {
     animation: lv-beat 0.85s ease;
     transform-origin: 12px 13px;

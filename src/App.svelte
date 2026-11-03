@@ -5,6 +5,7 @@
   import DonatePage from "$lib/pages/DonatePage.svelte";
   import Footer from "$lib/site/Footer.svelte";
   import Get from "$lib/site/Get.svelte";
+  import More from "$lib/site/More.svelte";
   import Nav from "$lib/site/Nav.svelte";
   import ReleasesPage from "$lib/pages/ReleasesPage.svelte";
   import { router } from "$lib/site/router.svelte";
@@ -49,6 +50,7 @@
         <Film site={theme.current} />
         <Details />
         <Get />
+        <More />
       </main>
     {/if}
   {/key}

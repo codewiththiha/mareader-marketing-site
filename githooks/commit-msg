@@ -1,0 +1,3 @@
+#!/bin/sh
+# Rejects commits whose message lines exceed 50 characters.
+exec python3 "$(git rev-parse --show-toplevel)/tools/check_commit_message.py" "$1"

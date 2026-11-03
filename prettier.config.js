@@ -1,0 +1,7 @@
+export default {
+	useTabs: true,
+	printWidth: 120,
+	trailingComma: "none",
+	plugins: ["prettier-plugin-svelte"],
+	overrides: [{ files: "*.svelte", options: { parser: "svelte" } }]
+};

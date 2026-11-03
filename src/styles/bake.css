@@ -1,0 +1,17 @@
+/* Baking the lens: every frame drawn settled; no saturated selection under captions. */
+.bake,
+.bake * {
+  transition: none !important;
+  animation: none !important;
+}
+.bake .st-ni.sel {
+  background: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cap .w,
+  .cap .b {
+    transition-duration: 0.01s !important;
+    transform: none !important;
+  }
+}

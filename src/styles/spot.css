@@ -1,0 +1,15 @@
+/* What to look at: the component itself lights up, ring on its own shape. */
+.spot {
+  outline: 2px solid transparent;
+  outline-offset: 7px;
+  transition:
+    outline-color 0.45s ease,
+    outline-offset 0.5s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.5s ease,
+    background-color 0.35s ease;
+}
+.spot.lit {
+  outline-color: var(--a);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 8px color-mix(in srgb, var(--a) 14%, transparent);
+}

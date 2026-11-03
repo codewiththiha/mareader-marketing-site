@@ -1,0 +1,75 @@
+/* sidebar */
+.sb {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 368px;
+  background: var(--s);
+  border-right: 1px solid var(--l);
+  transform: translateX(-101%);
+  transition: transform 0.55s var(--e-pane);
+  z-index: 10;
+  overflow: hidden;
+}
+.sb.on {
+  transform: none;
+}
+.sb-i {
+  position: absolute;
+  top: 11px;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  color: var(--u);
+}
+.sb-th {
+  position: absolute;
+  width: 154px;
+  height: 198px;
+  background: var(--th);
+  border-radius: 2px;
+  box-shadow:
+    0 1px 2px rgba(40, 25, 5, 0.16),
+    0 4px 12px rgba(40, 25, 5, 0.07);
+}
+.sb-th.sel {
+  outline: 3px solid var(--a);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+.sb-n {
+  position: absolute;
+  width: 154px;
+  text-align: center;
+  font-size: 15px;
+  line-height: 20px;
+  color: var(--m);
+}
+.sb-n.sel {
+  color: var(--u);
+}
+.sb-tabs {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 76px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: var(--s);
+}
+.sb-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 14.5px;
+  color: var(--m);
+}
+.sb-tab.sel {
+  color: var(--a);
+  font-weight: 500;
+}

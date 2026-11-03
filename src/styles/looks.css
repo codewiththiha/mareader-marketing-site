@@ -1,0 +1,81 @@
+/* ---------------------------------------------------------------- reading looks, eased like the app's crossfade */
+@property --p {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #e6d9c3;
+}
+@property --k {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #1d1a16;
+}
+@property --u {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #2b2419;
+}
+@property --m {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #6a5a46;
+}
+@property --s {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #ecd8bc;
+}
+@property --l {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #d8c2a4;
+}
+@property --a {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #7a4e06;
+}
+@property --as {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #f2c48b;
+}
+@property --ai {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #fff4e2;
+}
+@property --c {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #f2e1c8;
+}
+@property --hl {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #cdb58b;
+}
+@property --lk {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #3b2fbf;
+}
+@property --mk {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #e8796b;
+}
+@property --mks {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #c9535b;
+}
+@property --th {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #f3e2cb;
+}
+@property --tx {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}

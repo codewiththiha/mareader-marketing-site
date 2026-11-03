@@ -1,0 +1,64 @@
+/* ---------------------------------------------------------------- the film */
+.film {
+  position: relative;
+}
+.stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+}
+.cam,
+.lens-cam {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1536px;
+  height: 960px;
+  transform-origin: 0 0;
+}
+.win-frame {
+  width: 1536px;
+  height: 960px;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: var(--win-shadow);
+}
+
+/* The lens: a baked lens blur of the very frame on screen, toned for reading. */
+.lens {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transition: opacity 0.7s ease;
+  z-index: 3;
+}
+.lens-base {
+  position: absolute;
+  inset: 0;
+  background: var(--bg);
+  transition: background-color 0.4s ease;
+}
+.lens-img {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1536px;
+  height: 960px;
+  border-radius: 14px;
+  transition: opacity 0.6s ease;
+}
+.lens-tone {
+  position: absolute;
+  inset: 0;
+  transition: background-color 0.6s ease;
+}
+.lens-grain {
+  position: absolute;
+  inset: 0;
+  background-image: var(--grain);
+  background-size: 160px 160px;
+  opacity: 0.07;
+  mix-blend-mode: overlay;
+}

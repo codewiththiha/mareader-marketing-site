@@ -18,10 +18,11 @@ Rules for every agent and human working in this repository. They are enforced me
 
 ## Visual parity
 
-- The Svelte rewrite must stay pixel-identical to the React baseline in `tools/visual/baseline/`.
-- `node tools/visual/capture.mjs --url <url> --out <dir>` captures the four reference views; `node tools/visual/compare.mjs` diffs them with pixelmatch (threshold 0.1, max ratio 0.005).
-- Captures freeze `requestAnimationFrame` and gate the focus-measure interval behind `window.__measureGo` so both implementations settle on identical geometry.
-- Any change that moves a pixel fails CI; fix the component, never the baseline.
+- The rewrite was proven pixel-identical to the original React build at commit `4bf842f`; those proofs live in `tools/visual/baseline-react/` and stay untouched as history.
+- From then on `tools/visual/baseline/` is the approved Svelte state: nine views (home light/dark/hero/mobile, releases light/dark, donate light/dark and donate local). It is a regression gate — any change that moves a pixel fails CI until the change is reviewed and the baseline is deliberately refreshed.
+- `node tools/visual/capture.mjs --url <url> --out <dir>` captures every view; `node tools/visual/compare.mjs` diffs them with pixelmatch (threshold 0.1, max ratio 0.005).
+- Captures freeze `requestAnimationFrame`, gate the focus-measure interval behind `window.__measureGo` and force-load webfonts, so captures settle on identical geometry every run.
+- Fix the component, never the baseline; refresh the baseline only in the same commit as the reviewed visual change.
 
 ## Svelte style
 

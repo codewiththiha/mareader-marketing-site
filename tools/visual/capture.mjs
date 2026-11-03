@@ -17,7 +17,20 @@ const SHOTS = [
 	{ name: "desktop-light", width: 1280, height: 800, theme: "light", fullPage: true },
 	{ name: "desktop-dark", width: 1280, height: 800, theme: "dark", fullPage: true },
 	{ name: "desktop-hero", width: 1280, height: 800, theme: "light", fullPage: false },
-	{ name: "mobile-light", width: 390, height: 844, theme: "light", fullPage: true }
+	{ name: "mobile-light", width: 390, height: 844, theme: "light", fullPage: true },
+	{ name: "releases-light", width: 1280, height: 800, theme: "light", fullPage: true, hash: "#/releases" },
+	{ name: "releases-dark", width: 1280, height: 800, theme: "dark", fullPage: true, hash: "#/releases" },
+	{ name: "donate-light", width: 1280, height: 800, theme: "light", fullPage: true, hash: "#/donate" },
+	{ name: "donate-dark", width: 1280, height: 800, theme: "dark", fullPage: true, hash: "#/donate" },
+	{
+		name: "donate-local-light",
+		width: 1280,
+		height: 800,
+		theme: "light",
+		fullPage: true,
+		hash: "#/donate",
+		donate: "local"
+	}
 ];
 
 mkdirSync(out, { recursive: true });
@@ -34,26 +47,30 @@ for (const shot of SHOTS) {
 		deviceScaleFactor: 1,
 		colorScheme: shot.theme
 	});
-	await context.addInitScript((theme) => {
-		window.requestAnimationFrame = () => 0;
-		window.cancelAnimationFrame = () => {};
-		const si = window.setInterval.bind(window);
-		window.setInterval = (fn, ms, ...rest) =>
-			ms === 140
-				? si(
-						() => {
-							if (window.__measureGo) fn();
-						},
-						ms,
-						...rest
-					)
-				: si(fn, ms, ...rest);
-		try {
-			localStorage.setItem("mareader-site-theme", theme);
-		} catch {}
-	}, shot.theme);
+	await context.addInitScript(
+		({ theme, donate }) => {
+			window.requestAnimationFrame = () => 0;
+			window.cancelAnimationFrame = () => {};
+			const si = window.setInterval.bind(window);
+			window.setInterval = (fn, ms, ...rest) =>
+				ms === 140
+					? si(
+							() => {
+								if (window.__measureGo) fn();
+							},
+							ms,
+							...rest
+						)
+					: si(fn, ms, ...rest);
+			try {
+				localStorage.setItem("mareader-site-theme", theme);
+				if (donate) localStorage.setItem("mareader-donate-mode", donate);
+			} catch {}
+		},
+		{ theme: shot.theme, donate: shot.donate ?? "" }
+	);
 	const warm = await context.newPage();
-	await warm.goto(url, { waitUntil: "networkidle" });
+	await warm.goto(`${url}${shot.hash ?? ""}`, { waitUntil: "networkidle" });
 	await warm.evaluate(() => document.fonts.ready);
 	await warm.close();
 	const page = await context.newPage();
@@ -62,11 +79,19 @@ for (const shot of SHOTS) {
 		if (m.type() === "error") errors.push(m.text());
 	});
 	page.on("pageerror", (e) => errors.push(String(e)));
-	await page.goto(url, { waitUntil: "networkidle" });
+	await page.goto(`${url}${shot.hash ?? ""}`, { waitUntil: "networkidle" });
 	await page.addStyleTag({
 		content: "*, *::before, *::after { transition-duration: 0s !important; animation-duration: 0s !important; }"
 	});
 	await page.evaluate(() => document.fonts.ready);
+	await page.evaluate(() =>
+		Promise.all([
+			document.fonts.load("16px Inter"),
+			document.fonts.load("600 16px Inter"),
+			document.fonts.load("16px Literata"),
+			document.fonts.load("500 16px Literata")
+		])
+	);
 	const fontsOk = await page.evaluate(
 		() => document.fonts.check("16px Inter") && document.fonts.check("16px Literata")
 	);

@@ -1,7 +1,10 @@
 // Self-review pipeline: static checks, build, screenshots, pixel compare.
 // Writes tools/visual/REPORT.md and exits non-zero when any check fails.
 // Usage: node tools/evaluate.mjs
-import { execFileSync } from "node:child_process";
+import { execFile, execFileSync } from "node:child_process";
+import { promisify } from "node:util";
+
+const execFileAsync = promisify(execFile);
 import { createServer } from "node:http";
 import { readFileSync, writeFileSync, existsSync, statSync, readdirSync } from "node:fs";
 import { join, extname } from "node:path";
@@ -26,7 +29,7 @@ function run(name, cmd, args) {
 		return { name, pass: true, detail: "ok" };
 	} catch (error) {
 		const tail = String(error.stdout ?? "") + String(error.stderr ?? "");
-		return { name, pass: false, detail: tail.trim().split("\n").slice(-4).join(" / ").slice(0, 400) };
+		return { name, pass: false, detail: tail.trim().split("\n").slice(-14).join(" / ").slice(0, 900) };
 	}
 }
 
@@ -88,11 +91,21 @@ const server = createServer((req, res) => {
 	res.end(readFileSync(file));
 });
 await new Promise((resolve) => server.listen(8090, "127.0.0.1", resolve));
+
+async function runAsync(name, cmd, args) {
+	try {
+		await execFileAsync(cmd, args, { cwd: root });
+		return { name, pass: true, detail: "ok" };
+	} catch (error) {
+		const tail = String(error.stdout ?? "") + String(error.stderr ?? "");
+		return { name, pass: false, detail: tail.trim().split("\n").slice(-6).join(" / ").slice(0, 600) };
+	}
+}
 checks.push(
-	run("screenshots", "node", ["tools/visual/capture.mjs", "--url", "http://127.0.0.1:8090/", "--out", shots])
+	await runAsync("screenshots", "node", ["tools/visual/capture.mjs", "--url", "http://127.0.0.1:8090/", "--out", shots])
 );
 checks.push(
-	run("pixel parity", "node", [
+	await runAsync("pixel parity", "node", [
 		"tools/visual/compare.mjs",
 		"--shots",
 		shots,

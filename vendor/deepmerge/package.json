@@ -1,0 +1,14 @@
+{
+  "name": "deepmerge",
+  "version": "4.3.2",
+  "description": "Audited stand-in for the unmaintained deepmerge package",
+  "type": "module",
+  "main": "./index.cjs",
+  "exports": {
+    ".": {
+      "import": "./index.mjs",
+      "require": "./index.cjs"
+    }
+  },
+  "license": "MIT"
+}

@@ -1,0 +1,7 @@
+node_modules
+dist
+.shots
+.visual-diff
+/tmp/bake
+*.log
+.DS_Store

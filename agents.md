@@ -27,6 +27,8 @@
 - `npm run lint` eslint; `npm run format:check` prettier; `npm run check` svelte-check.
 - `npm run test` vitest unit tests; `npm run guard` policy guard.
 - `npm run bake` regenerate lens blurs; `scripts/compare-blur.py` checks them.
+- `npm run releases` refresh the embedded release-notes snapshot.
+- `npm run ci:watch` poll this head's CI run to a verdict (0 green, 1 red, 2 running).
 - `npm run shots` capture screenshots; `npm run visual` compare to baselines.
 - `npm run review` print the self-review summary and fail on regressions.
 
@@ -34,4 +36,4 @@
 
 - Jobs: quality (lint, format, check, tests, audit, guard), visual (build,
   screenshots, compare, review), bake (lens blur reproducibility), commits.
-- Push only when every job is green.
+- Push only when every job is green, then wait with `npm run ci:watch`.

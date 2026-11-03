@@ -20,10 +20,13 @@
     "shots": "node tests/visual/capture.mjs dist .shots all",
     "visual": "node tests/visual/compare.mjs tests/visual/baselines .shots .visual-diff",
     "review": "node scripts/review.mjs",
+    "releases": "node scripts/fetch-releases.mjs",
+    "ci:watch": "python3 scripts/ci_wait.py watch",
     "prepare": "python3 scripts/install_hooks.py"
   },
   "dependencies": {
-    "lucide": "^1.67.0"
+    "lucide": "^1.67.0",
+    "uqr": "^0.1.3"
   },
   "overrides": {
     "deepmerge": "file:vendor/deepmerge",

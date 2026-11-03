@@ -37,12 +37,10 @@
 </script>
 
 <!-- one span per word, as before; the lit phrase shares one wash -->
-{#snippet wordAt(w: string, i: number)}
-  {@const isWord = w === "spleen"}
-  <span
-    >{#if isWord}<span class="mk-w mk-w-{mark}" data-focus="word">spleen{@render children?.()}</span
-      >{:else}{w}{/if}{#if i < READ_SENTENCE.length - 1}{SP}{/if}</span
-  >
+{#snippet wordAt(w: string)}
+  {#if w === "spleen"}
+    <span class="mk-w mk-w-{mark}" data-focus="word">spleen{@render children?.()}</span>
+  {:else}<span>{w}</span>{/if}
 {/snippet}
 
 {#if book === "b"}
@@ -78,15 +76,19 @@
         {#if reading}
           {@const a = reading[0]}
           {@const b = reading[1]}
-          {#each READ_SENTENCE.slice(0, a) as w, i (i)}{@render wordAt(w, i)}{/each}
+          {#each READ_SENTENCE.slice(0, a) as w, i (i)}{@render wordAt(w)}{SP}{/each}
           <span class="mk-phrase" data-focus="read"
             >{#each READ_SENTENCE.slice(a, b + 1) as w, j (j)}{@render wordAt(
-                w,
-                a + j
-              )}{/each}</span
-          >{#each READ_SENTENCE.slice(b + 1) as w, k (k)}{@render wordAt(w, b + 1 + k)}{/each}
+                w
+              )}{#if a + j < b}{SP}{/if}{/each}</span
+          >{#if b < READ_SENTENCE.length - 1}{SP}{/if}
+          {#each READ_SENTENCE.slice(b + 1) as w, k (k)}
+            {@const i = b + 1 + k}{@render wordAt(w)}{#if i < READ_SENTENCE.length - 1}{SP}{/if}
+          {/each}
         {:else}
-          {#each READ_SENTENCE as w, i (i)}{@render wordAt(w, i)}{/each}
+          {#each READ_SENTENCE as w, i (i)}
+            {@render wordAt(w)}{#if i < READ_SENTENCE.length - 1}{SP}{/if}
+          {/each}
         {/if}
         Whenever I find myself growing grim about the mouth; whenever it is a damp, drizzly November in
         my soul; whenever I find myself involuntarily pausing before coffin warehouses, and bringing up

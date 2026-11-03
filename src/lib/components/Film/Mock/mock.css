@@ -172,15 +172,18 @@
     box-shadow 0.5s;
 }
 .mk-w-sel {
-  background: color-mix(in srgb, var(--accent) 30%, transparent);
+  background: color-mix(in srgb, var(--accent) 32%, transparent);
+  border-radius: 2px;
 }
+/* explained words keep the reserved half-pen look */
 .mk-w-ai {
-  background: color-mix(in srgb, #a58af0 50%, transparent);
+  background: linear-gradient(transparent 50%, color-mix(in srgb, #a58af0 55%, transparent) 50%);
+  border-radius: 2px;
 }
 /* one continuous wash over the phrase the voice is on, as a pen on paper */
 .mk-phrase {
   background: color-mix(in srgb, var(--accent) 30%, transparent);
-  border-radius: 3px;
+  border-radius: 2px;
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
 }
@@ -899,6 +902,9 @@
 .mk-row.sel {
   background: var(--soft);
 }
+.mk-group.lit-group {
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
 .mk-row-text {
   flex: 1;
   min-width: 0;
@@ -927,9 +933,6 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-.mk-tick {
-  color: var(--accent);
 }
 .mk-logo {
   flex: none;

@@ -2,7 +2,6 @@
   // SettingsWindow — providers and voices
   import {
     Ban,
-    Check,
     ChevronDown,
     ChevronRight,
     Columns2,
@@ -97,8 +96,8 @@
         {#if tab === "models"}
           <div class="mk-set-scroll" style="transform: translateY({-offset}px)">
             <div class="mk-section">Models</div>
-            <div class="mk-group">
-              <div class="mk-row tall {step === 0 ? 'lit' : ''}">
+            <div class="mk-group lit-group">
+              <div class="mk-row tall">
                 <span class="mk-logo"
                   ><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"
                     ><path d={LOGOS["apple"]} /></svg
@@ -109,7 +108,7 @@
                 </div>
                 <ChevronRight size={16} strokeWidth={1.75} class="mk-chev" />
               </div>
-              <div class="mk-row tall {step === 0 ? 'lit' : ''}">
+              <div class="mk-row tall">
                 <span class="mk-logo"
                   ><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"
                     ><path d={LOGOS["ollama"]} /></svg
@@ -229,13 +228,11 @@
                 </div>
               </div>
               <i class="mk-div"></i>
-              <div class="mk-row tall sel">
+              <div class="mk-row tall">
                 <div class="mk-row-text">
-                  <b><Check size={14} strokeWidth={2.25} class="mk-tick" />Piper</b><small
-                    >Quick, clear English voices</small
-                  >
+                  <b>Piper</b><small>Quick, clear English voices</small>
                 </div>
-                <span class="mk-btn">Manage <ChevronRight size={13} strokeWidth={1.75} /></span>
+                <span class="mk-btn"><Download size={13} strokeWidth={1.75} /> Download</span>
               </div>
               <i class="mk-div"></i>
               <div class="mk-row tall">

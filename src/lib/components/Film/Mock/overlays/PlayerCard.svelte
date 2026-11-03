@@ -1,6 +1,7 @@
 <script lang="ts">
   // PlayerCard — read-aloud lyrics
   import { SkipBack, SkipForward, Pause, X } from "@lucide/svelte";
+  import { READ_PHRASES } from "@/lib/constants";
   let { open, tick }: { open: boolean; tick: number } = $props();
   let mounted = $state(false);
   let show = $state(false);
@@ -32,8 +33,7 @@
     "the",
     "circulation."
   ];
-  let start = 7;
-  let lit = $derived(start + 1 + (tick % 4));
+  let ph = $derived(READ_PHRASES[Math.floor(tick / 4) % READ_PHRASES.length]);
   const BARS = [0.5, 0.9, 0.35, 0.75];
 </script>
 
@@ -52,7 +52,7 @@
         <div class="before">Some years ago, never mind how long precisely.</div>
         <div class="now">
           {#each words as w, i (i)}{@const sp = " "}<span
-              class={i <= lit && i >= start ? "lit" : ""}
+              class={i >= ph[0] && i <= ph[1] ? "lit" : ""}
               >{w}{#if i < words.length - 1}{sp}{/if}</span
             >{/each}
         </div>

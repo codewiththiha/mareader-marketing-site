@@ -2,6 +2,7 @@
   // MockWindow — panes with themes and overlays
   import { Library, BookA, PanelLeft, Palette, Search, Ellipsis } from "@lucide/svelte";
   import { THEMES, themeVars } from "@/lib/themes";
+  import { READ_PHRASES } from "@/lib/constants";
   import type { AppTheme } from "@/lib/themes";
   import type { DocKind, Fold, Scene } from "@/lib/scenes";
   import EpubPage from "./pages/EpubPage.svelte";
@@ -95,7 +96,7 @@
     const id = setInterval(() => tick++, 520);
     return () => clearInterval(id);
   });
-  let lit = $derived(7 + 1 + (tick % 4));
+  let ph = $derived(READ_PHRASES[Math.floor(tick / 4) % READ_PHRASES.length]);
   let winStyle = $derived({ ...themeVars(winTheme), width: `${W}px`, height: `${H}px` } as Record<
     string,
     string
@@ -128,7 +129,7 @@
                     ? "sel"
                     : "none"
                 : "none"}
-              reading={first && scene.player ? [7, lit] : null}
+              reading={first && scene.player ? ph : null}
             >
               {#if first}
                 <SelectionBar open={scene.ai === "bar"} />

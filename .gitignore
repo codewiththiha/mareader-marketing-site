@@ -5,3 +5,5 @@ dist
 /tmp/bake
 *.log
 .DS_Store
+tests/visual/baselines/
+src/blur/

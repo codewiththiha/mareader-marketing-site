@@ -5,14 +5,6 @@
   const GH = "https://github.com/codewiththiha/mareader2";
   const year = new Date().getFullYear();
 
-  const toDownload = (e: Event) => {
-    if (router.current !== "home") {
-      e.preventDefault();
-      router.go("home");
-      window.setTimeout(() => document.getElementById("download")?.scrollIntoView(), 60);
-    }
-  };
-
   const toTop = (e: Event) => {
     e.preventDefault();
     if (router.current !== "home") router.go("home");
@@ -31,7 +23,7 @@
     </div>
     <nav aria-label="Product">
       <h4>Product</h4>
-      <a href="#download" onclick={toDownload}>Download</a>
+      <a href={router.href("download")} aria-current={router.current === "download" ? "page" : undefined}>Download</a>
       <a href={router.href("releases")} aria-current={router.current === "releases" ? "page" : undefined}>Release notes</a>
       <a href={router.href("donate")} aria-current={router.current === "donate" ? "page" : undefined}>Support</a>
     </nav>

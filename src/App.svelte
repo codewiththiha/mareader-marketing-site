@@ -3,6 +3,7 @@
   import Film from "$lib/film/Film.svelte";
   import Details from "$lib/site/Details.svelte";
   import DonatePage from "$lib/pages/DonatePage.svelte";
+  import DownloadPage from "$lib/pages/DownloadPage.svelte";
   import Footer from "$lib/site/Footer.svelte";
   import Get from "$lib/site/Get.svelte";
   import More from "$lib/site/More.svelte";
@@ -45,6 +46,8 @@
       <main id="top"><ReleasesPage /></main>
     {:else if router.current === "donate"}
       <main id="top"><DonatePage /></main>
+    {:else if router.current === "download"}
+      <main id="top"><DownloadPage /></main>
     {:else}
       <main id="top">
         <Film site={theme.current} />

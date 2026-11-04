@@ -1,10 +1,11 @@
 /** Hash router: the film stays home, notes and support get their own pages. */
-export type Route = "home" | "releases" | "donate";
+export type Route = "home" | "releases" | "donate" | "download";
 
 const parse = (hash: string): Route => {
   const h = hash.replace(/^#\/?/, "").split("?")[0];
   if (h === "releases" || h === "notes") return "releases";
   if (h === "donate" || h === "support") return "donate";
+  if (h === "download" || h === "get") return "download";
   return "home";
 };
 

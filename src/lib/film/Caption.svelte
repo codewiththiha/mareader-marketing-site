@@ -1,11 +1,13 @@
 <script lang="ts">
+  import { OS_LABEL } from "$lib/site/downloads";
+  import { router } from "$lib/site/router.svelte";
+  import { platform } from "$lib/utils/platform.svelte";
   import type { Layout } from "./layout";
   import type { Step } from "./steps";
 
   let { step, L, on, ink }: { step: Step; L: Layout; on: boolean; ink: { i: string; m: string } } = $props();
 
   const GH = "https://github.com/codewiththiha/mareader2";
-  const RELEASES = `${GH}/releases/latest`;
   const SEP = " ";
   const words = $derived(step.title.split(" "));
   const cls = $derived(["cap", on ? "on" : "", L.landscape ? "land" : "port", step.hero ? "hero" : "", L.side].join(" "));
@@ -32,7 +34,7 @@
   <p class="cap-b b" style:color={ink.m}>{step.body}</p>
   {#if step.hero}
     <div class="cap-cta b">
-      <a class="btn btn-accent" href={RELEASES} tabindex={on ? 0 : -1}>Download, it's free</a>
+      <a class="btn btn-accent" href={router.href("download")} tabindex={on ? 0 : -1}>Download for {OS_LABEL[platform.os]}</a>
       <a class="btn btn-ghost" href={GH} tabindex={on ? 0 : -1}>View on GitHub</a>
     </div>
   {/if}

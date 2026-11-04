@@ -7,3 +7,4 @@ tests/visual/baselines
 src/blur
 src/assets
 src/lib/site/releases.ts
+netlify.toml

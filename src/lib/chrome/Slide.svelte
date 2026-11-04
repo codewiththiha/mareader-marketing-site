@@ -9,25 +9,67 @@
   }: { group: SlideGroup; radius?: number; bg?: string; ring?: string } = $props();
 
   let self = $state<HTMLSpanElement | undefined>();
-  let off = $state({ x: 0, y: 0 });
-  // viewport rects from the group, re-based onto the marker's own container
-  $effect(() => {
-    const target = group.rect;
-    const host = self?.parentElement;
-    if (!target || !host) return;
+  let off = $state({ x: 0, y: 0, w: 0, h: 0 });
+  let on = $state(false);
+  let jump = $state(false);
+  let was = false;
+
+  // both rects come from one tick and are divided by the host's own scale, so a scaled ancestor (camera, popover) cannot skew them
+  const place = (host: HTMLElement, el: HTMLElement) => {
     const h = host.getBoundingClientRect();
-    off = { x: target.x - h.left - host.clientLeft, y: target.y - h.top - host.clientTop };
+    const t = el.getBoundingClientRect();
+    const k = host.offsetWidth > 0 ? h.width / host.offsetWidth : 1;
+    if (!k) return false;
+    off = {
+      x: (t.left - h.left) / k - host.clientLeft,
+      y: (t.top - h.top) / k - host.clientTop,
+      w: t.width / k,
+      h: t.height / k,
+    };
+    return true;
+  };
+
+  $effect(() => {
+    const host = self?.parentElement;
+    const el = group.el;
+    if (!host) return;
+    if (!el) {
+      on = false;
+      was = false;
+      return;
+    }
+    const first = !was;
+    if (first) {
+      on = false;
+      jump = true;
+    }
+    if (!place(host, el)) return;
+    on = true;
+    was = true;
+    const raf = requestAnimationFrame(() => {
+      jump = false;
+    });
+    const ro = new ResizeObserver(() => {
+      if (el.isConnected) place(host, el);
+    });
+    ro.observe(host);
+    return () => {
+      cancelAnimationFrame(raf);
+      ro.disconnect();
+      jump = false;
+    };
   });
 </script>
 
 <span
   bind:this={self}
   class="slide-mark"
-  class:on={group.shown && !!group.rect}
+  class:on={on && group.shown}
+  class:jump
   style:left="{off.x}px"
   style:top="{off.y}px"
-  style:width={group.rect ? `${group.rect.w}px` : "0px"}
-  style:height={group.rect ? `${group.rect.h}px` : "0px"}
+  style:width="{off.w}px"
+  style:height="{off.h}px"
   style:border-radius="{radius}px"
   style:--slide-bg={bg}
   style:--slide-ring={ring}
@@ -53,5 +95,8 @@
   }
   .slide-mark.on {
     opacity: 1;
+  }
+  .slide-mark.jump {
+    transition: none;
   }
 </style>

@@ -1,32 +1,20 @@
 /** A highlight that slides between the buttons of a group as you move across them. */
-export interface SlideRect {
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-}
-
 export function slideGroup() {
-  let rect = $state<SlideRect | null>(null);
+  let el = $state<HTMLElement | null>(null);
   let shown = $state(false);
   return {
-    get rect() {
-      return rect;
+    get el() {
+      return el;
     },
     get shown() {
       return shown;
     },
-    move(el: HTMLElement | null) {
-      if (!el) {
-        shown = false;
-        return;
-      }
-      const r = el.getBoundingClientRect();
-      rect = { x: r.left, y: r.top, w: r.width, h: r.height };
-      shown = true;
+    move(node: HTMLElement | null | undefined) {
+      el = node?.isConnected ? node : null;
+      shown = el !== null;
     },
     rest() {
-      shown = rect !== null;
+      shown = el !== null;
     },
   };
 }

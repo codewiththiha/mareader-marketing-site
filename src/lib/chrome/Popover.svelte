@@ -1,12 +1,30 @@
 <script lang="ts">
+  import Slide from "./Slide.svelte";
   import { CLASSIC, CUSTOM, LOOKS, hueColour, type LookId } from "$lib/looks";
   import Icon from "$lib/icons/Icon.svelte";
   import { ChevronDown, ChevronUp, Eclipse, Moon, Plus, Sun, SunMoon, type IconNode } from "$lib/icons/nodes";
+  import { slideGroup, type SlideGroup } from "$lib/utils/slide.svelte";
 
   let { shown, mode, sel, perPane, lit }: { shown: boolean; mode: "themes" | "split"; sel: LookId; perPane: boolean; lit: string | null } =
     $props();
 
   const L = $derived(LOOKS[sel]);
+
+  let held: "themes" | "split" = "themes";
+  const live = $derived.by(() => {
+    if (shown) held = mode;
+    return shown ? mode : held;
+  });
+  const modeG = slideGroup();
+  const texG = slideGroup();
+  let modeEls = $state<Record<string, HTMLElement | undefined>>({});
+  let texEls = $state<Record<string, HTMLElement | undefined>>({});
+  $effect(() => {
+    modeG.move(modeEls[L.mode] ?? null);
+  });
+  $effect(() => {
+    texG.move(texEls[L.texture] ?? null);
+  });
   const colourSum = $derived(`${L.mode}${L.strength ? ` · ${L.hueName} ${L.strength}%` : ""}`);
   const texSum = $derived(L.texture === "None" ? "None" : `Real paper · ${L.texOpacity}%`);
   const grainSum = $derived(L.grain === "Off" ? "Off" : `${L.grain} · ${L.grainI}%`);
@@ -61,10 +79,17 @@
   </div>
 {/snippet}
 
-{#snippet segs(items: [string, IconNode | null][], value: string, cols: number)}
+{#snippet segs(
+  items: [string, IconNode | null][],
+  value: string,
+  cols: number,
+  group: SlideGroup,
+  els: Record<string, HTMLElement | undefined>,
+)}
   <div class="segs" style:grid-template-columns={`repeat(${cols}, 1fr)`}>
+    <Slide {group} radius={7} bg="var(--c)" ring="0 1px 2px rgba(0, 0, 0, 0.14)" />
     {#each items as [name, node] (name)}
-      <div class="seg" class:on={name === value}>
+      <div class="seg" class:on={name === value} bind:this={els[name]}>
         {#if node}<Icon {node} size={13} strokeWidth={2} ariaHidden />{/if}
         <span>{name}</span>
       </div>
@@ -88,9 +113,9 @@
   {@render cards(CLASSIC)}
   <div class="pop-sec">Custom</div>
   {@render cards(CUSTOM)}
-  {#if mode === "themes"}
+  {#if live === "themes"}
     {@render fold("Mode & colour", colourSum, true)}
-    {@render segs(MODES, L.mode, 4)}
+    {@render segs(MODES, L.mode, 4, modeG, modeEls)}
     <div class="dial">
       <span class="dial-n">Hue</span>
       <span class="hue" style:background={HUE_STRIP}>
@@ -105,7 +130,7 @@
     </div>
     {@render dial("Strength", L.strength, `${L.strength}%`)}
     {@render fold("Page texture", texSum, true)}
-    {@render segs(TEXTURES, L.texture, 3)}
+    {@render segs(TEXTURES, L.texture, 3, texG, texEls)}
     {@render dial("Opacity", L.texOpacity, `${L.texOpacity}%`, L.texture === "None")}
     {@render dial("Scale", 30, "110%", L.texture === "None")}
     {@render fold("Film grain", grainSum)}

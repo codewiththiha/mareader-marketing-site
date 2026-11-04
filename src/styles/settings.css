@@ -211,9 +211,7 @@
   margin: 12px 2px 0;
 }
 .st-indent {
-  border-left: 3px solid color-mix(in srgb, var(--a) 20%, var(--l));
   padding-left: 14px;
-  margin-left: -2px;
 }
 .st-row {
   display: flex;

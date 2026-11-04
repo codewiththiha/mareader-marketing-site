@@ -63,8 +63,8 @@
       </div>
     {/key}
     <svg class="wc-caret" width={CARET * 2 + 2} height={CARET + 2} style:left="{cx - CARET - 1}px" aria-hidden="true">
-      <path d="M0 0 L1 0 L{CARET + 1} {CARET} L{CARET * 2 + 1} 0 L{CARET * 2 + 2} 0 L{CARET * 2 + 2} 1 L0 1 Z" fill="var(--wc-bg)" />
-      <path d="M1 0.5 L{CARET + 1} {CARET + 0.5} L{CARET * 2 + 1} 0.5" fill="var(--wc-bg)" stroke="var(--l)" stroke-width="1" />
+      <path d="M0 0 L{CARET * 2 + 2} 0 L{CARET * 2 + 2} 1 L{CARET * 2 + 1} 1 L{CARET + 1} {CARET + 1} L1 1 L0 1 Z" fill="var(--wc-bg)" />
+      <path d="M1 1 L{CARET + 1} {CARET + 1} L{CARET * 2 + 1} 1" fill="none" stroke="var(--l)" stroke-width="1" />
     </svg>
   </div>
 {/if}

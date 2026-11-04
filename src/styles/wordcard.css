@@ -91,7 +91,7 @@
 }
 .wc-caret {
   position: absolute;
-  bottom: -10px;
+  bottom: -9px;
   overflow: visible;
 }
 .stream > * {

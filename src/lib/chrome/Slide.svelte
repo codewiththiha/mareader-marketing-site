@@ -1,7 +1,12 @@
 <script lang="ts">
   import type { SlideGroup } from "$lib/utils/slide.svelte";
 
-  let { group, radius = 10 }: { group: SlideGroup; radius?: number } = $props();
+  let {
+    group,
+    radius = 10,
+    bg = "color-mix(in srgb, var(--ink) 7%, transparent)",
+    ring = "inset 0 0 0 1px color-mix(in srgb, var(--ink) 12%, transparent)",
+  }: { group: SlideGroup; radius?: number; bg?: string; ring?: string } = $props();
 
   let self = $state<HTMLSpanElement | undefined>();
   let off = $state({ x: 0, y: 0 });
@@ -24,6 +29,8 @@
   style:width={group.rect ? `${group.rect.w}px` : "0px"}
   style:height={group.rect ? `${group.rect.h}px` : "0px"}
   style:border-radius="{radius}px"
+  style:--slide-bg={bg}
+  style:--slide-ring={ring}
   aria-hidden="true"
 ></span>
 
@@ -32,8 +39,8 @@
     position: absolute;
     left: 0;
     top: 0;
-    background: color-mix(in srgb, var(--ink) 7%, transparent);
-    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink) 12%, transparent);
+    background: var(--slide-bg);
+    box-shadow: var(--slide-ring);
     opacity: 0;
     pointer-events: none;
     transition:

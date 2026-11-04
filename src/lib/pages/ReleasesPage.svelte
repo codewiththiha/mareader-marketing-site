@@ -48,13 +48,16 @@
       </h2>
       <div class="rel-fold" id="fold-{release.tag}" role="region" aria-label="{release.tag} highlights">
         <div class="rel-fold-in">
-          <ul class="rel-points">
-            {#each highlightsFor(release) as h, hi (hi)}
-              <li>
-                {#if h.lead}<strong>{h.lead}</strong>&nbsp;{/if}{h.rest}
-              </li>
-            {/each}
-          </ul>
+          {#each highlightsFor(release) as sec, si (si)}
+            {#if sec.title}<h4 class="rel-sec">{sec.title}</h4>{/if}
+            <ul class="rel-points">
+              {#each sec.items as point, pi (pi)}
+                <li>
+                  {#if point.lead}<strong>{point.lead}</strong>&nbsp;{/if}{point.rest}
+                </li>
+              {/each}
+            </ul>
+          {/each}
           <p class="rel-full">
             <a href={releaseUrl(release.tag)} rel="noopener noreferrer">Full notes for {release.tag} on GitHub →</a>
           </p>

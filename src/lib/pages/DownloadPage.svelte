@@ -37,7 +37,7 @@
         <Download />
         Download for {OS_LABEL[platform.os]}
       </a>
-      <p class="dl-cta-sub">{primary.label} · {primary.sub} · {primary.size} — or choose another build below</p>
+      <p class="dl-cta-sub">{primary.label} · {primary.size} — or choose another build below</p>
     {/if}
   </header>
 
@@ -73,7 +73,6 @@
                 <small>{o.hint}</small>
               </span>
               <span class="dl-row-side">
-                <span>{o.sub}</span>
                 <small>{o.size}</small>
               </span>
               <svg class="dl-go" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">

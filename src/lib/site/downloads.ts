@@ -28,7 +28,6 @@ export interface DlOption {
   id: string;
   label: string;
   hint: string;
-  sub: string;
   size: string;
   url: string;
 }
@@ -45,8 +44,8 @@ const FALLBACK = "https://github.com/codewiththiha/mareader2/releases/latest";
 const find = (test: (n: string) => boolean) => latest.assets.find((a) => test(a.name));
 const mb = (n?: number) => (n ? `${(n / 1048576).toFixed(1)} MB` : "");
 
-function opt(a: ReleaseAsset | undefined, id: string, label: string, hint: string, sub: string): DlOption {
-  return { id, label, hint, sub, size: mb(a?.size), url: a?.url ?? FALLBACK };
+function opt(a: ReleaseAsset | undefined, id: string, label: string, hint: string): DlOption {
+  return { id, label, hint, size: mb(a?.size), url: a?.url ?? FALLBACK };
 }
 
 export const GROUPS: DlGroup[] = [
@@ -60,14 +59,12 @@ export const GROUPS: DlGroup[] = [
         "mac-arm",
         "Apple silicon",
         "Macs from late 2020 on",
-        ".dmg · arm64",
       ),
       opt(
         find((n) => n.endsWith("_x64.dmg")),
         "mac-x64",
         "Intel",
         "Older Macs",
-        ".dmg · x64",
       ),
     ],
   },
@@ -81,14 +78,12 @@ export const GROUPS: DlGroup[] = [
         "win-exe",
         "Installer",
         "For you alone, no admin needed",
-        ".exe · x64",
       ),
       opt(
         find((n) => n.endsWith(".msi")),
         "win-msi",
         "MSI",
         "For managed machines",
-        ".msi · x64",
       ),
     ],
   },
@@ -102,21 +97,18 @@ export const GROUPS: DlGroup[] = [
         "linux-app",
         "AppImage",
         "Almost every distro",
-        "x86_64",
       ),
       opt(
         find((n) => n.endsWith("_amd64.deb")),
         "linux-deb",
         "Debian package",
         "Debian, Ubuntu, Mint, Pop!_OS",
-        ".deb · amd64",
       ),
       opt(
         find((n) => n.endsWith(".tar.gz")),
         "linux-tar",
         "Portable",
         "Arch and its family",
-        ".tar.gz",
       ),
     ],
   },

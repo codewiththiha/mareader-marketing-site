@@ -40,12 +40,21 @@ describe("download matrix", () => {
 });
 
 describe("highlights", () => {
-  it("curates every shipped release", () => {
+  const items = (tag: string) => highlightsFor(RELEASES.find((r) => r.tag === tag) ?? RELEASES[0]).flatMap((s) => s.items);
+
+  it("curates every shipped release in named sections", () => {
     for (const r of RELEASES) {
-      const h = highlightsFor(r);
-      expect(h.length).toBeGreaterThan(1);
-      expect(h.every((x) => x.lead && x.rest)).toBe(true);
+      const secs = highlightsFor(r);
+      expect(secs.length).toBeGreaterThanOrEqual(1);
+      expect(secs[0].title).not.toBe("");
+      expect(secs.flatMap((s) => s.items).every((x) => x.rest)).toBe(true);
     }
+  });
+
+  it("varies the shape between releases", () => {
+    const counts = RELEASES.map((r) => highlightsFor(r).flatMap((s) => s.items).length);
+    expect(new Set(counts).size).toBeGreaterThan(2);
+    expect(items("v0.0.5").length).not.toBe(items("v0.0.4").length);
   });
 
   it("falls back to the intro for an uncurated tag", () => {
@@ -56,6 +65,6 @@ describe("highlights", () => {
       body: "Intro line.\n\n- technical detail",
       assets: [],
     };
-    expect(highlightsFor(fake)).toEqual([{ lead: "", rest: "Intro line." }]);
+    expect(highlightsFor(fake)[0].items[0]).toEqual({ lead: "", rest: "Intro line." });
   });
 });

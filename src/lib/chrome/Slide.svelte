@@ -2,13 +2,25 @@
   import type { SlideGroup } from "$lib/utils/slide.svelte";
 
   let { group, radius = 10 }: { group: SlideGroup; radius?: number } = $props();
+
+  let self = $state<HTMLSpanElement | undefined>();
+  let off = $state({ x: 0, y: 0 });
+  // viewport rects from the group, re-based onto the marker's own container
+  $effect(() => {
+    const target = group.rect;
+    const host = self?.parentElement;
+    if (!target || !host) return;
+    const h = host.getBoundingClientRect();
+    off = { x: target.x - h.left - host.clientLeft, y: target.y - h.top - host.clientTop };
+  });
 </script>
 
 <span
+  bind:this={self}
   class="slide-mark"
   class:on={group.shown && !!group.rect}
-  style:left={group.rect ? `${group.rect.x}px` : "0px"}
-  style:top={group.rect ? `${group.rect.y}px` : "0px"}
+  style:left="{off.x}px"
+  style:top="{off.y}px"
   style:width={group.rect ? `${group.rect.w}px` : "0px"}
   style:height={group.rect ? `${group.rect.h}px` : "0px"}
   style:border-radius="{radius}px"

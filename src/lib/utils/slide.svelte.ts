@@ -21,7 +21,8 @@ export function slideGroup() {
         shown = false;
         return;
       }
-      rect = { x: el.offsetLeft, y: el.offsetTop, w: el.offsetWidth, h: el.offsetHeight };
+      const r = el.getBoundingClientRect();
+      rect = { x: r.left, y: r.top, w: r.width, h: r.height };
       shown = true;
     },
     rest() {

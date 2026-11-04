@@ -1,36 +1,9 @@
-/** Release-note markdown parsing and the download picker maths. */
+/** The download matrix maths and the curated release highlights. */
 import { describe, expect, it } from "vitest";
-import { inline, mdBlocks } from "../../src/lib/utils/md";
-import { parseArm, parseOs, picksFor } from "../../src/lib/site/downloads";
-
-describe("mdBlocks", () => {
-  const src = [
-    "## What's new",
-    "",
-    "- **Read along.** Words light up as spoken.",
-    "  Second line of the same note.",
-    "",
-    "Plain paragraph with `code` and [notes](https://x.dev/n).",
-  ].join("\n");
-  const blocks = mdBlocks(src);
-
-  it("splits headings, lists and paragraphs", () => {
-    expect(blocks.map((b) => b.k)).toEqual(["h3", "ul", "p"]);
-    expect(blocks[1].items).toHaveLength(1);
-  });
-
-  it("folds indented lines into the previous bullet", () => {
-    const item = blocks[1].items?.[0] ?? [];
-    expect(item.at(-1)?.text).toContain("Second line");
-  });
-
-  it("tokenises inline bold, code and links", () => {
-    const p = blocks[2].inlines;
-    expect(p.some((i) => i.k === "c" && i.text === "code")).toBe(true);
-    expect(p.some((i) => i.k === "a" && i.href === "https://x.dev/n")).toBe(true);
-    expect(inline("**a** b")[0]).toEqual({ k: "b", text: "a" });
-  });
-});
+import { GROUPS, parseArm, parseOs, primaryFor } from "../../src/lib/site/downloads";
+import { highlightsFor } from "../../src/lib/site/highlights";
+import { RELEASES } from "../../src/lib/site/releases";
+import type { Release } from "../../src/lib/site/releases-type";
 
 describe("platform parsing", () => {
   it("reads userAgentData first", () => {
@@ -47,18 +20,42 @@ describe("platform parsing", () => {
   });
 });
 
-describe("picksFor", () => {
-  it("offers the detected platform first, with siblings after", () => {
-    const mac = picksFor("mac");
-    expect(mac[0].url).toMatch(/_aarch64\.dmg$/);
-    expect(mac[1].url).toMatch(/_x64\.dmg$/);
-    const win = picksFor("windows");
-    expect(win[0].url).toMatch(/-setup\.exe$/);
-    const linux = picksFor("linux");
-    expect(linux[0].url).toMatch(/\.AppImage$/);
+describe("download matrix", () => {
+  it("gives every build a real url and a size", () => {
+    for (const g of GROUPS) {
+      for (const o of g.options) {
+        expect(o.url).toMatch(/^https:\/\/github\.com\//);
+        expect(o.size).toMatch(/MB$/);
+      }
+    }
   });
 
-  it("falls back to the three primaries when unknown", () => {
-    expect(picksFor("unknown")).toHaveLength(3);
+  it("picks the build that matches the visitor", () => {
+    expect(primaryFor("mac", true).id).toBe("mac-arm");
+    expect(primaryFor("mac", false).id).toBe("mac-x64");
+    expect(primaryFor("windows", false).id).toBe("win-exe");
+    expect(primaryFor("linux", true).id).toBe("linux-app");
+    expect(primaryFor("unknown", true).id).toBe("mac-arm");
+  });
+});
+
+describe("highlights", () => {
+  it("curates every shipped release", () => {
+    for (const r of RELEASES) {
+      const h = highlightsFor(r);
+      expect(h.length).toBeGreaterThan(1);
+      expect(h.every((x) => x.lead && x.rest)).toBe(true);
+    }
+  });
+
+  it("falls back to the intro for an uncurated tag", () => {
+    const fake: Release = {
+      tag: "v9.9.9",
+      name: "x",
+      published: "2026-01-01",
+      body: "Intro line.\n\n- technical detail",
+      assets: [],
+    };
+    expect(highlightsFor(fake)).toEqual([{ lead: "", rest: "Intro line." }]);
   });
 });

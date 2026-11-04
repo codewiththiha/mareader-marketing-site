@@ -1,67 +1,65 @@
 <script lang="ts">
+  import { releaseUrl } from "$lib/site/downloads";
+  import { highlightsFor } from "$lib/site/highlights";
   import { RELEASES } from "$lib/site/releases";
-  import { mdBlocks, type Inline } from "$lib/utils/md";
 
   const GH = "https://github.com/codewiththiha/mareader2/releases";
-  const mb = (n: number) => `${(n / 1048576).toFixed(1)} MB`;
-  const installers = (names: { name: string; size: number; url: string }[]) =>
-    names.filter((a) => /\.(dmg|exe|msi|deb|AppImage|tar\.gz)$/.test(a.name));
+  const latest = RELEASES[0]?.tag ?? "";
+  let open = $state<Record<string, boolean>>({ [latest]: true });
+  const toggle = (tag: string) => {
+    open[tag] = !open[tag];
+  };
 </script>
 
-{#snippet inlines(list: Inline[])}
-  {#each list as inl, i (i)}
-    {#if inl.k === "b"}
-      <strong>{inl.text}</strong>
-    {:else if inl.k === "c"}
-      <code>{inl.text}</code>
-    {:else if inl.k === "a"}
-      <a href={inl.href} rel="noopener noreferrer">{inl.text}</a>
-    {:else}
-      {inl.text}
-    {/if}
-  {/each}
-{/snippet}
-
-<div class="route-page">
+<div class="route-page rel-page">
   <header class="route-head">
     <p class="eyebrow">Release notes</p>
     <h1 class="serif">What changed, and why it reads better.</h1>
-    <p class="route-sub">Every version, straight from the build. The newest first.</p>
+    <p class="route-sub">The short version of every release, newest first. Each one opens; the full notes live on GitHub.</p>
   </header>
 
   {#each RELEASES as release, i (release.tag)}
-    <article class="rel" style="--i:{i}">
-      <div class="rel-head">
-        <span class="rel-pill">{release.tag}</span>
-        <span class="rel-date">{release.published}</span>
-      </div>
-      <div class="md-body">
-        {#each mdBlocks(release.body) as block, bi (bi)}
-          {#if block.k === "h3"}
-            <h3>{@render inlines(block.inlines)}</h3>
-          {:else if block.k === "h4"}
-            <h4>{@render inlines(block.inlines)}</h4>
-          {:else if block.k === "ul"}
-            <ul>
-              {#each block.items ?? [] as item, ii (ii)}
-                <li>{@render inlines(item)}</li>
-              {/each}
-            </ul>
-          {:else}
-            <p>{@render inlines(block.inlines)}</p>
-          {/if}
-        {/each}
-      </div>
-      {#if installers(release.assets).length}
-        <div class="rel-files">
-          {#each installers(release.assets) as a (a.name)}
-            <a class="file-chip" href={a.url} rel="noopener noreferrer">
-              <span>{a.name.replace(/_\d+\.\d+\.\d+/, "")}</span>
-              <small>{mb(a.size)}</small>
-            </a>
-          {/each}
+    {@const shown = open[release.tag]}
+    <article class="rel" class:open={shown} style="--i:{i}">
+      <h2 class="rel-h">
+        <button
+          type="button"
+          class="rel-head"
+          aria-expanded={shown}
+          aria-controls="fold-{release.tag}"
+          onclick={() => {
+            toggle(release.tag);
+          }}
+        >
+          <span class="rel-pill">{release.tag}</span>
+          <span class="rel-date">{release.published}</span>
+          {#if release.tag === latest}<span class="rel-new">Latest</span>{/if}
+          <svg class="rel-chev" viewBox="0 0 16 16" width="16" height="16" aria-hidden="true">
+            <path
+              d="M4 6.5 8 10.5 12 6.5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </button>
+      </h2>
+      <div class="rel-fold" id="fold-{release.tag}" role="region" aria-label="{release.tag} highlights">
+        <div class="rel-fold-in">
+          <ul class="rel-points">
+            {#each highlightsFor(release) as h, hi (hi)}
+              <li>
+                {#if h.lead}<strong>{h.lead}</strong>&nbsp;{/if}{h.rest}
+              </li>
+            {/each}
+          </ul>
+          <p class="rel-full">
+            <a href={releaseUrl(release.tag)} rel="noopener noreferrer">Full notes for {release.tag} on GitHub →</a>
+          </p>
         </div>
-      {/if}
+      </div>
     </article>
   {/each}
 

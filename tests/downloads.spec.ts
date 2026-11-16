@@ -69,7 +69,11 @@ for (const [os, label] of [
     await expect(page.locator(".downloads-system.detected")).toHaveCount(1);
     await expect(page.locator(`.downloads-system[data-os="${os}"]`)).toHaveClass(/detected/);
     await expect(page.locator(".downloads-system").first()).toHaveAttribute("data-os", os);
-    await expect(page.locator('[data-testid="download-detection"]')).toContainText(label);
+    await expect(page.locator(`.downloads-system[data-os="${os}"] .downloads-badge`)).toHaveText(
+      /Your system/
+    );
+    await expect(page.locator('[data-testid="download-detection"]')).toHaveCount(0);
+    await expect(page.getByText(/is highlighted for you/i)).toHaveCount(0);
     await expect(page.locator(".downloads-file")).toHaveCount(8);
   });
 }

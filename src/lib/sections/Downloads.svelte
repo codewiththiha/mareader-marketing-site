@@ -113,14 +113,11 @@
   <section class="downloads-choices" aria-labelledby="downloads-choices-title">
     <div class="downloads-choices-head">
       <h2 id="downloads-choices-title">Choose your system.</h2>
-      <p class="downloads-detection" data-testid="download-detection" aria-live="polite">
-        {#if detected}
-          <Check size={16} strokeWidth={2} />
-          {OS_LABEL[detected]} is highlighted for you. All systems are available below.
-        {:else}
+      {#if !detected}
+        <p class="downloads-detection" data-testid="download-detection" aria-live="polite">
           Mareader is a desktop app. Choose the installer for your computer.
-        {/if}
-      </p>
+        </p>
+      {/if}
     </div>
     {#if uncertainArch}
       <p class="downloads-arch-note">

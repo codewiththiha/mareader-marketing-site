@@ -96,19 +96,11 @@
   letter-spacing: -0.025em;
 }
 .downloads-detection {
-  display: flex;
   max-width: 365px;
-  align-items: flex-start;
-  gap: 8px;
   margin: 0 0 2px;
   color: var(--fg2);
   font-size: 13px;
   line-height: 1.55;
-}
-.downloads-detection svg {
-  flex: none;
-  margin-top: 2px;
-  color: var(--gold);
 }
 .downloads-arch-note {
   margin: 0 0 20px;

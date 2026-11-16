@@ -54,19 +54,31 @@ test("home sections", async ({ page }) => {
   }
 });
 
-test("home mobile", async ({ page }) => {
-  fs.mkdirSync("screenshots", { recursive: true });
-  await page.setViewportSize({ width: 390, height: 844 });
-  await dark(page, false);
-  await show(page, ".home-hero");
-  await page.screenshot({ path: "screenshots/mobile-light.png" });
-  await show(page, '[data-preview="appearance"]');
-  await page.screenshot({ path: "screenshots/mobile-light-preview.png" });
-  await show(page, ".cta-card");
-  await page.screenshot({ path: "screenshots/mobile-light-end.png" });
-  await dark(page, true);
-  await show(page, ".home-hero");
-  await page.screenshot({ path: "screenshots/mobile-dark.png" });
+test.describe("mobile", () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    deviceScaleFactor: 1,
+    isMobile: true,
+    hasTouch: true,
+    userAgent:
+      "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1"
+  });
+
+  test("home mobile", async ({ page }) => {
+    fs.mkdirSync("screenshots", { recursive: true });
+    await dark(page, false);
+    await show(page, ".home-hero");
+    await page.screenshot({ path: "screenshots/mobile-light.png" });
+    await show(page, '[data-preview="appearance"]');
+    await page.screenshot({ path: "screenshots/mobile-light-preview.png" });
+    await show(page, ".cta-card");
+    await page.screenshot({ path: "screenshots/mobile-light-end.png" });
+    await dark(page, true);
+    await show(page, ".home-hero");
+    await page.screenshot({ path: "screenshots/mobile-dark.png" });
+    await show(page, '[data-preview="appearance"]');
+    await page.screenshot({ path: "screenshots/mobile-dark-preview.png" });
+  });
 });
 
 test("routes", async ({ page }) => {

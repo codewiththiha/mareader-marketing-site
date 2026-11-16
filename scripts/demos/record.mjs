@@ -4,6 +4,10 @@ import { mkdtemp, mkdir, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
+const heroOnly = process.argv.includes("--hero-only");
+const clipArg = process.argv.find((arg) => arg.startsWith("--clip="));
+const clipName = clipArg?.slice("--clip=".length);
+if (heroOnly && clipArg) throw new Error("Choose either --hero-only or --clip=<name>");
 const port = 5178;
 const origin = `http://127.0.0.1:${port}`;
 const out = resolve("public/demos");
@@ -148,10 +152,18 @@ const clips = [
   }
 ];
 
-async function poster(page, name) {
+async function poster(page, name, height = 640) {
   const raw = join(temp, `${name}.jpg`);
   await page.screenshot({ path: raw, type: "jpeg", quality: 90 });
-  ffmpeg("-i", raw, "-vf", "scale=1024:640:flags=lanczos", "-q:v", "5", join(out, `${name}.jpg`));
+  ffmpeg(
+    "-i",
+    raw,
+    "-vf",
+    `scale=1024:${height}:flags=lanczos`,
+    "-q:v",
+    "5",
+    join(out, `${name}.jpg`)
+  );
 }
 
 async function capture(browser, clip) {
@@ -208,24 +220,41 @@ async function capture(browser, clip) {
 }
 
 try {
+  if (clipArg && !clips.some((clip) => clip.name === clipName)) {
+    throw new Error(`Unknown clip: ${clipName}`);
+  }
   await mkdir(out, { recursive: true });
   await ready();
   const browser = await chromium.launch({ args: ["--disable-dev-shm-usage"] });
   try {
-    const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
-    for (const [name, dark] of [
-      ["hero-light", 0],
-      ["hero-dark", 1]
-    ]) {
-      await page.goto(`${origin}/scripts/demos/capture.html?scene=hero&dark=${dark}`, {
-        waitUntil: "networkidle"
-      });
-      await page.evaluate(() => document.fonts.ready);
-      await wait(1400);
-      await poster(page, name);
+    if (!clipArg) {
+      const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+      for (const [name, dark, compact] of [
+        ["hero-light", 0, false],
+        ["hero-dark", 1, false],
+        ["hero-mobile-light", 0, true],
+        ["hero-mobile-dark", 1, true]
+      ]) {
+        await page.setViewportSize(
+          compact ? { width: 1024, height: 768 } : { width: 1280, height: 800 }
+        );
+        const size = compact ? "compact" : "full";
+        await page.goto(
+          `${origin}/scripts/demos/capture.html?scene=hero&dark=${dark}&size=${size}`,
+          { waitUntil: "networkidle" }
+        );
+        await page.evaluate(() => document.fonts.ready);
+        await wait(1400);
+        await poster(page, name, compact ? 768 : 640);
+        process.stdout.write(`Rendered ${name}\n`);
+      }
+      await page.close();
     }
-    await page.close();
-    for (const clip of clips) await capture(browser, clip);
+    if (!heroOnly) {
+      for (const clip of clips) {
+        if (!clipArg || clip.name === clipName) await capture(browser, clip);
+      }
+    }
   } finally {
     await browser.close();
   }

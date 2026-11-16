@@ -52,8 +52,10 @@ observer has a scroll/resize fallback for older browsers.
 To update a clip, adjust the scene data or mock under `src/lib/components/Film/Mock`,
 install Playwright Chromium with `npx playwright install chromium`, and run
 `npm run demos:record` with `ffmpeg` (including `libx264`) on the path. The
-capture harness and interaction sequences live in `scripts/demos/`. For the
-optional cross-browser suite, first install its browsers:
+capture harness and interaction sequences live in `scripts/demos/`. To regenerate
+only the four-pane hero stills, run `npm run demos:record -- --hero-only`; for one
+clip and its poster, use `npm run demos:record -- --clip=panes` (or another clip
+name). For the optional cross-browser suite, first install its browsers:
 
 ```sh
 npx playwright install firefox webkit
@@ -67,7 +69,7 @@ npx playwright install firefox webkit
 - `src/lib/downloads.ts` — installer matrix per OS/arch/format
 - `src/lib/previews.ts` — feature copy and demo asset paths
 - `src/lib/actions/viewportLoop.ts` — viewport, motion, data and tab-aware playback
-- `src/lib/components/Preview` — labelled preview frame with still-image fallback
+- `src/lib/components/Preview` — borderless previews with still-image fallbacks
 - `src/lib/scenes.ts` and `src/lib/components/Film/Mock` — source of recorded demos
 - `src/lib/sections` — Home, Facts, DownloadSection, Releases, Support
 - `src/lib/sections/support` — CryptoPanel, LocalPanel (Myanmar mock)

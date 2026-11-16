@@ -1,9 +1,8 @@
 <script lang="ts">
-  import { Repeat2 } from "@lucide/svelte";
   import { viewportLoop } from "@/lib/actions/viewportLoop";
   import { previewAsset, type Preview } from "@/lib/previews";
 
-  let { preview, number }: { preview: Preview; number: number } = $props();
+  let { preview }: { preview: Preview } = $props();
 </script>
 
 <figure class="preview-card" data-preview={preview.id}>
@@ -26,11 +25,5 @@
       tabindex="-1"
     ></video>
   </div>
-  <figcaption class="preview-caption">
-    <span
-      ><span class="preview-caption-number">{String(number).padStart(2, "0")}</span
-      >{preview.frameLabel}</span
-    >
-    <span class="preview-caption-loop"><Repeat2 size={14} strokeWidth={1.7} /> Silent preview</span>
-  </figcaption>
+  <figcaption class="sr-only">{preview.frameLabel}. Silent, looping preview.</figcaption>
 </figure>

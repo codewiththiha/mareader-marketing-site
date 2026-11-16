@@ -45,21 +45,19 @@
         <span><strong>Take a look around</strong><small>Scroll to explore</small></span>
       </button>
     </div>
-    <div class="hero-art">
-      <div class="hero-art-top"><span>YOUR SPACE TO READ</span><span>01 / 05</span></div>
-      <div class="hero-window">
-        <img
-          src={previewAsset(theme.dark ? "hero-dark.jpg" : "hero-light.jpg")}
-          width="1024"
-          height="640"
-          alt="A book open in the Mareader desktop app."
-          fetchpriority="high"
-        />
-      </div>
-      <div class="hero-art-bottom">
-        <span>PDF &amp; EPUB</span><span>MADE FOR THE LONG READ</span>
-      </div>
-    </div>
+    <picture class="hero-art">
+      <source
+        media="(max-width: 560px)"
+        srcset={previewAsset(theme.dark ? "hero-mobile-dark.jpg" : "hero-mobile-light.jpg")}
+      />
+      <img
+        src={previewAsset(theme.dark ? "hero-dark.jpg" : "hero-light.jpg")}
+        width="1024"
+        height="640"
+        alt="Four reading panes open in Mareader, showing books and PDFs."
+        fetchpriority="high"
+      />
+    </picture>
   </div>
 </section>
 
@@ -73,7 +71,7 @@
       <p>Scroll at your own pace. Each little preview starts when you arrive.</p>
     </header>
     {#each PREVIEWS as preview, index (preview.id)}
-      <article class="feature-row" class:reverse={index % 2 === 1}>
+      <article class="feature-row" class:reverse={index % 2 === 0}>
         <div class="feature-copy">
           <div class="feature-kicker">
             <span class="feature-number">{String(index + 1).padStart(2, "0")}</span>
@@ -88,7 +86,7 @@
             {/each}
           </ul>
         </div>
-        <FeaturePreview {preview} number={index + 1} />
+        <FeaturePreview {preview} />
       </article>
     {/each}
   </div>

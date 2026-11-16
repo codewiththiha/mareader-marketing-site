@@ -123,45 +123,17 @@
   }
 }
 .hero-art {
+  display: block;
   min-width: 0;
-  padding: 16px;
-  border: 1px solid var(--hair);
-  border-radius: 20px;
-  background: #eee8dc;
-  box-shadow: 0 35px 70px -55px rgba(29, 26, 21, 0.6);
-}
-.dark .hero-art {
-  background: #1c1b1b;
-  box-shadow: 0 35px 70px -45px rgba(0, 0, 0, 0.8);
-}
-.hero-art-top,
-.hero-art-bottom {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  color: var(--fg2);
-  font-size: 9px;
-  font-weight: 650;
-  letter-spacing: 0.1em;
-}
-.hero-art-top {
-  padding: 2px 1px 13px;
-}
-.hero-art-bottom {
-  padding: 13px 1px 1px;
-}
-.hero-window {
   overflow: hidden;
-  border: 1px solid rgba(29, 26, 21, 0.12);
-  border-radius: 9px;
-  background: #fff;
-  box-shadow: 0 16px 35px -22px rgba(29, 26, 21, 0.5);
+  aspect-ratio: 16 / 10;
+  border-radius: 12px;
 }
-.hero-window img {
+.hero-art img {
   display: block;
   width: 100%;
-  height: auto;
-  aspect-ratio: 16 / 10;
+  height: 100%;
+  object-fit: cover;
 }
 
 /* Each preview is a separate, ordinary section. */
@@ -174,7 +146,7 @@
   align-items: end;
   justify-content: space-between;
   gap: 35px;
-  padding: 0 0 55px;
+  padding: 0 0 25px;
 }
 .showcase-heading h2 {
   max-width: 640px;
@@ -199,7 +171,6 @@
   align-items: center;
   gap: clamp(42px, 6vw, 84px);
   padding: 82px 0;
-  border-top: 1px solid var(--hair);
 }
 .feature-row.reverse {
   grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
@@ -249,31 +220,27 @@
 .feature-details {
   display: flex;
   flex-wrap: wrap;
-  gap: 7px;
+  gap: 10px;
   margin: 23px 0 0;
   padding: 0;
   list-style: none;
 }
 .feature-details li {
-  padding: 7px 10px;
-  border: 1px solid var(--hair);
-  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
   color: var(--fg2);
   font-size: 11px;
   font-weight: 550;
-  line-height: 1;
+  line-height: 1.4;
+}
+.feature-details li + li::before {
+  content: "·";
+  margin-right: 10px;
+  color: var(--gold);
 }
 .preview-card {
   min-width: 0;
   margin: 0;
-  padding: 9px;
-  border: 1px solid var(--hair);
-  border-radius: 17px;
-  background: var(--card);
-  box-shadow: 0 25px 45px -38px rgba(29, 26, 21, 0.55);
-}
-.dark .preview-card {
-  box-shadow: 0 25px 45px -30px rgba(0, 0, 0, 0.75);
 }
 .preview-screen {
   position: relative;
@@ -303,31 +270,6 @@
 .preview-screen video.is-playing {
   opacity: 1;
 }
-.preview-caption {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 13px 5px 5px;
-  color: var(--fg2);
-  font-size: 10.5px;
-  font-weight: 550;
-  line-height: 1.4;
-}
-.preview-caption > span,
-.preview-caption-loop {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-.preview-caption-number {
-  color: var(--gold);
-  font-variant-numeric: tabular-nums;
-}
-.preview-caption-loop {
-  white-space: nowrap;
-}
-
 @media (max-width: 800px) {
   .home-hero {
     min-height: 0;
@@ -367,6 +309,28 @@
   }
 }
 @media (max-width: 560px) {
+  .hero-grid {
+    gap: 28px;
+  }
+  .hero-copy h1,
+  .hero-description {
+    margin-top: 16px;
+  }
+  .hero-actions {
+    gap: 8px;
+    margin-top: 20px;
+  }
+  .hero-actions a {
+    padding-right: 14px;
+    padding-left: 14px;
+    font-size: 14px;
+  }
+  .hero-footnote {
+    margin-top: 10px;
+  }
+  .scroll-cue {
+    margin-top: 22px;
+  }
   .preview-screen {
     aspect-ratio: 4 / 3;
   }
@@ -376,17 +340,13 @@
   .preview-card[data-preview="dictionary"] .preview-screen video {
     object-position: right center;
   }
-  .hero-window {
+  .hero-art {
     aspect-ratio: 4 / 3;
-  }
-  .hero-window img {
-    height: 100%;
-    object-fit: cover;
   }
 }
 @media (max-width: 420px) {
   .home-hero {
-    padding-top: 100px;
+    padding-top: 90px;
   }
   .hero-copy h1 {
     font-size: 43px;
@@ -394,15 +354,19 @@
   .hero-description {
     font-size: 15px;
   }
-  .hero-art {
-    padding: 11px;
-  }
-  .hero-art-top,
-  .hero-art-bottom {
-    font-size: 8px;
-  }
   .feature-copy h3 {
     font-size: 31px;
+  }
+}
+@media (max-width: 340px) {
+  .hero-actions {
+    gap: 6px;
+  }
+  .hero-actions a {
+    gap: 5px;
+    padding-right: 10px;
+    padding-left: 10px;
+    font-size: 13px;
   }
 }
 @media (prefers-reduced-motion: reduce) {

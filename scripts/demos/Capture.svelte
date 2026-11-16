@@ -6,6 +6,9 @@
   const params = new URLSearchParams(location.search);
   const view = params.get("view") ?? "full";
   const dark = params.get("dark") === "1";
+  const compact = params.get("size") === "compact";
+  const W = compact ? 1024 : 1280;
+  const H = compact ? 768 : 800;
   const frames: Record<string, string> = {
     full: "translate(0px, 0px) scale(1)",
     appearance: "translate(-180px, 0px) scale(1.15)",
@@ -20,7 +23,12 @@
     popover: { theme, open: ["presets", "colour"] }
   });
   const extra: Record<string, Scene> = {
-    hero: { ...SCENES[0], bar: true },
+    hero: {
+      ...SCENES[7],
+      id: "hero",
+      themes: dark ? ["night", "cinema", "dark", "dusk"] : ["sepia", "light", "ocean", "parchment"],
+      bar: true
+    },
     "appearance-sepia": themeScene("sepia"),
     "appearance-green": themeScene("green"),
     "appearance-night": themeScene("night"),
@@ -49,9 +57,14 @@
   });
 </script>
 
-<div class="capture-stage">
+<div
+  class="capture-stage"
+  class:room-for-titlebar={id === "hero" || id.startsWith("panes-")}
+  style:width="{W}px"
+  style:height="{H}px"
+>
   <div class="capture-window" style:transform={frames[view] ?? frames.full}>
-    <MockWindow {scene} siteDark={dark} W={1280} H={800} />
+    <MockWindow {scene} siteDark={dark} {W} {H} />
   </div>
   <div
     class="capture-cursor {cursor.visible ? 'visible' : ''} {cursor.pressed ? 'pressed' : ''}"
@@ -68,10 +81,11 @@
   .capture-stage {
     position: fixed;
     inset: 0;
-    width: 1280px;
-    height: 800px;
     overflow: hidden;
     background: #f7f4ed;
+  }
+  .room-for-titlebar :global(.mk-panes) {
+    top: 48px;
   }
   .capture-window {
     position: absolute;

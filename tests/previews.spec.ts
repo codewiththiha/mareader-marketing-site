@@ -10,6 +10,57 @@ test("the scroll cue opens the feature sections without changing routes", async 
   expect(new URL(page.url()).hash).toBe("");
 });
 
+test("the four-pane hero adapts to screen size and theme", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.emulateMedia({ colorScheme: "light" });
+  await page.goto("/", { waitUntil: "networkidle" });
+  const hero = page.getByRole("img", { name: /Four reading panes open/ });
+  const currentSrc = () => hero.evaluate((image: HTMLImageElement) => image.currentSrc);
+  const height = () => hero.evaluate((image: HTMLImageElement) => image.naturalHeight);
+
+  await expect.poll(currentSrc).toMatch(/\/demos\/hero-light\.jpg$/);
+  await expect.poll(height).toBe(640);
+  await page.getByRole("button", { name: "Switch to dark theme" }).click();
+  await expect.poll(currentSrc).toMatch(/\/demos\/hero-dark\.jpg$/);
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect.poll(currentSrc).toMatch(/\/demos\/hero-mobile-dark\.jpg$/);
+  await expect.poll(height).toBe(768);
+  await page.getByRole("button", { name: "Switch to light theme" }).click();
+  await expect.poll(currentSrc).toMatch(/\/demos\/hero-mobile-light\.jpg$/);
+  await expect.poll(height).toBe(768);
+});
+
+test("borderless previews alternate beside their descriptions and stack on phones", async ({
+  page
+}) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/", { waitUntil: "networkidle" });
+  for (const selector of [".hero-art", ".preview-card", ".preview-screen"]) {
+    const element = page.locator(selector).first();
+    await expect(element).toHaveCSS("border-top-width", "0px");
+    await expect(element).toHaveCSS("padding-top", "0px");
+    await expect(element).toHaveCSS("box-shadow", "none");
+  }
+  const rows = page.locator(".feature-row");
+  await expect(rows).toHaveCount(5);
+  for (let index = 0; index < 5; index++) {
+    const row = rows.nth(index);
+    const copy = (await row.locator(".feature-copy").boundingBox())!;
+    const media = (await row.locator(".preview-card").boundingBox())!;
+    if (index % 2 === 0) expect(media.x + media.width).toBeLessThan(copy.x);
+    else expect(copy.x + copy.width).toBeLessThan(media.x);
+  }
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  for (let index = 0; index < 5; index++) {
+    const row = rows.nth(index);
+    const copy = (await row.locator(".feature-copy").boundingBox())!;
+    const media = (await row.locator(".preview-card").boundingBox())!;
+    expect(copy.y + copy.height).toBeLessThan(media.y);
+  }
+});
+
 test("previews load and restart only when in view", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 800 });
   const requested: string[] = [];
@@ -63,6 +114,20 @@ test("previews load and restart only when in view", async ({ page }) => {
   await expect(first).toHaveAttribute("data-play-state", "playing");
   expect(await first.evaluate((video: HTMLVideoElement) => video.currentTime)).toBeLessThan(1.5);
   await expect(last).toHaveAttribute("data-play-state", "paused");
+});
+
+test("every feature clip plays when its section is reached", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto("/", { waitUntil: "networkidle" });
+  for (const id of ["appearance", "panes", "dictionary", "models", "voice"]) {
+    const video = page.locator(`[data-preview="${id}"] video`);
+    await video.scrollIntoViewIfNeeded();
+    await expect(video).toHaveAttribute("data-play-state", "playing");
+    await expect.poll(() => video.evaluate((node: HTMLVideoElement) => node.videoWidth)).toBe(1024);
+    await expect
+      .poll(() => video.evaluate((node: HTMLVideoElement) => node.currentTime))
+      .toBeGreaterThan(0.15);
+  }
 });
 
 test("previews pause in hidden tabs and restart when visible", async ({ page }) => {
@@ -157,6 +222,16 @@ test("touch-sized iPhone view plays the preview inline", async ({ browser, brows
     const page = await context.newPage();
     await page.goto("/", { waitUntil: "networkidle" });
     await expect(page.locator('[data-testid="hero-dl"]')).toHaveText(/Download free/);
+    await page.setViewportSize({ width: 320, height: 640 });
+    const buttons = page.locator(".hero-actions a");
+    const primary = (await buttons.nth(0).boundingBox())!;
+    const other = (await buttons.nth(1).boundingBox())!;
+    expect(Math.abs(primary.y - other.y)).toBeLessThan(1);
+    expect(primary.height).toBeGreaterThanOrEqual(44);
+    expect(other.height).toBeGreaterThanOrEqual(44);
+    const hero = (await page.locator(".hero-art").boundingBox())!;
+    expect(hero.y + hero.height / 2).toBeLessThan(640);
+
     const video = page.locator('[data-preview="dictionary"] video');
     await video.scrollIntoViewIfNeeded();
     await expect(video).toHaveAttribute("data-play-state", "playing");
@@ -164,7 +239,7 @@ test("touch-sized iPhone view plays the preview inline", async ({ browser, brows
       true
     );
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
-      390
+      320
     );
   } finally {
     await context.close();

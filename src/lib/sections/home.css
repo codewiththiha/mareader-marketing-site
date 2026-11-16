@@ -1,65 +1,76 @@
-/* A quieter, naturally scrolling introduction. */
+/* A full-viewport introduction. */
 .home-hero {
-  min-height: min(820px, 100svh);
+  position: relative;
   display: flex;
   align-items: center;
-  padding: 112px 0 80px;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 88px 0 40px;
+  overflow: hidden;
 }
-.hero-grid {
+.home-hero::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 1%;
+  width: min(100%, 1100px);
+  height: min(45vh, 440px);
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse at center, rgba(166, 124, 59, 0.12), transparent 68%);
+  pointer-events: none;
+}
+.dark .home-hero::before {
+  background: radial-gradient(ellipse at center, rgba(227, 189, 105, 0.11), transparent 68%);
+}
+.hero-inner {
+  position: relative;
+  display: flex;
   width: 100%;
-  display: grid;
-  grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr);
+  max-width: 1240px;
+  flex-direction: column;
   align-items: center;
-  gap: clamp(40px, 6vw, 90px);
+  justify-content: center;
+  gap: clamp(24px, 4vh, 38px);
 }
-.home-eyebrow {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  margin: 0;
-  color: var(--gold);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.15em;
-  line-height: 1.4;
-  text-transform: uppercase;
-}
-.eyebrow-dot {
-  width: 7px;
-  height: 7px;
-  flex: none;
-  border-radius: 50%;
-  background: var(--gold);
+.hero-copy {
+  width: 100%;
+  text-align: center;
 }
 .hero-copy h1 {
-  max-width: 520px;
-  margin: 20px 0 0;
+  max-width: 1100px;
+  margin: 0 auto;
   font-family: var(--font-serif);
-  font-size: clamp(44px, 4.8vw, 68px);
+  font-size: clamp(44px, 5vw, 72px);
   font-weight: 500;
   letter-spacing: -0.035em;
   line-height: 1.08;
   text-wrap: balance;
 }
+.hero-copy h1 em {
+  color: var(--gold);
+  font-style: italic;
+  font-weight: 450;
+}
 .hero-description {
-  max-width: 410px;
-  margin: 20px 0 0;
+  max-width: 660px;
+  margin: 16px auto 0;
   color: var(--fg2);
   font-size: 16px;
-  line-height: 1.7;
+  line-height: 1.65;
   text-wrap: pretty;
 }
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 10px;
-  margin-top: 28px;
+  margin-top: 24px;
 }
 .hero-actions a {
   text-decoration: none;
 }
 .hero-footnote {
-  margin: 14px 0 0;
+  margin: 12px 0 0;
   color: var(--fg2);
   font-size: 12px;
 }
@@ -67,64 +78,14 @@
   margin: 0 5px;
   color: var(--gold);
 }
-.scroll-cue {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  margin-top: 50px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--fg);
-  text-align: left;
-  cursor: pointer;
-}
-.scroll-cue-icon {
-  display: grid;
-  width: 40px;
-  height: 40px;
-  place-items: center;
-  flex: none;
-  border: 1px solid var(--hair);
-  border-radius: 50%;
-  background: var(--card);
-  color: var(--gold);
-  transition:
-    border-color 0.2s,
-    background-color 0.2s;
-}
-.scroll-cue:hover .scroll-cue-icon {
-  border-color: var(--gold);
-  background: var(--gold-soft);
-}
-.scroll-cue-icon svg {
-  animation: scroll-nudge 2s ease-in-out 3;
-}
-.scroll-cue strong,
-.scroll-cue small {
-  display: block;
-}
-.scroll-cue strong {
-  font-size: 12px;
-  font-weight: 600;
-}
-.scroll-cue small {
-  margin-top: 2px;
-  color: var(--fg2);
-  font-size: 11px;
-}
-@keyframes scroll-nudge {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(4px);
-  }
-}
 .hero-art {
   display: block;
+  /* Leave room for the copy on shorter viewports. */
+  width: min(840px, 100%);
+  width: min(840px, 100%, max(260px, calc(160vh - 610px)));
+  width: min(840px, 100%, max(260px, calc(160dvh - 610px)));
   min-width: 0;
+  flex: none;
   overflow: hidden;
   aspect-ratio: 16 / 10;
   border-radius: 12px;
@@ -139,31 +100,20 @@
 /* Each preview is a separate, ordinary section. */
 .showcase {
   scroll-margin-top: 80px;
-  padding: 25px 0 0;
+  padding: 96px 0 0;
 }
 .showcase-heading {
-  display: flex;
-  align-items: end;
-  justify-content: space-between;
-  gap: 35px;
   padding: 0 0 25px;
 }
 .showcase-heading h2 {
   max-width: 640px;
-  margin: 15px 0 0;
+  margin: 0;
   font-family: var(--font-serif);
   font-size: clamp(32px, 3.3vw, 45px);
   font-weight: 500;
   letter-spacing: -0.025em;
   line-height: 1.14;
   text-wrap: balance;
-}
-.showcase-heading > p {
-  max-width: 245px;
-  margin: 0 0 3px;
-  color: var(--fg2);
-  font-size: 13px;
-  line-height: 1.65;
 }
 .feature-row {
   display: grid;
@@ -271,32 +221,12 @@
   opacity: 1;
 }
 @media (max-width: 800px) {
-  .home-hero {
-    min-height: 0;
-    padding: 112px 0 78px;
-  }
-  .hero-grid {
-    grid-template-columns: 1fr;
-    gap: 42px;
+  .hero-inner {
+    gap: 30px;
   }
   .hero-copy h1 {
-    max-width: 560px;
-    font-size: clamp(44px, 8vw, 62px);
-  }
-  .scroll-cue {
-    margin-top: 32px;
-  }
-  .hero-art {
-    max-width: 650px;
-  }
-  .showcase-heading {
-    align-items: start;
-    flex-direction: column;
-    gap: 16px;
-    padding-bottom: 38px;
-  }
-  .showcase-heading > p {
-    max-width: 420px;
+    max-width: 760px;
+    font-size: clamp(44px, 7vw, 60px);
   }
   .feature-row,
   .feature-row.reverse {
@@ -309,12 +239,20 @@
   }
 }
 @media (max-width: 560px) {
-  .hero-grid {
-    gap: 28px;
+  .home-hero {
+    padding: 80px 0 28px;
   }
-  .hero-copy h1,
+  .hero-inner {
+    gap: 24px;
+  }
+  .hero-copy h1 {
+    max-width: 420px;
+    font-size: clamp(38px, 11vw, 46px);
+  }
   .hero-description {
-    margin-top: 16px;
+    margin-top: 13px;
+    font-size: 15px;
+    line-height: 1.6;
   }
   .hero-actions {
     gap: 8px;
@@ -328,8 +266,13 @@
   .hero-footnote {
     margin-top: 10px;
   }
-  .scroll-cue {
-    margin-top: 22px;
+  .hero-art {
+    width: min(100%, max(200px, calc(133vh - 530px)));
+    width: min(100%, max(200px, calc(133dvh - 530px)));
+    aspect-ratio: 4 / 3;
+  }
+  .showcase {
+    padding-top: 80px;
   }
   .preview-screen {
     aspect-ratio: 4 / 3;
@@ -340,20 +283,8 @@
   .preview-card[data-preview="dictionary"] .preview-screen video {
     object-position: right center;
   }
-  .hero-art {
-    aspect-ratio: 4 / 3;
-  }
 }
 @media (max-width: 420px) {
-  .home-hero {
-    padding-top: 90px;
-  }
-  .hero-copy h1 {
-    font-size: 43px;
-  }
-  .hero-description {
-    font-size: 15px;
-  }
   .feature-copy h3 {
     font-size: 31px;
   }
@@ -367,10 +298,5 @@
     padding-right: 10px;
     padding-left: 10px;
     font-size: 13px;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .scroll-cue-icon svg {
-    animation: none;
   }
 }

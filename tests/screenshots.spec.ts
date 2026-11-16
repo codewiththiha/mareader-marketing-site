@@ -51,6 +51,11 @@ test("home sections", async ({ page }) => {
       await show(page, selector);
       await page.screenshot({ path: `screenshots/home-${name}-${label}.png` });
     }
+    await page.locator('[data-preview="panes"]').evaluate((node) => {
+      window.scrollTo(0, node.getBoundingClientRect().top + window.scrollY - 8);
+    });
+    await page.waitForTimeout(300);
+    await page.screenshot({ path: `screenshots/home-${name}-floating-nav.png` });
   }
 });
 
@@ -78,6 +83,11 @@ test.describe("mobile", () => {
     await page.screenshot({ path: "screenshots/mobile-dark.png" });
     await show(page, '[data-preview="appearance"]');
     await page.screenshot({ path: "screenshots/mobile-dark-preview.png" });
+    await page.locator('[data-preview="appearance"]').evaluate((node) => {
+      window.scrollTo(0, node.getBoundingClientRect().top + window.scrollY - 8);
+    });
+    await page.waitForTimeout(300);
+    await page.screenshot({ path: "screenshots/mobile-dark-floating-nav.png" });
   });
 });
 

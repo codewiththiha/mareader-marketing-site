@@ -1,13 +1,63 @@
 import { test, expect } from "@playwright/test";
 
-test("the scroll cue opens the feature sections without changing routes", async ({ page }) => {
+test("the hero fills the first viewport without scroll prompts", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/", { waitUntil: "networkidle" });
-  await page.getByRole("button", { name: /Take a look around/ }).click();
-  await expect(
-    page.getByRole("heading", { name: "Good reading lives in the details." })
-  ).toBeVisible();
-  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(300);
-  expect(new URL(page.url()).hash).toBe("");
+  for (const text of [
+    "A LITTLE MORE ROOM TO READ",
+    "A CLOSER LOOK",
+    "Scroll at your own pace. Each little preview starts when you arrive.",
+    "Take a look around",
+    "Scroll to explore"
+  ]) {
+    await expect(page.getByText(text, { exact: true })).toHaveCount(0);
+  }
+  for (const { width, height } of [
+    { width: 320, height: 568 },
+    { width: 390, height: 844 },
+    { width: 768, height: 1024 },
+    { width: 1024, height: 768 },
+    { width: 1280, height: 800 },
+    { width: 1440, height: 900 },
+    { width: 1920, height: 1080 }
+  ]) {
+    await page.setViewportSize({ width, height });
+    await page.evaluate(() => window.scrollTo(0, 0));
+    const bounds = await page.evaluate(() => ({
+      heroBottom: document.querySelector(".home-hero")!.getBoundingClientRect().bottom,
+      showcaseTop: document.querySelector(".showcase")!.getBoundingClientRect().top,
+      firstPreviewTop: document.querySelector(".preview-card")!.getBoundingClientRect().top,
+      viewportHeight: window.innerHeight
+    }));
+    expect(bounds.heroBottom).toBeGreaterThanOrEqual(bounds.viewportHeight - 1);
+    expect(bounds.showcaseTop).toBeGreaterThanOrEqual(bounds.viewportHeight - 1);
+    expect(bounds.firstPreviewTop).toBeGreaterThan(bounds.viewportHeight);
+  }
+  await page.locator('[data-preview="appearance"]').scrollIntoViewIfNeeded();
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+  await expect(page.getByRole("heading", { name: "Limitless themes." })).toBeVisible();
+});
+
+test("navigation floats without a bar and keeps frosted pill controls", async ({ page }) => {
+  await page.emulateMedia({ colorScheme: "dark" });
+  await page.goto("/", { waitUntil: "networkidle" });
+  await expect(page.locator(".hdr-wash")).toHaveCount(0);
+  await expect(page.locator(".hdr")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+  await expect(page.locator(".hdr .pill.bare")).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+  const releases = page.locator(".hdr").getByRole("link", { name: "Releases" });
+  const glass = await releases.evaluate((element) => ({
+    background: getComputedStyle(element).backgroundColor,
+    blur: getComputedStyle(element).backdropFilter,
+    supported: CSS.supports("backdrop-filter", "blur(1px)")
+  }));
+  expect(glass.background).not.toBe("rgba(0, 0, 0, 0)");
+  if (glass.supported) expect(glass.blur).toContain("blur");
+
+  await page.locator('[data-preview="panes"]').evaluate((element) => {
+    window.scrollTo(0, element.getBoundingClientRect().top + window.scrollY - 8);
+  });
+  await releases.click();
+  await expect(page).toHaveURL(/#\/releases/);
 });
 
 test("the four-pane hero adapts to screen size and theme", async ({ page }) => {
@@ -230,7 +280,9 @@ test("touch-sized iPhone view plays the preview inline", async ({ browser, brows
     expect(primary.height).toBeGreaterThanOrEqual(44);
     expect(other.height).toBeGreaterThanOrEqual(44);
     const hero = (await page.locator(".hero-art").boundingBox())!;
-    expect(hero.y + hero.height / 2).toBeLessThan(640);
+    const showcase = (await page.locator(".showcase").boundingBox())!;
+    expect(hero.y + hero.height).toBeLessThanOrEqual(640);
+    expect(showcase.y).toBeGreaterThanOrEqual(639);
 
     const video = page.locator('[data-preview="dictionary"] video');
     await video.scrollIntoViewIfNeeded();

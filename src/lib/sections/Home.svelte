@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ArrowDown, ArrowDownRight, Download } from "@lucide/svelte";
+  import { ArrowDownRight, Download } from "@lucide/svelte";
   import FeaturePreview from "@/lib/components/Preview/FeaturePreview.svelte";
   import { PREVIEWS, previewAsset } from "@/lib/previews";
   import { useTheme } from "@/lib/stores/theme.svelte";
@@ -13,18 +13,12 @@
 
   const theme = useTheme();
   let heroBest = $derived(platform.mobile ? null : bestFor(platform.os, platform.arch));
-
-  function explore() {
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    document.getElementById("features")?.scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
-  }
 </script>
 
 <section class="home-hero" aria-labelledby="hero-title">
-  <div class="wrap hero-grid">
+  <div class="wrap hero-inner">
     <div class="hero-copy">
-      <p class="home-eyebrow"><span class="eyebrow-dot"></span>A LITTLE MORE ROOM TO READ</p>
-      <h1 id="hero-title">Read the way your eyes like.</h1>
+      <h1 id="hero-title">Read the way <em>your eyes like.</em></h1>
       <p class="hero-description">
         A calm reader for PDF and EPUB, with themes, panes, AI and voices that bend to you.
       </p>
@@ -40,10 +34,6 @@
         <a href={href("releases")} class="btn-ghost">Other systems <ArrowDownRight size={15} /></a>
       </div>
       <p class="hero-footnote">Free &amp; open source <span>·</span> Made for desktop</p>
-      <button class="scroll-cue" type="button" onclick={explore}>
-        <span class="scroll-cue-icon"><ArrowDown size={16} strokeWidth={1.8} /></span>
-        <span><strong>Take a look around</strong><small>Scroll to explore</small></span>
-      </button>
     </div>
     <picture class="hero-art">
       <source
@@ -64,11 +54,7 @@
 <section class="showcase" id="features" aria-labelledby="features-title">
   <div class="wrap">
     <header class="showcase-heading">
-      <div>
-        <p class="home-eyebrow"><span class="eyebrow-dot"></span>A CLOSER LOOK</p>
-        <h2 id="features-title">Good reading lives in the details.</h2>
-      </div>
-      <p>Scroll at your own pace. Each little preview starts when you arrive.</p>
+      <h2 id="features-title">Good reading lives in the details.</h2>
     </header>
     {#each PREVIEWS as preview, index (preview.id)}
       <article class="feature-row" class:reverse={index % 2 === 0}>

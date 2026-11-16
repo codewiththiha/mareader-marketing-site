@@ -264,13 +264,12 @@ body {
   inset-inline: 0;
   top: 0;
   z-index: 50;
-}
-.hdr-wash {
-  position: absolute;
-  inset-inline: 0;
-  top: 0;
-  height: 84px;
+  /* The empty header area should not block the page. */
   pointer-events: none;
+}
+.hdr-brand,
+.hdr-right {
+  pointer-events: auto;
 }
 .hdr-in {
   position: relative;
@@ -289,12 +288,24 @@ body {
   }
 }
 .hdr-brand {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
   color: var(--fg);
   text-decoration: none;
   min-width: 0;
+  isolation: isolate;
+}
+.hdr-brand::before {
+  content: "";
+  position: absolute;
+  inset: -6px -9px;
+  z-index: -1;
+  border-radius: 999px;
+  background: rgba(var(--bg-rgb), 0.84);
+  -webkit-backdrop-filter: blur(18px) saturate(1.35);
+  backdrop-filter: blur(18px) saturate(1.35);
 }
 .hdr-word {
   font-family: var(--font-serif);
@@ -307,6 +318,21 @@ body {
   align-items: center;
   gap: 8px;
   min-width: 0;
+}
+.hdr .pill.bare {
+  gap: 3px;
+}
+.hdr .pill.bare .pill-item,
+.hdr .tt {
+  background: rgba(var(--bg-rgb), 0.84);
+  -webkit-backdrop-filter: blur(18px) saturate(1.35);
+  backdrop-filter: blur(18px) saturate(1.35);
+}
+.hdr .pill.bare .pill-item.on {
+  background: rgba(var(--bg-rgb), 0.1);
+}
+.hdr .tt:hover {
+  background: rgba(var(--bg-rgb), 0.96);
 }
 .hdr-dl {
   display: none;

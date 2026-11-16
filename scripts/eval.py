@@ -13,7 +13,11 @@ def check_build():
     size = dist.stat().st_size
     if size < 1000:
         return False, f"dist too small {size}"
-    return True, f"build ok: {size} bytes singlefile"
+    if not list((ROOT / "dist" / "assets").glob("*.js")):
+        return False, "build missing JavaScript assets"
+    if len(list((ROOT / "dist" / "demos").glob("*.mp4"))) != 5:
+        return False, "build missing demo clips"
+    return True, f"build ok: {size} byte HTML plus cacheable assets"
 
 def check_screenshots():
     shot_dir = ROOT / "screenshots"
@@ -27,7 +31,8 @@ def check_screenshots():
 def check_structure():
     must = [
         "src/App.svelte",
-        "src/lib/components/Film/Film.svelte",
+        "src/lib/components/Preview/FeaturePreview.svelte",
+        "src/lib/actions/viewportLoop.ts",
         "src/lib/components/Film/Mock/MockWindow.svelte",
         "src/lib/stores/theme.svelte.ts",
         "src/lib/support/wallets.ts",

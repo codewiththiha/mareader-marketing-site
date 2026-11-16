@@ -10,11 +10,19 @@ export default defineConfig({
   },
   use: {
     baseURL: "http://localhost:4173",
-    screenshot: "only-on-failure",
-    launchOptions: {
-      args: ["--disable-gpu", "--disable-dev-shm-usage"]
-    }
+    screenshot: "only-on-failure"
   },
+  projects: [
+    {
+      name: "chromium",
+      use: {
+        browserName: "chromium",
+        launchOptions: { args: ["--disable-gpu", "--disable-dev-shm-usage"] }
+      }
+    },
+    { name: "firefox", use: { browserName: "firefox" } },
+    { name: "webkit", use: { browserName: "webkit" } }
+  ],
   testDir: "tests",
   outputDir: "test-results",
   timeout: 60_000,

@@ -60,10 +60,15 @@
   $effect(() => {
     const t = track;
     if (!t) return;
-    const ro = new ResizeObserver(() => moveTo(nodes[active]));
-    ro.observe(t);
-    document.fonts?.ready.then(() => moveTo(nodes[active]));
-    return () => ro.disconnect();
+    const measure = () => moveTo(nodes[active]);
+    const ro = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(measure);
+    if (ro) ro.observe(t);
+    else window.addEventListener("resize", measure);
+    document.fonts?.ready.then(measure);
+    return () => {
+      ro?.disconnect();
+      window.removeEventListener("resize", measure);
+    };
   });
 
   function select(id: string) {

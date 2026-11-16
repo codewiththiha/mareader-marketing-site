@@ -1,25 +1,24 @@
 # Mareader Marketing Site
 
 Marketing site for [Mareader](https://github.com/codewiththiha/mareader2), a calm
-reader for PDF and EPUB. Svelte 5 + TypeScript + Vite, hash-routed single page
-with a sticky film section, platform-aware downloads, release notes and a
-donation desk (crypto worldwide, local methods for Myanmar).
+reader for PDF and EPUB. Svelte 5 + TypeScript + Vite, with independent feature
+previews, platform-aware downloads, release notes and a donation desk.
 
 ## Stack
 
 - Vite 8 + Svelte 5 runes, TypeScript strict
-- Styling: custom design tokens in `src/app.css` (Tailwind 4 imported for utilities)
+- Styling: custom design tokens in `src/app.css` and the home layout in `src/lib/sections/home.css`
 - Fonts: Inter Variable + Literata Variable via `@fontsource-variable`
 - Icons: `@lucide/svelte` plus hand-drawn chain marks in `src/lib/support/marks.ts`
 - QR: `qrcode-generator`, rendered as theme-aware inline SVG
-- Single-file production bundle via `vite-plugin-singlefile`
+- Cacheable production assets; releases and support code load only when visited
 
 ## Commands
 
-```
+```sh
 npm ci
 npm run dev          # dev server on 0.0.0.0:5173
-npm run build        # production bundle in dist/
+npm run build        # production site and assets in dist/
 npm run preview      # serve dist/ on 0.0.0.0:4173
 npm run check        # svelte-check
 npm run lint         # eslint
@@ -28,6 +27,8 @@ npm run format:check # prettier check
 npm run validate     # commit + comment rule gate
 npm run test         # playwright: behaviour + screenshot capture
 npm run screenshots  # screenshot capture only
+npm run test:browsers # preview behaviour in Chromium, Firefox and WebKit
+npm run demos:record # regenerate preview clips; requires ffmpeg and Playwright Chromium
 npm run releases     # pull release notes from mareader2 into src/lib/releases
 npm run ci:watch     # wait on a CI run from the terminal
 python3 scripts/eval.py  # self review: build, shots, structure, addresses
@@ -35,17 +36,39 @@ python3 scripts/eval.py  # self review: build, shots, structure, addresses
 
 ## Routes
 
-Hash routes, no server required: `#/` home (film + download), `#/releases`
-notes per version, `#/support` donation desk.
+Hash routes: `#/` home (previews + download), `#/releases` notes per version,
+`#/support` donation desk. Deploy the whole `dist/` directory: its relative
+asset URLs also work when hosted under a subdirectory.
+
+## Feature previews
+
+Home uses short, silent H.264 loops and descriptive stills in `public/demos/`.
+They are recorded from the existing Svelte reader mock, not a live app. A
+preview loads and begins at the first frame only after it enters the viewport;
+it pauses and resets when it leaves or the tab is hidden. Reduced-motion and
+Save-Data preferences keep the stills and avoid video downloads. The playback
+observer has a scroll/resize fallback for older browsers.
+
+To update a clip, adjust the scene data or mock under `src/lib/components/Film/Mock`,
+install Playwright Chromium with `npx playwright install chromium`, and run
+`npm run demos:record` with `ffmpeg` (including `libx264`) on the path. The
+capture harness and interaction sequences live in `scripts/demos/`. For the
+optional cross-browser suite, first install its browsers:
+
+```sh
+npx playwright install firefox webkit
+```
 
 ## Structure
 
-- `src/App.svelte` — shell, header, footer, route switch
+- `src/App.svelte` — shell, header, footer, lazy route switch
 - `src/lib/router.svelte.ts` — hash router
 - `src/lib/platform.ts` — OS/arch detection (UA + UA-CH) and installer choice
 - `src/lib/downloads.ts` — installer matrix per OS/arch/format
-- `src/lib/scenes.ts` — film beats: focus targets, layouts, themes
-- `src/lib/components/Film` — sticky film, camera damping, mock window
+- `src/lib/previews.ts` — feature copy and demo asset paths
+- `src/lib/actions/viewportLoop.ts` — viewport, motion, data and tab-aware playback
+- `src/lib/components/Preview` — labelled preview frame with still-image fallback
+- `src/lib/scenes.ts` and `src/lib/components/Film/Mock` — source of recorded demos
 - `src/lib/sections` — Home, Facts, DownloadSection, Releases, Support
 - `src/lib/sections/support` — CryptoPanel, LocalPanel (Myanmar mock)
 - `src/lib/support/wallets.ts` — verified donation addresses, chain registry
@@ -53,7 +76,6 @@ notes per version, `#/support` donation desk.
 - `src/lib/support/myanmar.ts` — local methods, mocked until live
 - `src/lib/releases/data.ts` — generated release notes (do not hand edit)
 - `src/lib/stores/theme.svelte.ts` — light/dark with persistence
-- `src/lib/actions` — reveal and mount actions
 
 ## Donations
 

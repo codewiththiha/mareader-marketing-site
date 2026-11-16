@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import "./lib/components/Film/Mock/mock.css";
+@import "./lib/sections/home.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -101,88 +101,6 @@ body {
   border: 0;
 }
 
-.film-stage {
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  height: 100svh;
-  overflow: hidden;
-  background: var(--bg);
-  transition: background-color 0.5s;
-}
-.film-cam {
-  position: absolute;
-  left: 0;
-  top: 0;
-  transform-origin: 0 0;
-  opacity: 0;
-  transition: opacity 0.9s;
-}
-.film-cam.ready {
-  opacity: 1;
-}
-
-.film-wash-bottom {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  pointer-events: none;
-  background: linear-gradient(
-    to top,
-    rgba(var(--bg-rgb), 1) 0,
-    rgba(var(--bg-rgb), 0.99) calc(var(--zone) - 18px),
-    rgba(var(--bg-rgb), 0.93) var(--zone),
-    rgba(var(--bg-rgb), 0.72) calc(var(--zone) + 12px),
-    rgba(var(--bg-rgb), 0.4) calc(var(--zone) + 26px),
-    rgba(var(--bg-rgb), 0.14) calc(var(--zone) + 40px),
-    rgba(var(--bg-rgb), 0) calc(var(--zone) + 54px)
-  );
-}
-.film-wash-top {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  height: 76px;
-  pointer-events: none;
-  background: linear-gradient(
-    to bottom,
-    rgba(var(--bg-rgb), 1) 0%,
-    rgba(var(--bg-rgb), 0.92) 40%,
-    rgba(var(--bg-rgb), 0.5) 72%,
-    rgba(var(--bg-rgb), 0) 100%
-  );
-}
-
-.cap {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  opacity: 0;
-  transform: translateY(14px);
-  filter: blur(6px);
-  pointer-events: none;
-  transition:
-    opacity 0.35s ease,
-    transform 0.45s cubic-bezier(0.32, 0.72, 0, 1),
-    filter 0.35s ease;
-}
-.cap.on {
-  opacity: 1;
-  transform: none;
-  filter: none;
-  pointer-events: auto;
-  transition:
-    opacity 0.7s ease 0.2s,
-    transform 0.9s cubic-bezier(0.32, 0.72, 0, 1) 0.2s,
-    filter 0.7s ease 0.2s;
-}
-.cap.gone {
-  transform: translateY(-12px);
-}
-
 .btn-primary {
   display: inline-flex;
   align-items: center;
@@ -243,6 +161,15 @@ body {
     padding-left: 40px;
     padding-right: 40px;
   }
+}
+.route-loading {
+  min-height: 50vh;
+  color: var(--fg2);
+}
+.route-loading button {
+  color: var(--gold);
+  text-decoration: underline;
+  cursor: pointer;
 }
 .page-pad {
   padding-top: 104px;
@@ -1821,8 +1748,6 @@ button:hover .pm-tux {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cap,
-  .cap.on,
   .reveal,
   .page,
   .panel-in,

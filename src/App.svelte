@@ -3,8 +3,6 @@
   import Header from "@/lib/components/Header.svelte";
   import Footer from "@/lib/components/Footer.svelte";
   import Home from "@/lib/sections/Home.svelte";
-  import Releases from "@/lib/sections/Releases.svelte";
-  import Support from "@/lib/sections/Support.svelte";
   import { router, type Route } from "@/lib/router.svelte";
   import { useTheme, applyThemeClass } from "@/lib/stores/theme.svelte";
   import { platform } from "@/lib/platform.svelte";
@@ -55,9 +53,27 @@
     {#key route}
       <div class="page" data-dir={dir}>
         {#if route === "releases"}
-          <Releases />
+          {#await import("@/lib/sections/Releases.svelte")}
+            <div class="wrap page-pad route-loading" role="status">Opening release notes…</div>
+          {:then module}
+            {@const Releases = module.default}
+            <Releases />
+          {:catch}
+            <div class="wrap page-pad route-loading" role="alert">
+              Could not open this page. <button onclick={() => location.reload()}>Try again</button>
+            </div>
+          {/await}
         {:else if route === "support"}
-          <Support />
+          {#await import("@/lib/sections/Support.svelte")}
+            <div class="wrap page-pad route-loading" role="status">Opening support…</div>
+          {:then module}
+            {@const Support = module.default}
+            <Support />
+          {:catch}
+            <div class="wrap page-pad route-loading" role="alert">
+              Could not open this page. <button onclick={() => location.reload()}>Try again</button>
+            </div>
+          {/await}
         {:else}
           <Home />
         {/if}

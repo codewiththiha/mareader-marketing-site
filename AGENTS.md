@@ -30,7 +30,7 @@
 - Svelte 5 runes (`$state`, `$derived`, `$effect`, `$props`); actions for DOM.
 - Hash router in `src/lib/router.svelte.ts`; routes: home, releases, support.
 - Styling: tokens and components in `src/app.css`; tailwind import for utilities.
-- Film camera damps toward scene focus rects in `src/lib/scenes.ts`.
+- Home previews are pre-recorded from `src/lib/scenes.ts`; `viewportLoop.ts` starts them in view.
 - Downloads: `platform.ts` detects OS/arch, `downloads.ts` maps the matrix.
 - Support: `wallets.ts` is the chain registry; add a chain by appending there.
 - EVM chains share one address; the picker swaps explorer and QR mark only.
@@ -42,7 +42,7 @@
 
 - Playwright config pins `workers: 1`; headless shell SEGVs under memory pressure.
 - Never screenshot Home with `fullPage: true`; capture viewport beats instead.
-- After viewport or scroll jumps, wait ~1.5s for the camera to settle.
+- Capture each home preview in its own viewport; avoid full-page home screenshots.
 - Behaviour specs assert platform picks, QR counts, flip and theme persistence.
 
 ## Push

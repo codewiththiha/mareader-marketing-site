@@ -110,7 +110,10 @@ test.describe("mobile", () => {
     await page.screenshot({ path: "screenshots/mobile-light-support-local.png" });
     await dark(page, true);
     await page.screenshot({ path: "screenshots/mobile-dark-support-local.png" });
+    await show(page, ".local-thanks");
+    await page.screenshot({ path: "screenshots/mobile-dark-support-local-end.png" });
     await page.getByRole("radio", { name: "Crypto" }).click();
+    await page.evaluate(() => window.scrollTo(0, 0));
     await page.waitForTimeout(600);
     await page.screenshot({ path: "screenshots/mobile-dark-support-crypto.png" });
     await dark(page, false);

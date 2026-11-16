@@ -40,6 +40,7 @@ for (const [width, theme, initial] of [
     expect((await crypto.boundingBox())!.height).toBeGreaterThanOrEqual(44);
     expect((await local.boundingBox())!.height).toBeGreaterThanOrEqual(44);
     await expect(initial === "crypto" ? crypto : local).toHaveAttribute("aria-checked", "true");
+    await expect(page.getByTestId("support-note")).toHaveCount(initial === "crypto" ? 1 : 0);
     await expectMarkerOnSelected(page);
 
     if (initial === "crypto") {
@@ -55,9 +56,11 @@ for (const [width, theme, initial] of [
       await expect(page.getByTestId("wallet-evm")).toBeVisible();
       await expect(page.getByTestId("sup-flip")).toContainText("Are you from Myanmar?");
     }
+    await expect(page.getByTestId("support-note")).toHaveCount(initial === "crypto" ? 0 : 1);
     await expectMarkerOnSelected(page);
     await page.getByTestId("sup-flip").click();
     await expect(initial === "crypto" ? crypto : local).toHaveAttribute("aria-checked", "true");
+    await expect(page.getByTestId("support-note")).toHaveCount(initial === "crypto" ? 1 : 0);
     await expectMarkerOnSelected(page);
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
       width
@@ -89,11 +92,15 @@ test("mobile methods work with the keyboard and persist across visits", async ({
   await expect(page.getByTestId("local-panel")).toBeVisible();
 });
 
-test("the maker's note explains crypto and stays below both donation views", async ({ page }) => {
+test("the maker's note appears only for crypto", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
-  await page.goto("/?support=crypto#/support", { waitUntil: "networkidle" });
-  const note = page.getByRole("region", { name: "Why crypto?" });
-  await expect(note).toHaveCount(1);
+  await page.goto("/?support=local#/support", { waitUntil: "networkidle" });
+  const note = page.getByTestId("support-note");
+  await expect(page.getByTestId("local-panel")).toBeVisible();
+  await expect(note).toHaveCount(0);
+
+  await page.getByRole("radio", { name: "Crypto" }).click();
+  await expect(page.getByRole("region", { name: "Why crypto?" })).toBeVisible();
   await expect(note).toContainText("I live in Myanmar");
   await expect(note).toContainText("PayPal, Stripe");
   await expect(note).toContainText("support from readers abroad");
@@ -101,30 +108,34 @@ test("the maker's note explains crypto and stays below both donation views", asy
   await expect(note).toContainText("even a small donation helps");
   await expect(note).toContainText("No pressure, though");
   await expect(note.locator("p")).toHaveCount(4);
-
-  for (const method of ["crypto", "local"] as const) {
-    if (method === "local") await page.getByRole("radio", { name: "Myanmar" }).click();
-    await expect(note).toBeVisible();
-    const order = await page.evaluate(() => {
-      const panel = document.querySelector('[data-testid="sup-panel"]')!;
-      const story = document.querySelector('[data-testid="support-note"]')!;
-      const footer = document.querySelector(".ftr")!;
-      return Boolean(
-        panel.compareDocumentPosition(story) & Node.DOCUMENT_POSITION_FOLLOWING &&
-        story.compareDocumentPosition(footer) & Node.DOCUMENT_POSITION_FOLLOWING
-      );
-    });
-    expect(order).toBe(true);
-    for (const width of [320, 390, 768, 1280]) {
-      await page.setViewportSize({ width, height: 900 });
-      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
-        width
-      );
-      const box = (await note.boundingBox())!;
-      expect(box.x).toBeGreaterThanOrEqual(0);
-      expect(box.x + box.width).toBeLessThanOrEqual(width);
-    }
+  const order = await page.evaluate(() => {
+    const panel = document.querySelector('[data-testid="sup-panel"]')!;
+    const story = document.querySelector('[data-testid="support-note"]')!;
+    const footer = document.querySelector(".ftr")!;
+    return Boolean(
+      panel.compareDocumentPosition(story) & Node.DOCUMENT_POSITION_FOLLOWING &&
+      story.compareDocumentPosition(footer) & Node.DOCUMENT_POSITION_FOLLOWING
+    );
+  });
+  expect(order).toBe(true);
+  for (const width of [320, 390, 768, 1280]) {
+    await page.setViewportSize({ width, height: 900 });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
+      width
+    );
+    const box = (await note.boundingBox())!;
+    expect(box.x).toBeGreaterThanOrEqual(0);
+    expect(box.x + box.width).toBeLessThanOrEqual(width);
   }
+
+  await page.getByRole("radio", { name: "Myanmar" }).click();
+  await expect(note).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "Why crypto?" })).toHaveCount(0);
+  await page.reload({ waitUntil: "networkidle" });
+  await expect(page.getByTestId("local-panel")).toBeVisible();
+  await expect(note).toHaveCount(0);
+  await page.getByTestId("sup-flip").click();
+  await expect(note).toBeVisible();
 });
 
 test("resizing keeps the selection aligned while header navigation stays compact", async ({

@@ -130,6 +130,7 @@ test("yangon visitors land on local methods first", async ({ browser }) => {
   await page.goto("/#/support", { waitUntil: "networkidle" });
   await expect(page.locator('[data-testid="local-panel"]')).toBeVisible();
   await expect(page.locator('[data-testid="sup-flip"]')).toContainText("Prefer crypto?");
+  await expect(page.getByTestId("support-note")).toHaveCount(0);
   await ctx.close();
 });
 

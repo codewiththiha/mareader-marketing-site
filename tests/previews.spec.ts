@@ -38,8 +38,10 @@ test("the hero fills the first viewport without scroll prompts", async ({ page }
   await expect(page.getByRole("heading", { name: "Limitless themes." })).toBeVisible();
 });
 
-test("the redesigned hero uses flat surfaces and a responsive split layout", async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: "reduce" });
+test("the hero has no backdrop or gradient and keeps its responsive split layout", async ({
+  page
+}) => {
+  await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto("/", { waitUntil: "networkidle" });
   const backgrounds = await page.locator(".home-hero").evaluate((hero) => {
@@ -50,19 +52,27 @@ test("the redesigned hero uses flat surfaces and a responsive split layout", asy
     );
   });
   expect(backgrounds.every((background) => !/gradient/i.test(background))).toBe(true);
-  const field = await page.locator(".hero-visual").evaluate((element) => ({
-    background: getComputedStyle(element, "::before").backgroundColor,
-    image: getComputedStyle(element, "::before").backgroundImage,
-    filter: getComputedStyle(element, "::before").filter
-  }));
-  expect(field.background).not.toBe("rgba(0, 0, 0, 0)");
-  expect(field.image).toBe("none");
-  expect(field.filter).toBe("none");
+  async function assertNoBackdrop() {
+    const visual = await page.locator(".hero-visual").evaluate((element) => ({
+      background: getComputedStyle(element).backgroundColor,
+      beforeContent: getComputedStyle(element, "::before").content,
+      beforeBackground: getComputedStyle(element, "::before").backgroundColor,
+      afterContent: getComputedStyle(element, "::after").content
+    }));
+    expect(visual.background).toBe("rgba(0, 0, 0, 0)");
+    expect(visual.beforeContent).toMatch(/^(none|normal)$/);
+    expect(visual.beforeBackground).toBe("rgba(0, 0, 0, 0)");
+    expect(visual.afterContent).toMatch(/^(none|normal)$/);
+  }
+  await assertNoBackdrop();
+  await page.getByRole("button", { name: "Switch to dark theme" }).click();
+  await assertNoBackdrop();
   const desktopCopy = (await page.locator(".hero-copy").boundingBox())!;
   const desktopArt = (await page.locator(".hero-art").boundingBox())!;
   expect(desktopCopy.x + desktopCopy.width).toBeLessThan(desktopArt.x);
 
   await page.setViewportSize({ width: 390, height: 844 });
+  await assertNoBackdrop();
   const mobileCopy = (await page.locator(".hero-copy").boundingBox())!;
   const mobileArt = (await page.locator(".hero-art").boundingBox())!;
   expect(mobileCopy.y + mobileCopy.height).toBeLessThan(mobileArt.y);
@@ -116,7 +126,7 @@ test("borderless previews alternate beside their descriptions and stack on phone
 }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto("/", { waitUntil: "networkidle" });
-  for (const selector of [".hero-art", ".preview-card", ".preview-screen"]) {
+  for (const selector of [".hero-visual", ".hero-art", ".preview-card", ".preview-screen"]) {
     const element = page.locator(selector).first();
     await expect(element).toHaveCSS("border-top-width", "0px");
     await expect(element).toHaveCSS("padding-top", "0px");

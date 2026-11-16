@@ -37,7 +37,7 @@ python3 scripts/eval.py  # self review: build, shots, structure, addresses
 ## Routes
 
 Hash routes: `#/` home (previews + download), `#/downloads` every latest-release
-file with the detected desktop OS highlighted, `#/releases` notes per version,
+file with the detected desktop OS first and highlighted, `#/releases` notes per version,
 and `#/support` donation desk. Download links are taken from the same live or
 baked release data as the notes; unknown files and checksums are listed too.
 Phones and unknown systems see all choices without a guessed highlight. Deploy

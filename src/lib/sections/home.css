@@ -1,4 +1,4 @@
-/* A quiet, full-viewport introduction with a flat paper field. */
+/* A quiet, full-viewport introduction. */
 .home-hero {
   display: flex;
   align-items: center;
@@ -57,21 +57,7 @@
   color: var(--gold);
 }
 .hero-visual {
-  position: relative;
   min-width: 0;
-  padding: clamp(24px, 3vw, 42px) 0;
-  isolation: isolate;
-}
-.hero-visual::before {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  inset: 0 -100vw 0 14%;
-  background: #eae3d6;
-  pointer-events: none;
-}
-.dark .hero-visual::before {
-  background: #1b1d1b;
 }
 .hero-art {
   display: block;
@@ -267,7 +253,6 @@
   .hero-visual {
     width: min(100%, max(210px, calc(145vh - 640px)));
     width: min(100%, max(210px, calc(145dvh - 640px)));
-    padding: 16px 0;
   }
   .hero-art {
     aspect-ratio: 4 / 3;

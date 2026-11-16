@@ -17,7 +17,7 @@ async function dark(page: Page, on: boolean) {
       .getByRole("button", { name: on ? "Switch to dark theme" : "Switch to light theme" })
       .click();
   }
-  await page.waitForTimeout(250);
+  await page.waitForTimeout(600);
 }
 
 async function show(page: Page, selector: string) {
@@ -28,7 +28,7 @@ async function show(page: Page, selector: string) {
       const top = node.getBoundingClientRect().top + window.scrollY;
       window.scrollTo(0, Math.max(0, top - 95));
     });
-  await page.waitForTimeout(450);
+  await page.waitForTimeout(900);
 }
 
 test("home sections", async ({ page }) => {

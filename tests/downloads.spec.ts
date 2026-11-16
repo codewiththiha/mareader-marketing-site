@@ -68,10 +68,40 @@ for (const [os, label] of [
     await expect(page.locator(".downloads-system")).toHaveCount(3);
     await expect(page.locator(".downloads-system.detected")).toHaveCount(1);
     await expect(page.locator(`.downloads-system[data-os="${os}"]`)).toHaveClass(/detected/);
+    await expect(page.locator(".downloads-system").first()).toHaveAttribute("data-os", os);
     await expect(page.locator('[data-testid="download-detection"]')).toContainText(label);
     await expect(page.locator(".downloads-file")).toHaveCount(8);
   });
 }
+
+test("download choices use compact editorial rows that stack on phones", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/?os=mac#/downloads", { waitUntil: "networkidle" });
+  const systems = page.locator(".downloads-system");
+  for (const system of await systems.all()) {
+    await expect(system).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+    await expect(system).toHaveCSS("border-top-left-radius", "0px");
+    const heading = (await system.locator(".downloads-system-head").boundingBox())!;
+    const files = (await system.locator(".downloads-system-content").boundingBox())!;
+    expect(heading.x + heading.width).toBeLessThan(files.x);
+  }
+  const linuxFiles = page.locator('.downloads-system[data-os="linux"] .downloads-file');
+  const first = (await linuxFiles.nth(0).boundingBox())!;
+  const second = (await linuxFiles.nth(1).boundingBox())!;
+  expect(first.y).toBe(second.y);
+  expect(first.x + first.width).toBeLessThan(second.x);
+
+  await page.setViewportSize({ width: 320, height: 640 });
+  for (const system of await systems.all()) {
+    const heading = (await system.locator(".downloads-system-head").boundingBox())!;
+    const files = (await system.locator(".downloads-system-content").boundingBox())!;
+    expect(heading.y + heading.height).toBeLessThan(files.y);
+  }
+  for (const link of await page.locator(".downloads-file").all()) {
+    expect((await link.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+  }
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
+});
 
 test("unknown systems use the downloads route from the hero, header and footer", async ({
   page
@@ -150,6 +180,26 @@ test("a chosen Mac chip stays consistent across the direct download links", asyn
     await expect(link).toHaveAttribute("href", /aarch64\.dmg$/);
   await page.reload({ waitUntil: "networkidle" });
   await expect(page.locator('[data-testid="hero-dl"]')).toHaveAttribute("href", /aarch64\.dmg$/);
+});
+
+test("keyboard users can open guidance and choose a file", async ({ page }) => {
+  await page.goto("/?os=windows#/downloads", { waitUntil: "networkidle" });
+  const system = page.locator('.downloads-system[data-os="windows"]');
+  const summary = system.locator("summary");
+  await summary.focus();
+  await page.keyboard.press("Enter");
+  await expect(system.locator("details")).toHaveAttribute("open", "");
+  await expect(system.locator("details p")).toContainText("SmartScreen");
+
+  const installer = system.locator('[data-kind="win-exe"]');
+  await installer.focus();
+  await expect(installer).toBeFocused();
+  await page.route("https://github.com/codewiththiha/mareader2/releases/download/**", (route) =>
+    route.fulfill({ status: 200, body: "test installer" })
+  );
+  const requested = page.waitForRequest((request) => /-setup\.exe$/.test(request.url()));
+  await page.keyboard.press("Enter");
+  expect((await requested).url()).toMatch(/-setup\.exe$/);
 });
 
 test("a manually selected file really requests its download URL", async ({ page }) => {

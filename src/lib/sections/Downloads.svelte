@@ -66,8 +66,16 @@
   let uncertainArch = $derived(
     (detected === "windows" || detected === "linux") && platform.arch === "arm64"
   );
+  let orderedSystems = $derived(
+    detected
+      ? [
+          ...SYSTEMS.filter((system) => system.id === detected),
+          ...SYSTEMS.filter((system) => system.id !== detected)
+        ]
+      : SYSTEMS
+  );
   let systems = $derived(
-    SYSTEMS.map((system) => ({
+    orderedSystems.map((system) => ({
       ...system,
       available: system.files.flatMap((option) =>
         release.assets
@@ -86,81 +94,99 @@
 
 <div class="wrap page-pad downloads-page">
   <header class="downloads-intro">
-    <div>
+    <div class="downloads-intro-copy">
       <h1 class="downloads-title">Download Mareader.</h1>
       <p class="downloads-lede">
-        A little more room for your books. Choose the version that fits your computer.
+        A calm place for your books, made for your desktop. Choose a version and settle in.
       </p>
     </div>
     <div class="downloads-release">
-      <span>Latest release</span>
-      <strong>{release.tag}</strong>
-      <span>{dateLabel(release.date)}</span>
+      <span class="downloads-release-label">Latest release</span>
+      <div class="downloads-release-version">
+        <strong>{release.tag}</strong>
+        <span>{dateLabel(release.date)}</span>
+      </div>
       <a href={href("releases")}>Release notes <ArrowUpRight size={14} /></a>
     </div>
   </header>
 
-  <p class="downloads-detection" data-testid="download-detection" aria-live="polite">
-    {#if detected}
-      <Check size={16} strokeWidth={2} />
-      {OS_LABEL[detected]} is highlighted for you. You can choose any system below.
-    {:else}
-      Mareader is a desktop app. Choose the installer for your computer.
+  <section class="downloads-choices" aria-labelledby="downloads-choices-title">
+    <div class="downloads-choices-head">
+      <h2 id="downloads-choices-title">Choose your system.</h2>
+      <p class="downloads-detection" data-testid="download-detection" aria-live="polite">
+        {#if detected}
+          <Check size={16} strokeWidth={2} />
+          {OS_LABEL[detected]} is highlighted for you. All systems are available below.
+        {:else}
+          Mareader is a desktop app. Choose the installer for your computer.
+        {/if}
+      </p>
+    </div>
+    {#if uncertainArch}
+      <p class="downloads-arch-note">
+        We couldn't choose an installer automatically. Check the processor requirements for each
+        file.
+      </p>
     {/if}
-  </p>
-  {#if uncertainArch}
-    <p class="downloads-arch-note">
-      We couldn't choose an installer automatically. Check the processor requirements for each file.
-    </p>
-  {/if}
 
-  <div class="downloads-grid">
-    {#each systems as system (system.id)}
-      <section
-        class="downloads-system"
-        class:detected={detected === system.id}
-        data-os={system.id}
-        aria-labelledby={`system-${system.id}`}
-      >
-        <div class="downloads-system-head">
-          <span class="downloads-system-icon"><PlatformMark os={system.id} size={22} /></span>
-          <div>
-            <h2 id={`system-${system.id}`}>{OS_LABEL[system.id]}</h2>
-            <p>{system.description}</p>
+    <div class="downloads-grid">
+      {#each systems as system, index (system.id)}
+        <section
+          class="downloads-system"
+          class:detected={detected === system.id}
+          data-os={system.id}
+          aria-labelledby={`system-${system.id}`}
+        >
+          <div class="downloads-system-head">
+            <div class="downloads-system-index" aria-hidden="true">
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <span class="downloads-index-rule"></span>
+            </div>
+            <div class="downloads-system-title">
+              <span class="downloads-system-icon"><PlatformMark os={system.id} size={22} /></span>
+              <div>
+                <h3 id={`system-${system.id}`}>{OS_LABEL[system.id]}</h3>
+                <p>{system.description}</p>
+              </div>
+            </div>
+            {#if detected === system.id}
+              <span class="downloads-badge"><Check size={12} /> Your system</span>
+            {/if}
           </div>
-          {#if detected === system.id}
-            <span class="downloads-badge"><Check size={12} /> Your system</span>
-          {/if}
-        </div>
 
-        <div class="downloads-files">
-          {#each system.available as file (file.asset.name)}
-            <a
-              class="downloads-file"
-              href={file.asset.url}
-              title={file.asset.name}
-              data-kind={file.kind}
-            >
-              <span class="downloads-file-copy">
-                <strong>{file.name}</strong>
-                <span>{file.detail}</span>
-                <span class="downloads-file-format"
-                  >{file.format} · {sizeLabel(file.asset.size)}</span
+          <div class="downloads-system-content">
+            <div class="downloads-files">
+              {#each system.available as file (file.asset.name)}
+                <a
+                  class="downloads-file"
+                  href={file.asset.url}
+                  title={file.asset.name}
+                  data-kind={file.kind}
                 >
-              </span>
-              <ArrowDownToLine size={17} strokeWidth={1.7} aria-hidden="true" />
-            </a>
-          {:else}
-            <p class="downloads-empty">No files for this system in the latest release.</p>
-          {/each}
-        </div>
-        <details class="downloads-first">
-          <summary>First launch on {OS_LABEL[system.id]}</summary>
-          <p>{FIRST_LAUNCH[system.id]}</p>
-        </details>
-      </section>
-    {/each}
-  </div>
+                  <span class="downloads-file-copy">
+                    <strong>{file.name}</strong>
+                    <span>{file.detail}</span>
+                    <span class="downloads-file-format">
+                      {file.format} · {sizeLabel(file.asset.size)}
+                    </span>
+                  </span>
+                  <span class="downloads-file-action" aria-hidden="true">
+                    <ArrowDownToLine size={17} strokeWidth={1.7} />
+                  </span>
+                </a>
+              {:else}
+                <p class="downloads-empty">No files for this system in the latest release.</p>
+              {/each}
+            </div>
+            <details class="downloads-first">
+              <summary>First launch on {OS_LABEL[system.id]}</summary>
+              <p>{FIRST_LAUNCH[system.id]}</p>
+            </details>
+          </div>
+        </section>
+      {/each}
+    </div>
+  </section>
 
   {#if extraFiles.length}
     <section class="downloads-extras" aria-labelledby="extra-files-title">
@@ -173,7 +199,9 @@
           <a href={asset.url} class="downloads-extra" title={asset.name}>
             <span>{kindOf(asset.name) === "checksums" ? "SHA-256 checksums" : asset.name}</span>
             <span>{sizeLabel(asset.size)}</span>
-            <ArrowDownToLine size={16} strokeWidth={1.7} aria-hidden="true" />
+            <span class="downloads-file-action" aria-hidden="true">
+              <ArrowDownToLine size={17} strokeWidth={1.7} />
+            </span>
           </a>
         {/each}
       </div>

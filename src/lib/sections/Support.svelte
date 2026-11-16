@@ -32,9 +32,11 @@
     />
     <button type="button" class="sup-alt" onclick={() => support.flip()} data-testid="sup-flip">
       {#if method === "crypto"}
-        Are you from Myanmar? <span>KBZPay &amp; Wave, right here</span>
+        <span class="sup-alt-question">Are you from Myanmar?</span>
+        <span class="sup-alt-detail">KBZPay &amp; Wave, right here</span>
       {:else}
-        Prefer crypto? <span>wallets for every chain</span>
+        <span class="sup-alt-question">Prefer crypto?</span>
+        <span class="sup-alt-detail">wallets for every chain</span>
       {/if}
       <ArrowRight size={14} strokeWidth={1.9} class="sup-alt-arrow" />
     </button>

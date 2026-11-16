@@ -510,11 +510,11 @@ body {
   transition: opacity 0.3s;
 }
 @media (max-width: 559px) {
-  .pill:not(.dense) .pill-item {
+  .hdr .pill:not(.dense) .pill-item {
     padding: 0 11px;
     gap: 0;
   }
-  .pill:not(.dense) .pill-label {
+  .hdr .pill:not(.dense) .pill-label {
     display: none;
   }
 }
@@ -1087,7 +1087,7 @@ button:hover .pm-tux {
   cursor: pointer;
   transition: color 0.25s;
 }
-.sup-alt span {
+.sup-alt-detail {
   color: var(--fg2);
   opacity: 0.75;
   font-size: 12.5px;
@@ -1100,6 +1100,28 @@ button:hover .pm-tux {
 }
 .sup-alt:hover .sup-alt-arrow {
   transform: translateX(3px);
+}
+@media (max-width: 559px) {
+  .sup-switch {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .sup-switch .pill {
+    display: flex;
+    width: 100%;
+  }
+  .sup-switch .pill-item {
+    height: 44px;
+    flex: 1;
+  }
+  .sup-alt {
+    min-height: 44px;
+    align-self: flex-start;
+    flex-wrap: wrap;
+    max-width: 100%;
+    text-align: left;
+  }
 }
 .panel-in {
   animation: panel-in 0.5s var(--ease) both;

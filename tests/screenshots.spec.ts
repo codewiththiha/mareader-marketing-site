@@ -105,6 +105,16 @@ test.describe("mobile", () => {
     await page.screenshot({ path: "screenshots/mobile-dark-releases-closed.png", fullPage: true });
     await page.locator(".rel-mobile-trigger").first().click();
     await page.screenshot({ path: "screenshots/mobile-dark-releases-open.png" });
+    await page.goto("/?support=local#/support", { waitUntil: "networkidle" });
+    await dark(page, false);
+    await page.screenshot({ path: "screenshots/mobile-light-support-local.png" });
+    await dark(page, true);
+    await page.screenshot({ path: "screenshots/mobile-dark-support-local.png" });
+    await page.getByRole("radio", { name: "Crypto" }).click();
+    await page.waitForTimeout(600);
+    await page.screenshot({ path: "screenshots/mobile-dark-support-crypto.png" });
+    await dark(page, false);
+    await page.screenshot({ path: "screenshots/mobile-light-support-crypto.png" });
   });
 });
 

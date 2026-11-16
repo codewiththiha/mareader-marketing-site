@@ -27,7 +27,7 @@ npm run format:check # prettier check
 npm run validate     # commit + comment rule gate
 npm run test         # playwright: behaviour + screenshot capture
 npm run screenshots  # screenshot capture only
-npm run test:browsers # previews, downloads and releases across browsers
+npm run test:browsers # previews, downloads, releases and support across browsers
 npm run demos:record # regenerate preview clips; requires ffmpeg and Playwright Chromium
 npm run releases     # pull release notes from mareader2 into src/lib/releases
 npm run ci:watch     # wait on a CI run from the terminal

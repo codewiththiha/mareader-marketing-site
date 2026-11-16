@@ -96,6 +96,15 @@ test.describe("mobile", () => {
     await page.screenshot({ path: "screenshots/mobile-light-downloads.png", fullPage: true });
     await dark(page, true);
     await page.screenshot({ path: "screenshots/mobile-dark-downloads.png", fullPage: true });
+    await page.goto("/#/releases", { waitUntil: "networkidle" });
+    await dark(page, false);
+    await page.screenshot({ path: "screenshots/mobile-light-releases-open.png" });
+    await page.locator(".rel-mobile-trigger").first().click();
+    await page.screenshot({ path: "screenshots/mobile-light-releases-closed.png", fullPage: true });
+    await dark(page, true);
+    await page.screenshot({ path: "screenshots/mobile-dark-releases-closed.png", fullPage: true });
+    await page.locator(".rel-mobile-trigger").first().click();
+    await page.screenshot({ path: "screenshots/mobile-dark-releases-open.png" });
   });
 });
 

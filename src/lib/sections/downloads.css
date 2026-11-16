@@ -127,14 +127,23 @@
   padding: 31px 0 25px;
   border-top: 1px solid var(--hair);
 }
-.downloads-system.detected::before {
-  content: "";
-  position: absolute;
-  top: 30px;
-  bottom: 30px;
-  left: -16px;
-  width: 2px;
-  background: var(--gold);
+.downloads-system.detected {
+  --fg: var(--btn-fg);
+  --fg2: color-mix(in srgb, var(--btn-fg) 70%, transparent);
+  --hair: color-mix(in srgb, var(--btn-fg) 20%, transparent);
+  --gold: var(--btn-fg);
+  --gold-soft: color-mix(in srgb, var(--btn-fg) 10%, transparent);
+  --card2: color-mix(in srgb, var(--btn-fg) 9%, transparent);
+  --pm-cutout: var(--btn);
+  padding-right: 26px;
+  padding-left: 26px;
+  border-top-color: transparent;
+  border-radius: 16px;
+  background: var(--btn);
+  color: var(--btn-fg);
+}
+.downloads-system.detected + .downloads-system {
+  border-top-color: transparent;
 }
 .downloads-system-head {
   min-width: 0;
@@ -274,6 +283,12 @@
   background: var(--btn);
   color: var(--btn-fg);
 }
+.detected .downloads-file:hover .downloads-file-action,
+.detected .downloads-file:focus-visible .downloads-file-action {
+  border-color: var(--btn-fg);
+  background: var(--btn-fg);
+  color: var(--btn);
+}
 .downloads-empty {
   grid-column: 1 / -1;
   margin: 0;
@@ -382,10 +397,9 @@
   .downloads-system {
     padding: 25px 0;
   }
-  .downloads-system.detected::before {
-    top: 24px;
-    bottom: 24px;
-    left: -12px;
+  .downloads-system.detected {
+    padding-right: 20px;
+    padding-left: 20px;
   }
   .downloads-extras {
     margin-top: 48px;

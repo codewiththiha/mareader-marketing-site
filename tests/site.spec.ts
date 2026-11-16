@@ -74,7 +74,7 @@ test("nav pill routes between pages", async ({ page }) => {
   await page.goto("/", { waitUntil: "networkidle" });
   await page.locator(".hdr").getByRole("link", { name: "Releases" }).click();
   await expect(page).toHaveURL(/#\/releases/);
-  await expect(page.locator('[data-testid="rel-latest"]')).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Release notes." })).toBeVisible();
   await page.locator(".hdr").getByRole("link", { name: "Support" }).click();
   await expect(page).toHaveURL(/#\/support/);
   await expect(page.locator('[data-testid="wallet-evm"]')).toBeVisible();
@@ -82,17 +82,15 @@ test("nav pill routes between pages", async ({ page }) => {
   await expect(page).toHaveURL(/#\/$/);
 });
 
-test("releases page lists every build and folds older ones", async ({ page }) => {
+test("releases page opens on the latest build", async ({ page }) => {
   await page.goto("/#/releases", { waitUntil: "networkidle" });
-  await expect(page.locator('[data-testid="rel-latest"]')).toContainText("v0.0.5");
-  await expect(page.locator('[data-testid="rel-latest"] .notes')).toContainText("Read along");
-  const rows = page.locator(".rel-row");
-  await expect(rows).toHaveCount(4);
-  const first = rows.first();
-  await expect(first.locator(".rel-fold-in")).not.toBeVisible();
-  await first.locator(".rel-row-head").click();
-  await expect(first.locator(".rel-fold-in")).toBeVisible();
-  await expect(first.locator(".rel-file").first()).toHaveAttribute("href", /releases\/download/);
+  const panel = page.getByRole("tabpanel");
+  await expect(panel).toHaveAttribute("data-version", "v0.0.5");
+  await expect(panel.locator(".notes")).toContainText("Read along");
+  await expect(page.getByRole("tab", { name: /v0\.0\.5/ })).toHaveAttribute(
+    "aria-selected",
+    "true"
+  );
 });
 
 test("support page defaults to crypto with styled QRs", async ({ page, context }) => {

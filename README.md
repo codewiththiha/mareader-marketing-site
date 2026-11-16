@@ -27,7 +27,7 @@ npm run format:check # prettier check
 npm run validate     # commit + comment rule gate
 npm run test         # playwright: behaviour + screenshot capture
 npm run screenshots  # screenshot capture only
-npm run test:browsers # previews and downloads in Chromium, Firefox and WebKit
+npm run test:browsers # previews, downloads and releases across browsers
 npm run demos:record # regenerate preview clips; requires ffmpeg and Playwright Chromium
 npm run releases     # pull release notes from mareader2 into src/lib/releases
 npm run ci:watch     # wait on a CI run from the terminal
@@ -38,11 +38,12 @@ python3 scripts/eval.py  # self review: build, shots, structure, addresses
 
 Hash routes: `#/` home (previews + download), `#/downloads` every latest-release
 file with the detected desktop OS first and highlighted, `#/releases` notes per version,
-and `#/support` donation desk. Download links are taken from the same live or
-baked release data as the notes; unknown files and checksums are listed too.
-Phones and unknown systems see all choices without a guessed highlight. Deploy
-the whole `dist/` directory: its relative asset URLs also work when hosted under
-a subdirectory.
+and `#/support` donation desk. On desktop, a keyboard-accessible version outline
+switches the release notes; on mobile, each release, including the latest, can be
+folded. Download links are taken from the same live or baked release data as the
+notes; unknown files and checksums are listed too. Phones and unknown systems see
+all choices without a guessed highlight. Deploy the whole `dist/` directory: its
+relative asset URLs also work when hosted under a subdirectory.
 
 ## Feature previews
 

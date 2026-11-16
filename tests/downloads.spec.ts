@@ -74,13 +74,52 @@ for (const [os, label] of [
   });
 }
 
+test("the detected system uses the inverted theme surface without a side outline", async ({
+  page
+}) => {
+  await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
+  await page.goto("/?os=mac#/downloads", { waitUntil: "networkidle" });
+  const system = page.locator('.downloads-system[data-os="mac"]');
+  const checkSurface = async () => {
+    const style = await system.evaluate((element) => {
+      const probe = document.createElement("span");
+      probe.style.backgroundColor = "var(--btn)";
+      probe.style.color = "var(--btn-fg)";
+      document.body.append(probe);
+      const expected = getComputedStyle(probe);
+      const actual = getComputedStyle(element);
+      const result = {
+        surface: actual.backgroundColor,
+        text: actual.color,
+        expectedSurface: expected.backgroundColor,
+        expectedText: expected.color,
+        before: getComputedStyle(element, "::before").content
+      };
+      probe.remove();
+      return result;
+    });
+    expect(style.surface).toBe(style.expectedSurface);
+    expect(style.text).toBe(style.expectedText);
+    expect(style.before).toMatch(/^(none|normal)$/);
+  };
+  await checkSurface();
+  await expect(system).toHaveCSS("background-color", "rgb(29, 26, 21)");
+  await page.getByRole("button", { name: "Switch to dark theme" }).click();
+  await checkSurface();
+  await expect(system).toHaveCSS("background-color", "rgb(244, 240, 231)");
+  await system.locator('[data-kind="mac-arm"]').focus();
+  await expect(system.locator('[data-kind="mac-arm"]')).toBeFocused();
+});
+
 test("download choices use compact editorial rows that stack on phones", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto("/?os=mac#/downloads", { waitUntil: "networkidle" });
   const systems = page.locator(".downloads-system");
   for (const system of await systems.all()) {
-    await expect(system).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-    await expect(system).toHaveCSS("border-top-left-radius", "0px");
+    if (!(await system.evaluate((element) => element.classList.contains("detected")))) {
+      await expect(system).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+      await expect(system).toHaveCSS("border-top-left-radius", "0px");
+    }
     const heading = (await system.locator(".downloads-system-head").boundingBox())!;
     const files = (await system.locator(".downloads-system-content").boundingBox())!;
     expect(heading.x + heading.width).toBeLessThan(files.x);

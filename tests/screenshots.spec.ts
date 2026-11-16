@@ -115,6 +115,10 @@ test.describe("mobile", () => {
     await page.screenshot({ path: "screenshots/mobile-dark-support-crypto.png" });
     await dark(page, false);
     await page.screenshot({ path: "screenshots/mobile-light-support-crypto.png" });
+    await show(page, ".sup-story");
+    await page.screenshot({ path: "screenshots/mobile-light-support-note.png" });
+    await dark(page, true);
+    await page.screenshot({ path: "screenshots/mobile-dark-support-note.png" });
   });
 });
 

@@ -89,6 +89,44 @@ test("mobile methods work with the keyboard and persist across visits", async ({
   await expect(page.getByTestId("local-panel")).toBeVisible();
 });
 
+test("the maker's note explains crypto and stays below both donation views", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/?support=crypto#/support", { waitUntil: "networkidle" });
+  const note = page.getByRole("region", { name: "Why crypto?" });
+  await expect(note).toHaveCount(1);
+  await expect(note).toContainText("I live in Myanmar");
+  await expect(note).toContainText("PayPal, Stripe");
+  await expect(note).toContainText("support from readers abroad");
+  await expect(note).toContainText("middle-class family in a developing country");
+  await expect(note).toContainText("even a small donation helps");
+  await expect(note).toContainText("No pressure, though");
+  await expect(note.locator("p")).toHaveCount(4);
+
+  for (const method of ["crypto", "local"] as const) {
+    if (method === "local") await page.getByRole("radio", { name: "Myanmar" }).click();
+    await expect(note).toBeVisible();
+    const order = await page.evaluate(() => {
+      const panel = document.querySelector('[data-testid="sup-panel"]')!;
+      const story = document.querySelector('[data-testid="support-note"]')!;
+      const footer = document.querySelector(".ftr")!;
+      return Boolean(
+        panel.compareDocumentPosition(story) & Node.DOCUMENT_POSITION_FOLLOWING &&
+        story.compareDocumentPosition(footer) & Node.DOCUMENT_POSITION_FOLLOWING
+      );
+    });
+    expect(order).toBe(true);
+    for (const width of [320, 390, 768, 1280]) {
+      await page.setViewportSize({ width, height: 900 });
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
+        width
+      );
+      const box = (await note.boundingBox())!;
+      expect(box.x).toBeGreaterThanOrEqual(0);
+      expect(box.x + box.width).toBeLessThanOrEqual(width);
+    }
+  }
+});
+
 test("resizing keeps the selection aligned while header navigation stays compact", async ({
   page
 }) => {

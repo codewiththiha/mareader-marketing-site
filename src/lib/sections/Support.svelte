@@ -51,4 +51,28 @@
       {/if}
     </div>
   {/key}
+
+  <section class="sup-story" aria-labelledby="support-why-title" data-testid="support-note">
+    <div class="sup-story-heading">
+      <p class="sup-story-label">A note from the maker</p>
+      <h2 id="support-why-title">Why crypto?</h2>
+    </div>
+    <div class="sup-story-copy">
+      <p>
+        I live in Myanmar, where I can’t use PayPal, Stripe, or many other international payment
+        services to receive donations. For now, crypto is how I can accept support from readers
+        abroad.
+      </p>
+      <p>
+        I come from a middle-class family in a developing country, and making Mareader takes time
+        and resources. If you’re able to give, even a small donation helps me keep working on it and
+        sharing it freely.
+      </p>
+      <p>
+        No pressure, though. If donating isn’t possible, that’s completely okay. Reading with
+        Mareader, sharing it with a friend, or sending a kind word means a lot, too. Thank you for
+        being here.
+      </p>
+    </div>
+  </section>
 </div>

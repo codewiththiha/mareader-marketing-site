@@ -1123,6 +1123,55 @@ button:hover .pm-tux {
     text-align: left;
   }
 }
+.sup-story {
+  display: grid;
+  grid-template-columns: minmax(200px, 0.8fr) minmax(0, 1.7fr);
+  gap: 24px clamp(32px, 5vw, 68px);
+  margin-top: clamp(64px, 7vw, 88px);
+  padding-top: clamp(36px, 4vw, 52px);
+  border-top: 1px solid var(--hair);
+}
+.sup-story-label {
+  margin: 0 0 14px;
+  color: var(--gold);
+  font-size: 10.5px;
+  font-weight: 650;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+.sup-story-heading h2 {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: clamp(28px, 3vw, 36px);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+}
+.sup-story-copy {
+  max-width: 650px;
+  color: var(--fg2);
+  font-size: 15px;
+  line-height: 1.75;
+  text-wrap: pretty;
+}
+.sup-story-copy p {
+  margin: 0;
+}
+.sup-story-copy p + p {
+  margin-top: 16px;
+}
+.sup-story-copy p:first-child,
+.sup-story-copy p:last-child {
+  color: var(--fg);
+}
+@media (max-width: 720px) {
+  .sup-story {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    margin-top: 56px;
+    padding-top: 32px;
+  }
+}
 .panel-in {
   animation: panel-in 0.5s var(--ease) both;
 }

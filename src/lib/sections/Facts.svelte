@@ -26,11 +26,12 @@
 </script>
 
 <div use:reveal class="reveal facts">
-  {#each FACTS as { icon: Icon, ico, title, body } (title)}
+  {#each FACTS as { icon: Icon, ico, title, body }, index (title)}
     <div class="fact">
-      <span class="fact-ico {ico}">
-        <Icon size={21} strokeWidth={1.6} />
-      </span>
+      <div class="fact-top" aria-hidden="true">
+        <span class="fact-ico {ico}"><Icon size={23} strokeWidth={1.5} /></span>
+        <span class="fact-number">{String(index + 1).padStart(2, "0")}</span>
+      </div>
       <h3 class="fact-h">{title}</h3>
       <p class="fact-p">{body}</p>
     </div>

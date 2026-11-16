@@ -17,6 +17,7 @@
 
   const TITLES: Record<Route, string> = {
     home: "Mareader — a calm PDF and EPUB reader",
+    downloads: "Downloads — Mareader",
     releases: "Release notes — Mareader",
     support: "Support — Mareader"
   };
@@ -52,7 +53,18 @@
   <main id="top">
     {#key route}
       <div class="page" data-dir={dir}>
-        {#if route === "releases"}
+        {#if route === "downloads"}
+          {#await import("@/lib/sections/Downloads.svelte")}
+            <div class="wrap page-pad route-loading" role="status">Opening downloads…</div>
+          {:then module}
+            {@const Downloads = module.default}
+            <Downloads />
+          {:catch}
+            <div class="wrap page-pad route-loading" role="alert">
+              Could not open this page. <button onclick={() => location.reload()}>Try again</button>
+            </div>
+          {/await}
+        {:else if route === "releases"}
           {#await import("@/lib/sections/Releases.svelte")}
             <div class="wrap page-pad route-loading" role="status">Opening release notes…</div>
           {:then module}

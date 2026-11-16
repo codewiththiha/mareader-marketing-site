@@ -46,6 +46,7 @@ test("home sections", async ({ page }) => {
       ["dictionary", '[data-preview="dictionary"]'],
       ["models", '[data-preview="models"]'],
       ["voice", '[data-preview="voice"]'],
+      ["pitch", ".pitch-head"],
       ["download", ".cta-card"]
     ]) {
       await show(page, selector);
@@ -83,18 +84,25 @@ test.describe("mobile", () => {
     await page.screenshot({ path: "screenshots/mobile-dark.png" });
     await show(page, '[data-preview="appearance"]');
     await page.screenshot({ path: "screenshots/mobile-dark-preview.png" });
+    await show(page, ".cta-card");
+    await page.screenshot({ path: "screenshots/mobile-dark-end.png" });
     await page.locator('[data-preview="appearance"]').evaluate((node) => {
       window.scrollTo(0, node.getBoundingClientRect().top + window.scrollY - 8);
     });
     await page.waitForTimeout(300);
     await page.screenshot({ path: "screenshots/mobile-dark-floating-nav.png" });
+    await page.goto("/#/downloads", { waitUntil: "networkidle" });
+    await dark(page, false);
+    await page.screenshot({ path: "screenshots/mobile-light-downloads.png", fullPage: true });
+    await dark(page, true);
+    await page.screenshot({ path: "screenshots/mobile-dark-downloads.png", fullPage: true });
   });
 });
 
 test("routes", async ({ page }) => {
   fs.mkdirSync("screenshots", { recursive: true });
   await page.setViewportSize({ width: 1280, height: 900 });
-  for (const route of ["releases", "support"] as const) {
+  for (const route of ["downloads", "releases", "support"] as const) {
     await page.goto(`/#/${route}`, { waitUntil: "networkidle" });
     await dark(page, false);
     await page.screenshot({ path: `screenshots/${route}-light.png`, fullPage: true });

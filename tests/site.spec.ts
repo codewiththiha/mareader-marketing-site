@@ -45,12 +45,17 @@ test("detects windows and offers the exe", async ({ browser }) => {
   await ctx.close();
 });
 
-test("phones get the three-system grid", async ({ browser }) => {
+test("phones can choose a desktop installer without a guessed system", async ({ browser }) => {
   const { ctx, page } = await withUA(browser, IPHONE_UA);
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-  await expect(page.locator(".dl-grid")).toBeVisible();
-  await expect(page.locator(".dl-card")).toHaveCount(3);
+  const choose = page.locator('[data-testid="dl-choose"]');
+  await expect(choose).toBeVisible();
+  await expect(choose).toHaveAttribute("href", "#/downloads");
   await expect(page.locator('[data-testid="dl-main"]')).toHaveCount(0);
+  await choose.click();
+  await expect(page).toHaveURL(/#\/downloads$/);
+  await expect(page.locator(".downloads-system")).toHaveCount(3);
+  await expect(page.locator(".downloads-system.detected")).toHaveCount(0);
   await ctx.close();
 });
 
@@ -61,6 +66,8 @@ test("mac arch toggle switches the asset", async ({ page }) => {
   await expect(main).toHaveAttribute("href", /x64\.dmg$/);
   await page.getByRole("radio", { name: "Apple Silicon" }).click();
   await expect(main).toHaveAttribute("href", /aarch64\.dmg$/);
+  await expect(page.locator('[data-testid="hero-dl"]')).toHaveAttribute("href", /aarch64\.dmg$/);
+  await expect(page.locator('[data-testid="hdr-dl"]')).toHaveAttribute("href", /aarch64\.dmg$/);
 });
 
 test("nav pill routes between pages", async ({ page }) => {

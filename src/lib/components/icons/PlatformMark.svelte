@@ -22,16 +22,16 @@
   <svg class="pm pm-tux" viewBox="0 0 24 24" width={size} height={size} aria-hidden="true">
     <path
       d="M12 2.1c-3.4 0-5.7 2.7-5.7 6.6 0 1.6-.3 2.6-1 3.9-.8 1.6-1.5 2.9-1.5 4.7 0 2.6 3.4 4.5 8.2 4.5s8.2-1.9 8.2-4.5c0-1.8-.7-3.1-1.5-4.7-.7-1.3-1-2.3-1-3.9 0-3.9-2.3-6.6-5.7-6.6Z"
-      fill="var(--fg)"
+      fill="currentColor"
     ></path>
     <path
       d="M12 9.4c-2 0-3.3 1.8-3.3 4.2 0 2.4 1.4 5.5 3.3 5.5s3.3-3.1 3.3-5.5c0-2.4-1.3-4.2-3.3-4.2Z"
-      fill="var(--bg)"
+      fill="var(--pm-cutout, var(--bg))"
     ></path>
-    <circle cx="10.1" cy="7" r="1.1" fill="var(--bg)"></circle>
-    <circle cx="13.9" cy="7" r="1.1" fill="var(--bg)"></circle>
-    <circle cx="10.35" cy="7.15" r="0.46" fill="var(--fg)"></circle>
-    <circle cx="13.65" cy="7.15" r="0.46" fill="var(--fg)"></circle>
+    <circle cx="10.1" cy="7" r="1.1" fill="var(--pm-cutout, var(--bg))"></circle>
+    <circle cx="13.9" cy="7" r="1.1" fill="var(--pm-cutout, var(--bg))"></circle>
+    <circle cx="10.35" cy="7.15" r="0.46" fill="currentColor"></circle>
+    <circle cx="13.65" cy="7.15" r="0.46" fill="currentColor"></circle>
     <path d="M12 8.1 14 9.35 12 10.6 10 9.35Z" fill="var(--gold)"></path>
     <ellipse cx="9.1" cy="21.7" rx="2" ry="0.8" fill="var(--gold)"></ellipse>
     <ellipse cx="14.9" cy="21.7" rx="2" ry="0.8" fill="var(--gold)"></ellipse>

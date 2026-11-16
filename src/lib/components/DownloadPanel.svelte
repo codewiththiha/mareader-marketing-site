@@ -1,46 +1,24 @@
 <script lang="ts">
-  // DownloadPanel — detected system first, every other one click away
+  // Keep the preferred Mac chip for the direct download on subsequent visits.
+  import { ArrowRight, Download } from "@lucide/svelte";
   import { platform } from "@/lib/platform.svelte";
-  import { releases } from "@/lib/releases/refresh.svelte";
-  import { assetOf, sizeLabel } from "@/lib/releases/assets";
-  import { bestFor, FIRST_LAUNCH, OS_LABEL } from "@/lib/downloads";
-  import { RELEASES } from "@/lib/constants";
+  import { sizeLabel } from "@/lib/releases/assets";
+  import { bestFor, OS_LABEL } from "@/lib/downloads";
+  import { href } from "@/lib/router.svelte";
   import PlatformMark from "./icons/PlatformMark.svelte";
   import Pill from "./Pill.svelte";
   import type { OS } from "@/lib/platform";
 
   let { variant = "full" }: { variant?: "full" | "compact" } = $props();
 
-  const ARCH_KEY = "mareader-mac-arch";
-  function loadPick(): "arm64" | "x64" | null {
-    try {
-      const v = localStorage.getItem(ARCH_KEY);
-      return v === "arm64" || v === "x64" ? v : null;
-    } catch {
-      return null;
-    }
-  }
-  let userPick = $state<"arm64" | "x64" | null>(null);
-  let mounted = $state(false);
-  $effect(() => {
-    if (mounted) return;
-    mounted = true;
-    userPick = loadPick();
-  });
-
-  let arch = $derived(userPick ?? (platform.arch === "x64" ? "x64" : "arm64"));
-  let best = $derived(bestFor(platform.os, platform.mobile ? "" : arch));
-  let rel = $derived(releases.latest);
-  let tagUrl = $derived(`${RELEASES}/tag/${rel?.tag ?? ""}`);
+  let arch = $derived(platform.macArch);
+  let best = $derived(
+    platform.mobile ? null : bestFor(platform.os, platform.os === "mac" ? arch : platform.arch)
+  );
   const OTHERS = ["mac", "windows", "linux"] as const;
 
   function pickArch(a: "arm64" | "x64") {
-    userPick = a;
-    try {
-      localStorage.setItem(ARCH_KEY, a);
-    } catch {
-      // the pick lives for this page only
-    }
+    platform.setMacArch(a);
   }
 
   function otherBest(os: OS) {
@@ -71,25 +49,7 @@
         </div>
       {/if}
     </div>
-    {#if variant === "full"}
-      <div class="dl-alt">
-        <span class="dl-alt-label">Also for</span>
-        {#each OTHERS.filter((o) => o !== best.os) as os (os)}
-          {@const b = otherBest(os)}
-          {#if b}
-            <a class="btn-ghost dl-alt-btn" href={b.asset.url} title={b.meta}>
-              <PlatformMark {os} size={16} />
-              {OS_LABEL[os]}
-            </a>
-          {/if}
-        {/each}
-      </div>
-      <details class="dl-first">
-        <summary>First launch on {OS_LABEL[best.os]}</summary>
-        <p>{FIRST_LAUNCH[best.os]}</p>
-      </details>
-    {/if}
-  {:else}
+  {:else if variant === "compact"}
     <div class="dl-grid">
       {#each OTHERS as os (os)}
         {@const b = otherBest(os)}
@@ -99,9 +59,9 @@
             <a class="btn-primary dl-btn sm" href={b.asset.url}>
               {os === "mac" ? (arch === "x64" ? "Intel" : "Apple Silicon") : "Download"}
             </a>
-            <span class="dl-card-meta"
-              >{sizeLabel(b.asset.size)} · {b.asset.name.split(".").pop()}</span
-            >
+            <span class="dl-card-meta">
+              {sizeLabel(b.asset.size)} · {b.asset.name.split(".").pop()}
+            </span>
             {#if os === "mac"}
               <button
                 type="button"
@@ -115,22 +75,17 @@
         {/if}
       {/each}
     </div>
-    <p class="dl-hint">Mareader is a desktop app — grab the installer for your computer.</p>
+    <p class="dl-hint">Mareader is a desktop app — choose the installer for your computer.</p>
+  {:else}
+    <div class="dl-primary">
+      <a class="btn-primary dl-btn" href={href("downloads")} data-testid="dl-choose">
+        <Download size={18} />
+        Choose your download
+      </a>
+      <p class="dl-meta">Available for macOS, Windows and Linux.</p>
+    </div>
   {/if}
-  {#if variant === "full"}
-    <p class="dl-all">
-      <a href={tagUrl}>All files, other formats & checksums</a>
-      {#if releases.live}<span class="dl-live" title="fetched live from GitHub"
-          >updated just now</span
-        >{/if}
-    </p>
-    <p class="dl-also" data-testid="dl-also">
-      Also available: {#if assetOf(rel, "win-msi")}<a href={assetOf(rel, "win-msi")!.url}>MSI</a
-        >{/if}
-      {#if assetOf(rel, "linux-appimage")}
-        · <a href={assetOf(rel, "linux-appimage")!.url}>AppImage</a>{/if}
-      {#if assetOf(rel, "linux-arch")}
-        · <a href={assetOf(rel, "linux-arch")!.url}>Arch tar.gz</a>{/if}
-    </p>
+  {#if variant === "full" && best}
+    <a class="dl-browse" href={href("downloads")}>All downloads <ArrowRight size={16} /></a>
   {/if}
 </div>

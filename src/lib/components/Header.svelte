@@ -55,7 +55,7 @@
           <span>Download</span>
         </a>
       {:else}
-        <a href={href("releases")} class="hdr-dl" data-testid="hdr-dl">
+        <a href={href("downloads")} class="hdr-dl" data-testid="hdr-dl">
           <span>Download</span>
         </a>
       {/if}

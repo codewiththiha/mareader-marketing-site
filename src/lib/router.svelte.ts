@@ -1,7 +1,7 @@
-// router — hash routes: #/ home, #/releases, #/support
-export type Route = "home" | "releases" | "support";
+// router — hash routes for home, downloads, release notes and support
+export type Route = "home" | "downloads" | "releases" | "support";
 
-const KNOWN: Route[] = ["home", "releases", "support"];
+const KNOWN: Route[] = ["home", "downloads", "releases", "support"];
 
 function fromHash(hash: string): Route {
   const slug = hash.replace(/^#\/?/, "").split("?")[0];

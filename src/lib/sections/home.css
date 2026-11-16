@@ -1,76 +1,54 @@
-/* A full-viewport introduction. */
+/* A quiet, full-viewport introduction with a flat paper field. */
 .home-hero {
-  position: relative;
   display: flex;
   align-items: center;
   min-height: 100vh;
   min-height: 100dvh;
-  padding: 88px 0 40px;
+  padding: 92px 0 48px;
   overflow: hidden;
 }
-.home-hero::before {
-  content: "";
-  position: absolute;
-  left: 50%;
-  bottom: 1%;
-  width: min(100%, 1100px);
-  height: min(45vh, 440px);
-  transform: translateX(-50%);
-  background: radial-gradient(ellipse at center, rgba(166, 124, 59, 0.12), transparent 68%);
-  pointer-events: none;
-}
-.dark .home-hero::before {
-  background: radial-gradient(ellipse at center, rgba(227, 189, 105, 0.11), transparent 68%);
-}
-.hero-inner {
-  position: relative;
-  display: flex;
+.home-hero .hero-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  align-items: center;
+  gap: clamp(36px, 4.5vw, 70px);
   width: 100%;
   max-width: 1240px;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: clamp(24px, 4vh, 38px);
 }
 .hero-copy {
-  width: 100%;
-  text-align: center;
+  min-width: 0;
 }
 .hero-copy h1 {
-  max-width: 1100px;
-  margin: 0 auto;
+  margin: 0;
   font-family: var(--font-serif);
-  font-size: clamp(44px, 5vw, 72px);
+  font-size: clamp(48px, 5.05vw, 70px);
   font-weight: 500;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.04em;
   line-height: 1.08;
   text-wrap: balance;
 }
-.hero-copy h1 em {
-  color: var(--gold);
-  font-style: italic;
-  font-weight: 450;
+.hero-copy h1 span {
+  display: block;
 }
 .hero-description {
-  max-width: 660px;
-  margin: 16px auto 0;
+  max-width: 410px;
+  margin: 22px 0 0;
   color: var(--fg2);
   font-size: 16px;
-  line-height: 1.65;
+  line-height: 1.7;
   text-wrap: pretty;
 }
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
   gap: 10px;
-  margin-top: 24px;
+  margin-top: 28px;
 }
 .hero-actions a {
   text-decoration: none;
 }
 .hero-footnote {
-  margin: 12px 0 0;
+  margin: 16px 0 0;
   color: var(--fg2);
   font-size: 12px;
 }
@@ -78,17 +56,29 @@
   margin: 0 5px;
   color: var(--gold);
 }
+.hero-visual {
+  position: relative;
+  min-width: 0;
+  padding: clamp(24px, 3vw, 42px) 0;
+  isolation: isolate;
+}
+.hero-visual::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0 -100vw 0 14%;
+  background: #eae3d6;
+  pointer-events: none;
+}
+.dark .hero-visual::before {
+  background: #1b1d1b;
+}
 .hero-art {
   display: block;
-  /* Leave room for the copy on shorter viewports. */
-  width: min(840px, 100%);
-  width: min(840px, 100%, max(260px, calc(160vh - 610px)));
-  width: min(840px, 100%, max(260px, calc(160dvh - 610px)));
-  min-width: 0;
-  flex: none;
+  width: 100%;
   overflow: hidden;
   aspect-ratio: 16 / 10;
-  border-radius: 12px;
+  border-radius: 9px;
 }
 .hero-art img {
   display: block;
@@ -221,12 +211,20 @@
   opacity: 1;
 }
 @media (max-width: 800px) {
-  .hero-inner {
-    gap: 30px;
+  .home-hero .hero-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 34px;
+    max-width: 760px;
   }
   .hero-copy h1 {
-    max-width: 760px;
     font-size: clamp(44px, 7vw, 60px);
+  }
+  .hero-visual {
+    align-self: flex-end;
+    width: min(100%, max(300px, calc(150vh - 680px)));
+    width: min(100%, max(300px, calc(150dvh - 680px)));
   }
   .feature-row,
   .feature-row.reverse {
@@ -240,18 +238,18 @@
 }
 @media (max-width: 560px) {
   .home-hero {
-    padding: 80px 0 28px;
+    padding: 82px 0 26px;
   }
-  .hero-inner {
+  .home-hero .hero-inner {
     gap: 24px;
   }
   .hero-copy h1 {
-    max-width: 420px;
-    font-size: clamp(38px, 11vw, 46px);
+    font-size: clamp(36px, 10vw, 44px);
   }
   .hero-description {
-    margin-top: 13px;
-    font-size: 15px;
+    max-width: 350px;
+    margin-top: 14px;
+    font-size: 14.5px;
     line-height: 1.6;
   }
   .hero-actions {
@@ -264,11 +262,14 @@
     font-size: 14px;
   }
   .hero-footnote {
-    margin-top: 10px;
+    margin-top: 11px;
+  }
+  .hero-visual {
+    width: min(100%, max(210px, calc(145vh - 640px)));
+    width: min(100%, max(210px, calc(145dvh - 640px)));
+    padding: 16px 0;
   }
   .hero-art {
-    width: min(100%, max(200px, calc(133vh - 530px)));
-    width: min(100%, max(200px, calc(133dvh - 530px)));
     aspect-ratio: 4 / 3;
   }
   .showcase {

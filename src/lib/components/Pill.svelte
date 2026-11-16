@@ -38,7 +38,10 @@
   let ready = $state(false);
 
   function moveTo(el: HTMLElement | undefined) {
-    if (!el) return;
+    if (!el) {
+      markW = 0;
+      return;
+    }
     markX = el.offsetLeft;
     markW = el.offsetWidth;
     if (!ready) requestAnimationFrame(() => (ready = true));
@@ -103,7 +106,11 @@
     style="--x:{ghostX}px;--w:{ghostW}px"
     aria-hidden="true"
   ></span>
-  <span class="pill-mark" style="--x:{markX}px;--w:{markW}px" aria-hidden="true"></span>
+  <span
+    class="pill-mark"
+    style="--x:{markX}px;--w:{markW}px;opacity:{markW ? 1 : 0}"
+    aria-hidden="true"
+  ></span>
   {#each items as it (it.id)}
     {@const El = it.href ? "a" : "button"}
     <svelte:element

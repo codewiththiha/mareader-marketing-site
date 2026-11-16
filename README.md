@@ -11,7 +11,7 @@ previews, platform-aware downloads, release notes and a donation desk.
 - Fonts: Inter Variable + Literata Variable via `@fontsource-variable`
 - Icons: `@lucide/svelte` plus hand-drawn chain marks in `src/lib/support/marks.ts`
 - QR: `qrcode-generator`, rendered as theme-aware inline SVG
-- Cacheable production assets; releases and support code load only when visited
+- Cacheable production assets; downloads, releases and support load only when visited
 
 ## Commands
 
@@ -27,7 +27,7 @@ npm run format:check # prettier check
 npm run validate     # commit + comment rule gate
 npm run test         # playwright: behaviour + screenshot capture
 npm run screenshots  # screenshot capture only
-npm run test:browsers # preview behaviour in Chromium, Firefox and WebKit
+npm run test:browsers # previews and downloads in Chromium, Firefox and WebKit
 npm run demos:record # regenerate preview clips; requires ffmpeg and Playwright Chromium
 npm run releases     # pull release notes from mareader2 into src/lib/releases
 npm run ci:watch     # wait on a CI run from the terminal
@@ -36,9 +36,13 @@ python3 scripts/eval.py  # self review: build, shots, structure, addresses
 
 ## Routes
 
-Hash routes: `#/` home (previews + download), `#/releases` notes per version,
-`#/support` donation desk. Deploy the whole `dist/` directory: its relative
-asset URLs also work when hosted under a subdirectory.
+Hash routes: `#/` home (previews + download), `#/downloads` every latest-release
+file with the detected desktop OS highlighted, `#/releases` notes per version,
+and `#/support` donation desk. Download links are taken from the same live or
+baked release data as the notes; unknown files and checksums are listed too.
+Phones and unknown systems see all choices without a guessed highlight. Deploy
+the whole `dist/` directory: its relative asset URLs also work when hosted under
+a subdirectory.
 
 ## Feature previews
 

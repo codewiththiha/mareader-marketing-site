@@ -28,7 +28,7 @@
 ## Architecture
 
 - Svelte 5 runes (`$state`, `$derived`, `$effect`, `$props`); actions for DOM.
-- Hash router in `src/lib/router.svelte.ts`; routes: home, releases, support.
+- Hash router in `src/lib/router.svelte.ts`; routes: home, downloads, releases, support.
 - Styling: tokens and components in `src/app.css`; tailwind import for utilities.
 - Home previews are pre-recorded from `src/lib/scenes.ts`; `viewportLoop.ts` starts them in view.
 - Downloads: `platform.ts` detects OS/arch, `downloads.ts` maps the matrix.

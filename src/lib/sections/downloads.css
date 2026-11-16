@@ -1,0 +1,300 @@
+/* Download choices stay visible together, including on small screens. */
+.downloads-page {
+  max-width: 1240px;
+}
+.downloads-intro {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 30px;
+  padding-bottom: 36px;
+  border-bottom: 1px solid var(--hair);
+}
+.downloads-title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: clamp(38px, 4.5vw, 60px);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+.downloads-lede {
+  max-width: 530px;
+  margin: 15px 0 0;
+  color: var(--fg2);
+  font-size: 16px;
+  line-height: 1.65;
+}
+.downloads-release {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 7px 12px;
+  color: var(--fg2);
+  font-size: 12px;
+  white-space: nowrap;
+}
+.downloads-release strong {
+  color: var(--fg);
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+.downloads-release a {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--fg);
+  text-decoration: underline;
+  text-decoration-color: var(--hair);
+  text-underline-offset: 4px;
+}
+.downloads-release a:hover {
+  text-decoration-color: currentColor;
+}
+.downloads-detection {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 25px 0 20px;
+  color: var(--fg2);
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+.downloads-detection svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--gold);
+}
+.downloads-arch-note {
+  margin: -9px 0 20px;
+  color: var(--fg2);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.downloads-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.downloads-system {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  padding: 24px 22px 20px;
+  overflow: hidden;
+  border: 1px solid var(--hair);
+  border-radius: 16px;
+  background: var(--card);
+}
+.downloads-system.detected {
+  border-color: color-mix(in srgb, var(--gold) 55%, var(--hair));
+  background: color-mix(in srgb, var(--gold-soft) 65%, var(--card));
+}
+.downloads-system.detected::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: var(--gold);
+}
+.downloads-system-head {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  align-content: start;
+  align-items: center;
+  gap: 0 12px;
+  min-height: 100px;
+}
+.downloads-system-icon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: 11px;
+  background: var(--card2);
+  color: var(--fg);
+}
+.downloads-system-head h2 {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 23px;
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+.downloads-system-head p {
+  margin: 6px 0 0;
+  color: var(--fg2);
+  font-size: 12px;
+  line-height: 1.4;
+}
+.downloads-badge {
+  display: inline-flex;
+  grid-column: 2;
+  align-items: center;
+  justify-self: start;
+  gap: 4px;
+  margin-top: 9px;
+  color: var(--gold);
+  font-size: 11px;
+  font-weight: 650;
+}
+.downloads-files {
+  margin-bottom: 16px;
+}
+.downloads-file {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 78px;
+  padding: 13px 0;
+  border-top: 1px solid var(--hair);
+  color: var(--fg);
+  text-decoration: none;
+}
+.downloads-file:hover strong,
+.downloads-extra:hover span:first-child {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.downloads-file > svg {
+  flex: none;
+  color: var(--gold);
+  transition: transform 0.2s var(--ease);
+}
+.downloads-file:hover > svg {
+  transform: translateY(2px);
+}
+.downloads-file-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+}
+.downloads-file-copy strong {
+  font-size: 14px;
+  font-weight: 600;
+}
+.downloads-file-copy > span {
+  color: var(--fg2);
+  font-size: 12px;
+  line-height: 1.4;
+}
+.downloads-file-copy .downloads-file-format {
+  margin-top: 2px;
+  font-size: 10px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+.downloads-empty {
+  margin: 0;
+  padding: 18px 0;
+  border-top: 1px solid var(--hair);
+  color: var(--fg2);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.downloads-first {
+  margin-top: auto;
+  padding-top: 7px;
+  border-top: 1px solid var(--hair);
+  color: var(--fg2);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+.downloads-first summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  cursor: pointer;
+  color: var(--fg);
+  list-style: none;
+}
+.downloads-first summary::-webkit-details-marker {
+  display: none;
+}
+.downloads-first summary::before {
+  content: "+";
+  margin-right: 7px;
+  color: var(--gold);
+}
+.downloads-first[open] summary::before {
+  content: "−";
+}
+.downloads-first p {
+  margin: 10px 0 0;
+}
+.downloads-extras {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px 60px;
+  margin-top: 50px;
+  padding-top: 25px;
+  border-top: 1px solid var(--hair);
+}
+.downloads-extras h2 {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 22px;
+  font-weight: 500;
+}
+.downloads-extras p {
+  margin: 8px 0 0;
+  color: var(--fg2);
+  font-size: 13px;
+  line-height: 1.55;
+}
+.downloads-extra {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  color: var(--fg);
+  font-size: 13px;
+  text-decoration: none;
+}
+.downloads-extra span:first-child {
+  flex: 1;
+  overflow-wrap: anywhere;
+  font-weight: 550;
+}
+.downloads-extra span:nth-child(2) {
+  color: var(--fg2);
+  font-size: 12px;
+  white-space: nowrap;
+}
+.downloads-extra svg {
+  flex: none;
+  color: var(--gold);
+}
+@media (max-width: 850px) {
+  .downloads-grid {
+    grid-template-columns: 1fr;
+  }
+  .downloads-system-head {
+    min-height: 85px;
+  }
+  .downloads-file {
+    min-height: 70px;
+  }
+}
+@media (max-width: 640px) {
+  .downloads-intro {
+    display: block;
+    padding-bottom: 26px;
+  }
+  .downloads-release {
+    justify-content: flex-start;
+    margin-top: 24px;
+  }
+  .downloads-extras {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 38px;
+  }
+}

@@ -21,6 +21,7 @@ const META: Record<string, string> = {
 
 export function bestFor(os: OS, arch: "arm64" | "x64" | "", altKind?: AssetKind): Best | null {
   if (os !== "mac" && os !== "windows" && os !== "linux") return null;
+  if ((os === "windows" || os === "linux") && arch === "arm64") return null;
   const rel = releases.latest;
   if (!rel) return null;
   const kind: AssetKind =

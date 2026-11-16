@@ -3,10 +3,10 @@ export type OS = "mac" | "windows" | "linux" | "other";
 export type Arch = "arm64" | "x64" | "";
 
 export function osFromUA(ua: string): OS {
-  if (/iphone|ipad|ipod|android/i.test(ua)) return "other";
+  if (/iphone|ipad|ipod|android|cros/i.test(ua)) return "other";
   if (/mac os x|macintosh/i.test(ua)) return "mac";
   if (/windows nt/i.test(ua)) return "windows";
-  if (/linux|x11/i.test(ua)) return "linux";
+  if (/linux/i.test(ua)) return "linux";
   return "other";
 }
 
@@ -23,7 +23,9 @@ export function archFromGL(renderer: string): Arch {
 export function archFromUAData(platform: string, architecture: string): Arch {
   if (!architecture) return "";
   const arm = /^arm/i.test(architecture);
-  if (platform === "macOS" || platform === "Windows") return arm ? "arm64" : "x64";
+  if (platform === "macOS" || platform === "Windows" || platform === "Linux") {
+    return arm ? "arm64" : "x64";
+  }
   return "";
 }
 

@@ -2,7 +2,7 @@
   // Footer — the quiet end of the page
   import Logo from "./Logo.svelte";
   import { href } from "@/lib/router.svelte";
-  import { RELEASES, REPO } from "@/lib/constants";
+  import { REPO } from "@/lib/constants";
 </script>
 
 <footer class="ftr">
@@ -15,7 +15,7 @@
       <a href={href("releases")}>Release notes</a>
       <a href={href("support")}>Support</a>
       <a href={REPO}>GitHub</a>
-      <a href={RELEASES}>Downloads</a>
+      <a href={href("downloads")}>Downloads</a>
     </nav>
   </div>
 </footer>

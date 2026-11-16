@@ -18,36 +18,40 @@
 <section class="home-hero" aria-labelledby="hero-title">
   <div class="wrap hero-inner">
     <div class="hero-copy">
-      <h1 id="hero-title">Read the way <em>your eyes like.</em></h1>
+      <h1 id="hero-title">Read the way <span>your eyes like.</span></h1>
       <p class="hero-description">
         A calm reader for PDF and EPUB, with themes, panes, AI and voices that bend to you.
       </p>
       <div class="hero-actions">
         <a
-          href={heroBest ? heroBest.asset.url : href("releases")}
+          href={heroBest ? heroBest.asset.url : href("downloads")}
           class="btn-primary"
           data-testid="hero-dl"
         >
           <Download size={17} strokeWidth={2} />
           {heroBest ? `Download for ${OS_LABEL[heroBest.os]}` : "Download free"}
         </a>
-        <a href={href("releases")} class="btn-ghost">Other systems <ArrowDownRight size={15} /></a>
+        <a href={href("downloads")} class="btn-ghost">
+          Other systems <ArrowDownRight size={15} />
+        </a>
       </div>
       <p class="hero-footnote">Free &amp; open source <span>·</span> Made for desktop</p>
     </div>
-    <picture class="hero-art">
-      <source
-        media="(max-width: 560px)"
-        srcset={previewAsset(theme.dark ? "hero-mobile-dark.jpg" : "hero-mobile-light.jpg")}
-      />
-      <img
-        src={previewAsset(theme.dark ? "hero-dark.jpg" : "hero-light.jpg")}
-        width="1024"
-        height="640"
-        alt="Four reading panes open in Mareader, showing books and PDFs."
-        fetchpriority="high"
-      />
-    </picture>
+    <div class="hero-visual">
+      <picture class="hero-art">
+        <source
+          media="(max-width: 560px)"
+          srcset={previewAsset(theme.dark ? "hero-mobile-dark.jpg" : "hero-mobile-light.jpg")}
+        />
+        <img
+          src={previewAsset(theme.dark ? "hero-dark.jpg" : "hero-light.jpg")}
+          width="1024"
+          height="640"
+          alt="Four reading panes open in Mareader, showing books and PDFs."
+          fetchpriority="high"
+        />
+      </picture>
+    </div>
   </div>
 </section>
 

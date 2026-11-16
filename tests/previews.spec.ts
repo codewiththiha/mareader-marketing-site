@@ -38,6 +38,36 @@ test("the hero fills the first viewport without scroll prompts", async ({ page }
   await expect(page.getByRole("heading", { name: "Limitless themes." })).toBeVisible();
 });
 
+test("the redesigned hero uses flat surfaces and a responsive split layout", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/", { waitUntil: "networkidle" });
+  const backgrounds = await page.locator(".home-hero").evaluate((hero) => {
+    return [hero, ...hero.querySelectorAll("*")].flatMap((element) =>
+      [null, "::before", "::after"].map(
+        (pseudo) => getComputedStyle(element, pseudo).backgroundImage
+      )
+    );
+  });
+  expect(backgrounds.every((background) => !/gradient/i.test(background))).toBe(true);
+  const field = await page.locator(".hero-visual").evaluate((element) => ({
+    background: getComputedStyle(element, "::before").backgroundColor,
+    image: getComputedStyle(element, "::before").backgroundImage,
+    filter: getComputedStyle(element, "::before").filter
+  }));
+  expect(field.background).not.toBe("rgba(0, 0, 0, 0)");
+  expect(field.image).toBe("none");
+  expect(field.filter).toBe("none");
+  const desktopCopy = (await page.locator(".hero-copy").boundingBox())!;
+  const desktopArt = (await page.locator(".hero-art").boundingBox())!;
+  expect(desktopCopy.x + desktopCopy.width).toBeLessThan(desktopArt.x);
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  const mobileCopy = (await page.locator(".hero-copy").boundingBox())!;
+  const mobileArt = (await page.locator(".hero-art").boundingBox())!;
+  expect(mobileCopy.y + mobileCopy.height).toBeLessThan(mobileArt.y);
+});
+
 test("navigation floats without a bar and keeps frosted pill controls", async ({ page }) => {
   await page.emulateMedia({ colorScheme: "dark" });
   await page.goto("/", { waitUntil: "networkidle" });

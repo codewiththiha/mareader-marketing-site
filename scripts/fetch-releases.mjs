@@ -1,8 +1,8 @@
 // Snapshot GitHub release notes into src/lib/site/releases.ts for offline use.
 import { writeFile } from "node:fs/promises";
 
-const REPO = "codewiththiha/mareader2";
-const COUNT = 5;
+const REPO = "codewiththiha/mareader";
+const COUNT = 6;
 
 const res = await fetch(`https://api.github.com/repos/${REPO}/releases?per_page=${COUNT}`);
 if (!res.ok) throw new Error(`releases api: ${res.status}`);

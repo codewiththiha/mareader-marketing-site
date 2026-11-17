@@ -224,5 +224,27 @@
     </p>
   {/if}
 
+  {#if region.mode === "intl"}
+    <section class="why" aria-labelledby="why-title">
+      <div class="why-head">
+        <p class="eyebrow">A note from the maker</p>
+        <h2 id="why-title">Why crypto?</h2>
+      </div>
+      <div class="why-copy">
+        <p>
+          I live in Myanmar, where PayPal, Stripe and most international payment services aren’t open to me — so crypto is the one way a
+          reader abroad can send a tip.
+        </p>
+        <p>
+          Mareader is one person’s work: written in the evenings, tested on a modest machine, given away as it is. It stays free and open
+          source whether or not anyone donates; a tip simply buys more evenings for the next release.
+        </p>
+        <p>
+          No pressure, ever. Reading it, telling a friend about it, or sending a kind word does plenty on its own. Thank you for being here.
+        </p>
+      </div>
+    </section>
+  {/if}
+
   <p class="route-more muted">Nothing here is required, ever. The book comes first.</p>
 </div>

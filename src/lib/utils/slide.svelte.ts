@@ -10,8 +10,9 @@ export function slideGroup() {
       return shown;
     },
     move(node: HTMLElement | null | undefined) {
-      el = node?.isConnected ? node : null;
-      shown = el !== null;
+      const next = node?.isConnected ? node : null;
+      el = next;
+      shown = next !== null;
     },
     rest() {
       shown = el !== null;

@@ -1,13 +1,19 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import { releaseUrl } from "$lib/site/downloads";
-  import { highlightsFor } from "$lib/site/highlights";
-  import { RELEASES } from "$lib/site/releases";
+  import { notesLead, releaseNotes } from "$lib/site/release-notes";
+  import { GH, releases } from "$lib/site/releases-live.svelte";
 
-  const GH = "https://github.com/codewiththiha/mareader2/releases";
-  const latest = RELEASES[0]?.tag ?? "";
-  let open = $state<Record<string, boolean>>({ [latest]: true });
+  onMount(() => {
+    void releases.refresh();
+  });
+
+  const list = $derived(releases.all);
+  const latest = $derived(list[0]?.tag ?? "");
+  let folded = $state<Record<string, boolean>>({});
+  const shown = (tag: string) => folded[tag] ?? tag === latest;
   const toggle = (tag: string) => {
-    open[tag] = !open[tag];
+    folded[tag] = !shown(tag);
   };
 </script>
 
@@ -15,17 +21,22 @@
   <header class="route-head">
     <p class="eyebrow">Release notes</p>
     <h1 class="serif">What changed, and why it reads better.</h1>
-    <p class="route-sub">The short version of every release, newest first. Each one opens; the full notes live on GitHub.</p>
+    <p class="route-sub">
+      The summary of every release, read straight from GitHub{releases.live
+        ? ""
+        : " — the newest build checks for fresher notes when it can"}. Open one for its highlights, then take the full notes from GitHub.
+    </p>
   </header>
 
-  {#each RELEASES as release, i (release.tag)}
-    {@const shown = open[release.tag]}
-    <article class="rel" class:open={shown} style="--i:{i}">
+  {#each list as release, i (release.tag)}
+    {@const open = shown(release.tag)}
+    {@const lead = notesLead(release.body)}
+    <article class="rel" class:open style="--i:{i}">
       <h2 class="rel-h">
         <button
           type="button"
           class="rel-head"
-          aria-expanded={shown}
+          aria-expanded={open}
           aria-controls="fold-{release.tag}"
           onclick={() => {
             toggle(release.tag);
@@ -48,8 +59,9 @@
       </h2>
       <div class="rel-fold" id="fold-{release.tag}" role="region" aria-label="{release.tag} highlights">
         <div class="rel-fold-in">
-          {#each highlightsFor(release) as sec, si (si)}
-            {#if sec.title}<h4 class="rel-sec">{sec.title}</h4>{/if}
+          {#if lead}<p class="rel-lead">{lead}</p>{/if}
+          {#each releaseNotes(release.body) as sec, si (si)}
+            <h4 class="rel-sec">{sec.title}</h4>
             <ul class="rel-points">
               {#each sec.items as point, pi (pi)}
                 <li>
@@ -59,12 +71,12 @@
             </ul>
           {/each}
           <p class="rel-full">
-            <a href={releaseUrl(release.tag)} rel="noopener noreferrer">Full notes for {release.tag} on GitHub →</a>
+            <a href={releaseUrl(release.tag)} rel="noopener noreferrer">Read the full notes for {release.tag} on GitHub →</a>
           </p>
         </div>
       </div>
     </article>
   {/each}
 
-  <p class="route-more"><a href={GH} rel="noopener noreferrer">All releases on GitHub →</a></p>
+  <p class="route-more"><a href="{GH}/releases" rel="noopener noreferrer">All releases, files and checksums on GitHub →</a></p>
 </div>

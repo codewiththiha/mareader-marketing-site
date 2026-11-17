@@ -1,10 +1,21 @@
 <script lang="ts">
   import Slide from "$lib/chrome/Slide.svelte";
+  import LaunchGuide from "./LaunchGuide.svelte";
   import AppleMark from "$lib/icons/AppleMark.svelte";
   import LinuxMark from "$lib/icons/LinuxMark.svelte";
   import WindowsMark from "$lib/icons/WindowsMark.svelte";
   import Download from "$lib/icons/lively/Download.svelte";
-  import { checksumsUrl, GROUPS, latestDate, latestTag, OS_LABEL, primaryFor, releaseUrl, type KnownOs } from "$lib/site/downloads";
+  import {
+    checksumsUrl,
+    GROUPS,
+    latestDate,
+    latestTag,
+    OS_LABEL,
+    primaryFor,
+    releaseUrl,
+    type KnownOs,
+    type Os,
+  } from "$lib/site/downloads";
   import { router } from "$lib/site/router.svelte";
   import { platform } from "$lib/utils/platform.svelte";
   import { slideGroup } from "$lib/utils/slide.svelte";
@@ -21,6 +32,33 @@
   const rest = () => {
     group.move(null);
   };
+
+  const guideKey = (os: Os) => `mr-launch-${os}`;
+  const canGuide = $derived(platform.os === "mac" || platform.os === "windows");
+  let guide = $state(false);
+
+  const openGuide = () => {
+    if (canGuide) guide = true;
+  };
+
+  const onceGuide = () => {
+    if (!canGuide) return;
+    try {
+      if (localStorage.getItem(guideKey(platform.os))) return;
+    } catch {
+      /* no storage: the note is worth showing anyway */
+    }
+    guide = true;
+  };
+
+  const closeGuide = () => {
+    guide = false;
+    try {
+      localStorage.setItem(guideKey(platform.os), "1");
+    } catch {
+      /* nothing to remember */
+    }
+  };
 </script>
 
 <div class="route-page dl-page">
@@ -33,7 +71,7 @@
       that same release.
     </p>
     {#if platform.os !== "unknown"}
-      <a class="btn btn-accent dl-cta" href={primary.url}>
+      <a class="btn btn-accent dl-cta" href={primary.url} onclick={onceGuide}>
         <Download />
         Download for {OS_LABEL[platform.os]}
       </a>
@@ -60,6 +98,7 @@
               class="dl-row"
               href={o.url}
               rel="noopener noreferrer"
+              onclick={onceGuide}
               bind:this={els[o.id]}
               onmouseenter={() => {
                 group.move(els[o.id] ?? null);
@@ -97,5 +136,10 @@
     <a href={checksumsUrl} rel="noopener noreferrer">Checksums (SHA256)</a>
     <a href={router.href("releases")}>What’s new in {latestTag}</a>
     <a href={releaseUrl()} rel="noopener noreferrer">All files on GitHub</a>
+    {#if canGuide}
+      <button type="button" class="dl-link" onclick={openGuide}>{OS_LABEL[platform.os]} first-launch tips</button>
+    {/if}
   </p>
+
+  <LaunchGuide os={platform.os} open={guide} onClose={closeGuide} />
 </div>

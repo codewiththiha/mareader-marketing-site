@@ -15,8 +15,7 @@
   const group = slideGroup();
   const els: Record<string, HTMLElement | undefined> = {};
   const rest = () => {
-    const cur = router.current;
-    group.move(cur === "home" || cur === "download" ? null : (els[cur] ?? null));
+    group.move(els[router.current] ?? null);
   };
   $effect(() => {
     rest();
@@ -28,8 +27,8 @@
     window.scrollTo({ top: 0 });
   };
 
-  const route = (key: "releases" | "donate", label: string) => ({ key, label });
-  const links = [route("releases", "Releases"), route("donate", "Support")];
+  const route = (key: "home" | "releases" | "donate", label: string) => ({ key, label });
+  const links = [route("home", "Home"), route("releases", "Releases"), route("donate", "Support")];
 </script>
 
 <header class="nav">

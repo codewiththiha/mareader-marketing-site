@@ -5,21 +5,29 @@ export type AssetKind =
   | "mac-arm"
   | "mac-intel"
   | "win-exe"
+  | "win-arm-exe"
   | "win-msi"
   | "linux-deb"
+  | "linux-arm-deb"
   | "linux-appimage"
+  | "linux-arm-appimage"
   | "linux-arch"
+  | "linux-arm-arch"
   | "linux-pkgbuild"
   | "checksums";
 
 const PATTERNS: [RegExp, AssetKind][] = [
   [/aarch64\.dmg$/i, "mac-arm"],
   [/x64\.dmg$/i, "mac-intel"],
-  [/-setup\.exe$/i, "win-exe"],
-  [/\.msi$/i, "win-msi"],
+  [/(?:x64|x86_64)-setup\.exe$/i, "win-exe"],
+  [/(?:arm64|aarch64)-setup\.exe$/i, "win-arm-exe"],
+  [/(?:^|[_-])(?:x64|x86_64|amd64)(?:[_-][^/]*)?\.msi$/i, "win-msi"],
   [/amd64\.deb$/i, "linux-deb"],
-  [/\.appimage$/i, "linux-appimage"],
+  [/(?:arm64|aarch64)\.deb$/i, "linux-arm-deb"],
+  [/x86_64\.appimage$/i, "linux-appimage"],
+  [/(?:arm64|aarch64)\.appimage$/i, "linux-arm-appimage"],
   [/x86_64\.tar\.gz$/i, "linux-arch"],
+  [/(?:arm64|aarch64)\.tar\.gz$/i, "linux-arm-arch"],
   [/^pkgbuild$/i, "linux-pkgbuild"],
   [/^sha256sums$/i, "checksums"]
 ];
@@ -48,9 +56,4 @@ export function dateLabel(iso: string): string {
 
 export function versionOf(tag: string): string {
   return tag.replace(/^v/, "");
-}
-
-export function summaryOf(body: string): string {
-  const para = body.split(/\n\s*\n/)[0] ?? "";
-  return para.replace(/\s*\n\s*/g, " ").trim();
 }

@@ -1,6 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 
-const API = "https://api.github.com/repos/codewiththiha/mareader2/releases?per_page=30";
+const API = "https://api.github.com/repos/codewiththiha/mareader/releases?per_page=30";
 
 test.beforeEach(async ({ page }) => {
   await page.route(API, (route) => route.abort());

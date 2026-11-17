@@ -1,7 +1,7 @@
 <script lang="ts">
   import { ArrowDownToLine, ArrowUpRight, Check } from "@lucide/svelte";
   import PlatformMark from "@/lib/components/icons/PlatformMark.svelte";
-  import { FIRST_LAUNCH, OS_LABEL } from "@/lib/downloads";
+  import { bestFor, FIRST_LAUNCH, OS_LABEL } from "@/lib/downloads";
   import { platform } from "@/lib/platform.svelte";
   import { dateLabel, kindOf, sizeLabel, type AssetKind } from "@/lib/releases/assets";
   import { releases } from "@/lib/releases/refresh.svelte";
@@ -23,38 +23,62 @@
     },
     {
       id: "windows",
-      description: "Windows 10 or 11 · x64",
+      description: "Windows 10 or 11 · x64 / Windows 11 · ARM64",
       files: [
-        { kind: "win-exe", name: "Installer", detail: "For most Windows PCs", format: "EXE" },
-        { kind: "win-msi", name: "MSI package", detail: "For managed installs", format: "MSI" }
+        { kind: "win-exe", name: "Installer", detail: "Windows 10 or 11 · x64", format: "EXE" },
+        {
+          kind: "win-arm-exe",
+          name: "ARM64 installer",
+          detail: "Windows 11 on ARM",
+          format: "EXE"
+        },
+        { kind: "win-msi", name: "MSI package", detail: "Managed installs · x64", format: "MSI" }
       ]
     },
     {
       id: "linux",
-      description: "Linux · x86_64",
+      description: "Linux · x86_64 and ARM64",
       files: [
         {
           kind: "linux-deb",
           name: "Debian / Ubuntu",
-          detail: "Also Mint, Pop!_OS and more",
+          detail: "x86_64 · Mint, Pop!_OS and more",
+          format: "DEB"
+        },
+        {
+          kind: "linux-arm-deb",
+          name: "Debian / Ubuntu · ARM64",
+          detail: "Ubuntu, Raspberry Pi OS and more",
           format: "DEB"
         },
         {
           kind: "linux-appimage",
           name: "AppImage",
-          detail: "For most distributions",
+          detail: "x86_64 · Most distributions",
+          format: "APPIMAGE"
+        },
+        {
+          kind: "linux-arm-appimage",
+          name: "AppImage · ARM64",
+          detail: "For most ARM64 distributions",
           format: "APPIMAGE"
         },
         {
           kind: "linux-arch",
           name: "Arch package",
+          detail: "x86_64 · Use with the PKGBUILD",
+          format: "TAR.GZ"
+        },
+        {
+          kind: "linux-arm-arch",
+          name: "Arch package · ARM64",
           detail: "Use with the PKGBUILD",
           format: "TAR.GZ"
         },
         {
           kind: "linux-pkgbuild",
           name: "PKGBUILD",
-          detail: "Use with the Arch package",
+          detail: "Use with either Arch package",
           format: "BUILD FILE"
         }
       ]
@@ -64,7 +88,9 @@
   let release = $derived(releases.latest);
   let detected = $derived(!platform.mobile && platform.os !== "other" ? platform.os : null);
   let uncertainArch = $derived(
-    (detected === "windows" || detected === "linux") && platform.arch === "arm64"
+    (detected === "windows" || detected === "linux") &&
+      platform.arch === "arm64" &&
+      !bestFor(detected, platform.arch)
   );
   let orderedSystems = $derived(
     detected

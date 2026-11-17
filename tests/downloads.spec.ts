@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
+import { kindOf } from "../src/lib/releases/assets";
 
-const API = "https://api.github.com/repos/codewiththiha/mareader2/releases?per_page=30";
+const API = "https://api.github.com/repos/codewiththiha/mareader/releases?per_page=30";
 const IPHONE_UA =
   "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1";
 const IPAD_DESKTOP_UA =
@@ -10,9 +11,16 @@ test.beforeEach(async ({ page }) => {
   await page.route(API, (route) => route.abort());
 });
 
+test("unknown installer architectures are not mislabeled as x64", () => {
+  expect(kindOf("mareader_0.0.7_x64_en-US.msi")).toBe("win-msi");
+  expect(kindOf("mareader_0.0.9_arm64_en-US.msi")).toBeNull();
+  expect(kindOf("mareader_0.0.9_arm64-setup.exe")).toBe("win-arm-exe");
+  expect(kindOf("mareader_0.0.9_aarch64.AppImage")).toBe("linux-arm-appimage");
+});
+
 test("Other systems opens its own page and leaves every installer available", async ({ page }) => {
   await page.goto("/?os=windows", { waitUntil: "networkidle" });
-  await expect(page.locator('[data-testid="hero-dl"]')).toHaveAttribute("href", /-setup\.exe$/);
+  await expect(page.locator('[data-testid="hero-dl"]')).toHaveAttribute("href", /x64-setup\.exe$/);
   await page.getByRole("link", { name: "Other systems" }).click();
   await expect(page).toHaveURL(/#\/downloads$/);
   await expect(page).toHaveTitle("Downloads — Mareader");
@@ -26,14 +34,18 @@ test("Other systems opens its own page and leaves every installer available", as
   const files: Record<string, RegExp> = {
     "mac-arm": /aarch64\.dmg$/,
     "mac-intel": /x64\.dmg$/,
-    "win-exe": /-setup\.exe$/,
+    "win-exe": /x64-setup\.exe$/,
+    "win-arm-exe": /arm64-setup\.exe$/,
     "win-msi": /\.msi$/,
     "linux-deb": /amd64\.deb$/,
-    "linux-appimage": /\.AppImage$/,
+    "linux-arm-deb": /arm64\.deb$/,
+    "linux-appimage": /x86_64\.AppImage$/,
+    "linux-arm-appimage": /aarch64\.AppImage$/,
     "linux-arch": /x86_64\.tar\.gz$/,
+    "linux-arm-arch": /aarch64\.tar\.gz$/,
     "linux-pkgbuild": /\/PKGBUILD$/
   };
-  await expect(page.locator(".downloads-file")).toHaveCount(8);
+  await expect(page.locator(".downloads-file")).toHaveCount(12);
   for (const [kind, pattern] of Object.entries(files)) {
     const file = page.locator(`[data-kind="${kind}"]`);
     await expect(file).toBeVisible();
@@ -43,7 +55,7 @@ test("Other systems opens its own page and leaves every installer available", as
     "href",
     /\/SHA256SUMS$/
   );
-  await expect(page.locator('[data-kind="linux-pkgbuild"]')).toContainText("553 B");
+  await expect(page.locator('[data-kind="linux-pkgbuild"]')).toContainText("773 B");
   await page.locator('.downloads-system[data-os="mac"] summary').click();
   await expect(page.locator('.downloads-system[data-os="mac"] details p')).toContainText(
     "Privacy & Security"
@@ -74,7 +86,7 @@ for (const [os, label] of [
     );
     await expect(page.locator('[data-testid="download-detection"]')).toHaveCount(0);
     await expect(page.getByText(/is highlighted for you/i)).toHaveCount(0);
-    await expect(page.locator(".downloads-file")).toHaveCount(8);
+    await expect(page.locator(".downloads-file")).toHaveCount(12);
   });
 }
 
@@ -159,7 +171,7 @@ test("unknown systems use the downloads route from the hero, header and footer",
   await page.locator('[data-testid="hero-dl"]').click();
   await expect(page.locator(".downloads-system.detected")).toHaveCount(0);
   await expect(page.locator('[data-testid="download-detection"]')).toContainText("desktop app");
-  await expect(page.locator(".downloads-file")).toHaveCount(8);
+  await expect(page.locator(".downloads-file")).toHaveCount(12);
 });
 
 for (const [name, ua, touches, hintedPlatform] of [
@@ -193,14 +205,61 @@ for (const [name, ua, touches, hintedPlatform] of [
     await expect(page.locator(".downloads-system")).toHaveCount(3);
     await expect(page.locator(".downloads-system.detected")).toHaveCount(0);
     await expect(page.locator(".downloads-badge")).toHaveCount(0);
-    await expect(page.locator(".downloads-file")).toHaveCount(8);
+    await expect(page.locator(".downloads-file")).toHaveCount(12);
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
       320
     );
   });
 }
 
-test("an unsupported ARM desktop is not sent straight to an x64 installer", async ({ page }) => {
+for (const [os, pattern] of [
+  ["windows", /x64-setup\.exe$/],
+  ["linux", /amd64\.deb$/]
+] as const) {
+  test(`${os} x64 gets the x64 installer even when ARM files exist`, async ({ page }) => {
+    await page.goto(`/?os=${os}&arch=x64`, { waitUntil: "networkidle" });
+    for (const id of ["hero-dl", "hdr-dl", "dl-main"]) {
+      await expect(page.getByTestId(id)).toHaveAttribute("href", pattern);
+    }
+  });
+}
+
+for (const [os, kind, pattern] of [
+  ["windows", "win-arm-exe", /arm64-setup\.exe$/],
+  ["linux", "linux-arm-deb", /arm64\.deb$/]
+] as const) {
+  test(`${os} ARM gets the native installer`, async ({ page }) => {
+    await page.goto(`/?os=${os}&arch=arm64`, { waitUntil: "networkidle" });
+    for (const id of ["hero-dl", "hdr-dl", "dl-main"]) {
+      await expect(page.getByTestId(id)).toHaveAttribute("href", pattern);
+    }
+    await page.getByRole("link", { name: "Other systems" }).click();
+    await expect(page.locator(`.downloads-system[data-os="${os}"]`)).toHaveClass(/detected/);
+    await expect(page.locator(`[data-kind="${kind}"]`)).toHaveAttribute("href", pattern);
+    await expect(page.locator(".downloads-arch-note")).toHaveCount(0);
+  });
+}
+
+test("an ARM desktop never falls back to x64 if an ARM installer is absent", async ({ page }) => {
+  await page.route(API, (route) =>
+    route.fulfill({
+      contentType: "application/json",
+      body: JSON.stringify([
+        {
+          tag_name: "v0.0.5",
+          published_at: "2026-10-29T12:00:00Z",
+          body: "An older release.",
+          assets: [
+            {
+              name: "mareader_0.0.5_x64-setup.exe",
+              size: 1000,
+              browser_download_url: "https://example.test/x64-setup.exe"
+            }
+          ]
+        }
+      ])
+    })
+  );
   await page.goto("/?os=windows&arch=arm64", { waitUntil: "networkidle" });
   await expect(page.locator('[data-testid="hero-dl"]')).toHaveAttribute("href", "#/downloads");
   await expect(page.locator('[data-testid="hdr-dl"]')).toHaveAttribute("href", "#/downloads");
@@ -237,7 +296,7 @@ test("keyboard users can open guidance and choose a file", async ({ page }) => {
   const installer = system.locator('[data-kind="win-exe"]');
   await installer.focus();
   await expect(installer).toBeFocused();
-  await page.route("https://github.com/codewiththiha/mareader2/releases/download/**", (route) =>
+  await page.route("https://github.com/codewiththiha/mareader/releases/download/**", (route) =>
     route.fulfill({ status: 200, body: "test installer" })
   );
   const requested = page.waitForRequest((request) => /-setup\.exe$/.test(request.url()));
@@ -247,7 +306,7 @@ test("keyboard users can open guidance and choose a file", async ({ page }) => {
 
 test("a manually selected file really requests its download URL", async ({ page }) => {
   await page.goto("/?os=mac#/downloads", { waitUntil: "networkidle" });
-  await page.route("https://github.com/codewiththiha/mareader2/releases/download/**", (route) =>
+  await page.route("https://github.com/codewiththiha/mareader/releases/download/**", (route) =>
     route.fulfill({ status: 200, body: "test installer" })
   );
   const requested = page.waitForRequest((request) => /_en-US\.msi$/.test(request.url()));

@@ -14,6 +14,150 @@ export interface Release {
 
 export const RELEASES: Release[] = [
   {
+    "tag": "v0.0.7",
+    "date": "2026-11-17",
+    "body": "# Mareader 0.0.7\n\nMareader brings unified dictionary and AI word cards, a searchable AI model\npicker with cleaner provider defaults, smoother live theme and paper-blend\ntransitions without animation hitches, and flicker-free voice switching in\nSettings › Read Aloud.\n\n<!-- release-summary:start -->\n## Summary\n\n### New\n- Unified word lookup and AI context cards with CEFR badges, IPA pronunciation, keyboard paging, and in-place tabs.\n- Searchable AI model autocomplete with keyboard navigation and a Use default address toggle for built-in providers.\n- Smooth animated checkboxes across settings and menus, plus a streamlined Vocabulary shading picker.\n- Live GPU theme and paper-blend transitions with background settings saving so UI animations stay fluid.\n\n### Fixes\n- Eliminated animation hitches when toggling Paper blend, themes, or colours and modal flicker when switching voices.\n- Kept the read-aloud player anchored cleanly along the bottom edge instead of jumping upward over popups.\n- Coordinated the floating Find bar and menus so opening one automatically dismisses the other.\n- Kept Windows and Linux window control icons steady on hover and aligned the API key Add row in AI settings.\n<!-- release-summary:end -->\n\n## What's new\n\n- **Unified Lookup and AI word cards.** Offline dictionary lookups and AI\n  contextual explanations now share a clean card header with the headword,\n  part of speech, colour-matched CEFR level badge, IPA pronunciation, and\n  pronunciation audio button. When both dictionary and AI answers are\n  available, an in-place **Dictionary | AI in context** tab switcher lets you\n  flip between them without moving the card, alongside compact `EN ⇄ FR`\n  language swapping, `< 1 of N >` numeric entry paging (`←`/`→` keys),\n  pinned footer actions (`+ Word list`, `Copy`, `Open in the Dictionary`,\n  `Ask again`), and clearer empty-dictionary actions.\n- **Searchable AI model picker and cleaner provider setup.** In Settings ›\n  AI, typing in the Model field now opens a unified autocomplete dropdown with\n  full keyboard navigation (`↑`, `↓`, `Enter`, `Esc`), and **Choose** focuses\n  the input directly. Built-in providers now default to **Use default\n  address**, keeping endpoint URLs tucked away unless you opt to customize\n  them.\n- **Animated checkboxes and streamlined Vocabulary shading.** Checkboxes\n  across Settings and menus now animate smoothly, and Vocabulary shading\n  presents **Mark** (`Highlight`, `Half highlight`, `Underline`) and\n  **Colour** directly without redundant style selectors.\n- **Zero-stall live theme and paper-blend fades.** Switching base modes,\n  themes, film grain, or Paper blend now blends UI tokens and GPU page passes\n  live instead of blocking on a full-window screenshot readback, and settings\n  persistence runs off the UI thread so animations never hitch or skip.\n\n## Fixes\n\n- Eliminated Settings › Read Aloud modal flicker and layout jumps when\n  switching between voice models, and reused idle OS speech handles so\n  toggling to and from system voices stays responsive.\n- Hovering a word card into AI explanations now tracks scroll cleanly without\n  leaving stale loading captions or duplicate in-flight requests.\n- Kept the read-aloud player strictly along the bottom edge, tucking cleanly\n  below popups rather than jumping upward.\n- Opening any menu or popover automatically closes the floating Find bar, and\n  opening Find dismisses open popovers.\n- Kept custom window control icons on Windows and Linux steady on hover, and\n  aligned the API key input and **Add** button spacing in Settings › AI.\n\n## Which file to download\n\n| System | File | Install |\n| --- | --- | --- |\n| macOS 11 or later, Apple Silicon | `Mareader_0.0.7_aarch64.dmg` | open it and drag Mareader to Applications |\n| macOS 11 or later, Intel | `Mareader_0.0.7_x64.dmg` | the same |\n| Windows 10 or 11 (x64) | `mareader_0.0.7_x64-setup.exe` | run it; it installs for you alone, no administrator needed |\n| Windows 10 or 11 (x64, managed machines) | `mareader_0.0.7_x64_en-US.msi` | `msiexec /i` it, or deploy it as usual |\n| Windows 11 on ARM (ARM64) | `mareader_0.0.7_arm64-setup.exe` | run it; installs native ARM64 Mareader for you alone |\n| Debian, Ubuntu, Mint, Pop!_OS (x86_64) | `mareader_0.0.7_amd64.deb` | `sudo apt install ./mareader_0.0.7_amd64.deb` |\n| Debian, Ubuntu, Raspberry Pi OS (ARM64) | `mareader_0.0.7_arm64.deb` | `sudo apt install ./mareader_0.0.7_arm64.deb` |\n| Arch and its family (x86_64 & ARM64) | `mareader_0.0.7_x86_64.tar.gz` or `mareader_0.0.7_aarch64.tar.gz` with `PKGBUILD` | put your archive and `PKGBUILD` in one folder, then `makepkg -si` |\n| Any other Linux, x86_64 (glibc 2.35+) | `mareader_0.0.7_x86_64.AppImage` | `chmod +x` it, then run it |\n| Any other Linux, ARM64 (glibc 2.35+) | `mareader_0.0.7_aarch64.AppImage` | `chmod +x` it, then run it |\n\nInstalling over v0.0.6 keeps your existing settings, session, library, and\nhighlights automatically. `SHA256SUMS` lists every file's checksum:\n`sha256sum -c SHA256SUMS --ignore-missing` on Linux,\n`shasum -a 256 -c SHA256SUMS --ignore-missing` on macOS.\n\n## The first launch\n\nThis build is not signed by Apple or Microsoft yet, so each system asks once:\n\n- **macOS:** \"Apple could not verify Mareader\". Choose Done, then open System\n  Settings › Privacy & Security and choose Open Anyway next to Mareader. Later\n  launches open directly.\n- **Windows:** \"Windows protected your PC\". Choose More info, then Run anyway.\n- **Linux:** nothing to approve. The AppImage only needs to be executable.\n\n## Known limits\n\n- Neural voices are downloads of 24 MB to 327 MB each. System voices need\n  none. On Linux, system voices go through Speech Dispatcher.\n- Only Kokoro, Piper, and Kitten report exact word timing. With Phonon and\n  system voices the lit word follows the reading pace, so it can run slightly\n  ahead or behind.\n- Skipping tables, lists, figures, and asides works in EPUB, Markdown, and\n  plain-text books, not PDFs.\n- Windows on ARM64 currently ships as the NSIS installer (`-setup.exe`);\n  `.msi` packages remain x64-only.\n- Your library stays on this computer; syncing between machines remains future\n  work.\n\nBefore publishing, CI built every installer on its own native platform (all\nsix runners), installed each one, verified its binary architecture, opened a\nbook with it, and removed it again.\n",
+    "assets": [
+      {
+        "name": "Mareader_0.0.7_aarch64.dmg",
+        "size": 29056854,
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.7/Mareader_0.0.7_aarch64.dmg"
+      },
+      {
+        "name": "Mareader_0.0.7_x64.dmg",
+        "size": 31923290,
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.7/Mareader_0.0.7_x64.dmg"
+      },
+      {
+        "name": "PKGBUILD",
+        "size": 773,
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.7/PKGBUILD"
+      },
+      {
+        "name": "SHA256SUMS",
+        "size": 1112,
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.7/SHA256SUMS"
+      },
+      {
+        "name": "mareader_0.0.7_aarch64.AppImage",
+        "size": 31889928,
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.7/mareader_0.0.7_aarch64.AppImage"
+      },
+      {
+        "name": "mareader_0.0.7_aarch64.tar.gz",
+        "size": 32853329,
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.7/mareader_0.0.7_aarch64.tar.gz"
+      },
+      {
+        "name": "mareader_0.0.7_amd64.deb",
+        "size": 35073514,
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.7/mareader_0.0.7_amd64.deb"
+      },
+      {
+        "name": "mareader_0.0.7_arm64-setup.exe",
+        "size": 22183464,
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.7/mareader_0.0.7_arm64-setup.exe"
+      },
+      {
+        "name": "mareader_0.0.7_arm64.deb",
+        "size": 32854064,
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.7/mareader_0.0.7_arm64.deb"
+      },
+      {
+        "name": "mareader_0.0.7_x64-setup.exe",
+        "size": 25069505,
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.7/mareader_0.0.7_x64-setup.exe"
+      },
+      {
+        "name": "mareader_0.0.7_x64_en-US.msi",
+        "size": 33046528,
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.7/mareader_0.0.7_x64_en-US.msi"
+      },
+      {
+        "name": "mareader_0.0.7_x86_64.AppImage",
+        "size": 33954296,
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.7/mareader_0.0.7_x86_64.AppImage"
+      },
+      {
+        "name": "mareader_0.0.7_x86_64.tar.gz",
+        "size": 35072783,
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.7/mareader_0.0.7_x86_64.tar.gz"
+      }
+    ]
+  },
+  {
+    "tag": "v0.0.6",
+    "date": "2026-11-17",
+    "body": "# Mareader 0.0.6\n\nMareader now ships native ARM64 builds for Windows and Linux, checks for\nupdates in-app with silent background updates on Windows and Linux AppImage,\nopens large EPUBs progressively with instant reflow, and brings a redesigned\nAppearance popover, animated icons, and a command palette.\n\n<!-- release-summary:start -->\n## Summary\n\n### New\n- Native installers for Windows on ARM and ARM64 Linux (Debian/Ubuntu, AppImage, and Arch).\n- Built-in update checks with silent background updates on Windows and Linux AppImage.\n- Progressive EPUB opening and instant reflow when resizing panes or changing typography.\n- Redesigned Appearance dial popover, animated icons, command palette, and eight offline dictionary packs.\n- Expanded EPUB layout, float, and book-wide picture theming across reflow and fixed-layout pages.\n\n### Fixes\n- Kept progressive EPUB pages steady and text edits fast without highlight or frame flicker.\n- Restored dark ink contrast in Dim mode and matched toast and icon colours to your theme.\n- Highlighted both spread thumbnails, aligned macOS traffic lights, and removed sidebar sidelines.\n- Reduced memory usage across EPUB covers, PDF tiles, document search, and offline neural voices.\n<!-- release-summary:end -->\n\n## What's new\n\n- **Windows on ARM and ARM64 Linux.** Native `aarch64` builds now join x86_64\n  and Apple Silicon: an ARM64 Windows setup installer plus ARM64 `.deb`,\n  AppImage, and Arch Linux packages, each built and launch-tested on native\n  ARM64 hardware in CI.\n- **Built-in updates.** Mareader checks GitHub Releases against verified\n  SHA-256 checksums, surfaces concise release highlights in a startup update\n  modal, and adds Settings › Updates controls. Writable Windows NSIS installs\n  and Linux AppImages can download and apply updates silently in the\n  background; macOS and package-managed installs open the matching download\n  link directly.\n- **Progressive EPUB opening and instant reflow.** Large EPUBs open right away\n  around your saved reading place while remaining chapters paginate in the\n  background, and local typography or pane-width edits retypeset immediately.\n- **Appearance dial popover and animated icons.** Appearance controls now live\n  in a tactile Dial deck popover with vertical-drag knobs, subtle animated\n  semantic icons (toggleable in Settings), voice engine marks, and optional\n  edge tabs for peeking floats.\n- **Command palette and headless automation.** Press `⌘K` / `Ctrl+K` to search\n  and run reader commands from the keyboard. Underneath, Mareader's reader\n  engine now powers atomic `settings.json` / `session.json` persistence, a\n  zero-UI CLI, and a live control channel.\n- **Richer EPUB layout and picture theming.** Improved CSS colour, z-order,\n  multi-column, spanning-float, and cover handling, plus consistent\n  `theme_pictures` styling across reflow pages, fixed-layout spreads, and\n  thumbnails.\n- **Eight offline dictionary packs.** Settings › Dictionary now offers eight\n  downloadable Wiktionary packs with folded views for packs you haven't\n  installed yet, Japanese headword pronunciation in a Japanese voice, and\n  smarter parking between the dictionary card and read-aloud player.\n- **Lower memory use.** Streamed EPUB cover loading, cached PDF render\n  sessions across tiles, streamed Kokoro weights, zero-allocation search\n  scanning, and reused GPU buffers reduce peak memory across reading and\n  narration.\n\n## Fixes\n\n- Progressive EPUB growth keeps the current reading position steady and avoids\n  highlight or frame flicker while resting text caches cleanly.\n- Dim mode restores dark book ink so dimmed pages stay calm and readable.\n- Toast notifications harmonise their semantic colours with the active theme,\n  stack cleanly, and step aside for the dictionary window and menus.\n- Hovering or rapidly clicking toolbar icons preserves their active tint and\n  completes animations smoothly.\n- Spread view highlights both visible pages in the Thumbnails sidebar.\n- Fold and selection sidelines are removed for a cleaner reading surface, and\n  centralized layer ordering keeps popovers, modals, and toasts cleanly\n  stacked.\n- On macOS, traffic-light window buttons stay aligned during animated resizes\n  with breathing room beside the sidebar icons.\n- Erasing reading progress now resets currently open books immediately.\n\n## Which file to download\n\n| System | File | Install |\n| --- | --- | --- |\n| macOS 11 or later, Apple Silicon | `Mareader_0.0.6_aarch64.dmg` | open it and drag Mareader to Applications |\n| macOS 11 or later, Intel | `Mareader_0.0.6_x64.dmg` | the same |\n| Windows 10 or 11 (x64) | `mareader_0.0.6_x64-setup.exe` | run it; it installs for you alone, no administrator needed |\n| Windows 10 or 11 (x64, managed machines) | `mareader_0.0.6_x64_en-US.msi` | `msiexec /i` it, or deploy it as usual |\n| Windows 11 on ARM (ARM64) | `mareader_0.0.6_arm64-setup.exe` | run it; installs native ARM64 Mareader for you alone |\n| Debian, Ubuntu, Mint, Pop!_OS (x86_64) | `mareader_0.0.6_amd64.deb` | `sudo apt install ./mareader_0.0.6_amd64.deb` |\n| Debian, Ubuntu, Raspberry Pi OS (ARM64) | `mareader_0.0.6_arm64.deb` | `sudo apt install ./mareader_0.0.6_arm64.deb` |\n| Arch and its family (x86_64 & ARM64) | `mareader_0.0.6_x86_64.tar.gz` or `mareader_0.0.6_aarch64.tar.gz` with `PKGBUILD` | put your archive and `PKGBUILD` in one folder, then `makepkg -si` |\n| Any other Linux, x86_64 (glibc 2.35+) | `mareader_0.0.6_x86_64.AppImage` | `chmod +x` it, then run it |\n| Any other Linux, ARM64 (glibc 2.35+) | `mareader_0.0.6_aarch64.AppImage` | `chmod +x` it, then run it |\n\nInstalling over v0.0.5 imports your existing settings, session, library, and\nhighlights automatically on first launch. `SHA256SUMS` lists every file's\nchecksum: `sha256sum -c SHA256SUMS --ignore-missing` on Linux,\n`shasum -a 256 -c SHA256SUMS --ignore-missing` on macOS.\n\n## The first launch\n\nThis build is not signed by Apple or Microsoft yet, so each system asks once:\n\n- **macOS:** \"Apple could not verify Mareader\". Choose Done, then open System\n  Settings › Privacy & Security and choose Open Anyway next to Mareader. Later\n  launches open directly.\n- **Windows:** \"Windows protected your PC\". Choose More info, then Run anyway.\n- **Linux:** nothing to approve. The AppImage only needs to be executable.\n\n## Known limits\n\n- Neural voices are downloads of 24 MB to 327 MB each. System voices need\n  none. On Linux, system voices go through Speech Dispatcher.\n- Only Kokoro, Piper, and Kitten report exact word timing. With Phonon and\n  system voices the lit word follows the reading pace, so it can run slightly\n  ahead or behind.\n- Skipping tables, lists, figures, and asides works in EPUB, Markdown, and\n  plain-text books, not PDFs.\n- Windows on ARM64 currently ships as the NSIS installer (`-setup.exe`);\n  `.msi` packages remain x64-only.\n- Your library stays on this computer; syncing between machines remains future\n  work.\n\nBefore publishing, CI built every installer on its own native platform (all\nsix runners), installed each one, verified its binary architecture, opened a\nbook with it, and removed it again.\n",
+    "assets": [
+      {
+        "name": "Mareader_0.0.6_aarch64.dmg",
+        "size": 29014001,
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.6/Mareader_0.0.6_aarch64.dmg"
+      },
+      {
+        "name": "Mareader_0.0.6_x64.dmg",
+        "size": 31885318,
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.6/Mareader_0.0.6_x64.dmg"
+      },
+      {
+        "name": "PKGBUILD",
+        "size": 773,
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.6/PKGBUILD"
+      },
+      {
+        "name": "SHA256SUMS",
+        "size": 1112,
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.6/SHA256SUMS"
+      },
+      {
+        "name": "mareader_0.0.6_aarch64.AppImage",
+        "size": 31820296,
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.6/mareader_0.0.6_aarch64.AppImage"
+      },
+      {
+        "name": "mareader_0.0.6_aarch64.tar.gz",
+        "size": 32823402,
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.6/mareader_0.0.6_aarch64.tar.gz"
+      },
+      {
+        "name": "mareader_0.0.6_amd64.deb",
+        "size": 35031074,
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.6/mareader_0.0.6_amd64.deb"
+      },
+      {
+        "name": "mareader_0.0.6_arm64-setup.exe",
+        "size": 22156252,
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.6/mareader_0.0.6_arm64-setup.exe"
+      },
+      {
+        "name": "mareader_0.0.6_arm64.deb",
+        "size": 32824134,
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.6/mareader_0.0.6_arm64.deb"
+      },
+      {
+        "name": "mareader_0.0.6_x64-setup.exe",
+        "size": 25030939,
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.6/mareader_0.0.6_x64-setup.exe"
+      },
+      {
+        "name": "mareader_0.0.6_x64_en-US.msi",
+        "size": 33001472,
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.6/mareader_0.0.6_x64_en-US.msi"
+      },
+      {
+        "name": "mareader_0.0.6_x86_64.AppImage",
+        "size": 33909240,
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.6/mareader_0.0.6_x86_64.AppImage"
+      },
+      {
+        "name": "mareader_0.0.6_x86_64.tar.gz",
+        "size": 35030336,
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.6/mareader_0.0.6_x86_64.tar.gz"
+      }
+    ]
+  },
+  {
     "tag": "v0.0.5",
     "date": "2026-10-29",
     "body": "Reading aloud becomes reading along: the words light up as they're\nheard, a new player sits over the page, and a fourth voice model joins\nthe others. Mareader also gets a new icon. This release gathers\neverything since v0.0.4.\n\n## What's new\n\n- **Read along.** The words light up as they're spoken, timed to the\n  voice itself with Kokoro, Piper and Kitten. Light one word, a few, or\n  a whole phrase; phrases break where the voice pauses.\n- **A new player.** A compact player sits over the page. Drag its sides\n  to make it wider or narrower. When the words being read scroll out of\n  view, it grows into a card showing them; Settings › Read aloud chooses\n  Full, Compact or the bar alone. It takes on the look of its book's\n  pane, and its time left counts down evenly. When something goes wrong,\n  it says what happened and how to fix it.\n- **Start where you choose.** Right-click a word to read from it; the\n  word lights up and the menu sits beside it, not over it. Select text\n  to read only that. Right-click empty space to read from the start of\n  that passage. A marker shows where reading will begin.\n- **Reading carries on.** Speech is prepared about 20 seconds ahead, so\n  sentences follow each other without a gap. Reading goes on after the\n  book leaves its pane, and a book opened again picks up where it was\n  being read.\n- **Skip what reads badly aloud.** Tables, lists, figures and asides can\n  each be read, skipped, or asked about every time, in EPUB, Markdown and\n  text books.\n- **Phonon, a fourth voice model.** English voices that read text as\n  written, numbers, money and addresses included. It's a 64.5 MB\n  download with 26 American and British voices of 256 KB each, and it\n  reads at every speed from 0.5 to 3.\n- **Kokoro Tiny.** A fourth Kokoro build of 92 MB, smaller than Small's\n  141 MB, a little rougher in sound.\n- **Voices start and speak sooner.** Models load in about half the time,\n  and Kitten and Kokoro start speaking well over a second sooner.\n- **A new dictionary.** The dictionary window and page are redesigned.\n  The headword is spoken with your voice, or with another voice from the\n  same model when yours doesn't speak that language. English IPA\n  follows your voice's accent, American or British. Word cards show the\n  word class and level after the headword.\n- **Zoom that follows the pane.** Fitted zooms refit as the pane\n  resizes. Turn on \"Scale my zoom with the pane\" in Settings › Layout,\n  and a zoom you set shrinks with a narrower pane, then grows back, never\n  past what you set.\n- **A calmer library.** Covers look bound, reading progress shows as a\n  bookmark ribbon, and organizing with AI gives quieter feedback.\n- **A new icon:** an ivory open book with gilt edges and a gold ribbon\n  on onyx.\n\n## Fixes\n\n- Wrapped lines in PDFs join into paragraphs, so they read aloud\n  smoothly and reflow cleanly, and lines beside a figure wrap at it.\n- A narrated book's highlight takes your accent colour, not the book's.\n- Notifications move aside for menus and bars that open under them.\n- Selected items stand out in light tinted themes.\n- On macOS, the window buttons line up with the sidebar's icons at any\n  interface zoom, and stay visible in light themes.\n- Open… left the reader's menu; ⌘O or Ctrl+O still opens a book.\n\n## Which file to download\n\n| System | File | Install |\n| --- | --- | --- |\n| macOS 11 or later, Apple silicon | `Mareader_0.0.5_aarch64.dmg` | open it and drag Mareader to Applications |\n| macOS 11 or later, Intel | `Mareader_0.0.5_x64.dmg` | the same |\n| Windows 10 or 11 | `mareader_0.0.5_x64-setup.exe` | run it; it installs for you alone, no administrator needed |\n| Windows, managed machines | `mareader_0.0.5_x64_en-US.msi` | `msiexec /i` it, or deploy it as usual |\n| Debian, Ubuntu, Mint, Pop!_OS | `mareader_0.0.5_amd64.deb` | `sudo apt install ./mareader_0.0.5_amd64.deb` |\n| Arch and its family | `mareader_0.0.5_x86_64.tar.gz` and `PKGBUILD` | put both in one folder, then `makepkg -si` |\n| Any other Linux (glibc 2.35 or newer) | `mareader_0.0.5_x86_64.AppImage` | `chmod +x` it, then run it |\n\nInstalling over v0.0.4 keeps your library, settings and highlights. The\ninterface zoom goes back to 100% once. Piper now offers only voices\ntrained on public-domain recordings: Alba, Joe, Mike, Reza, Sam and\nKathleen are gone, and their files are deleted at start if you\ndownloaded them. Your system may keep showing the old icon until its\nicon cache refreshes.\n`SHA256SUMS` lists every file's checksum: `sha256sum -c SHA256SUMS\n--ignore-missing` on Linux, `shasum -a 256 -c SHA256SUMS --ignore-missing`\non a Mac.\n\n## The first launch\n\nThis build is not signed by Apple or Microsoft yet, so each system asks\nonce:\n\n- **macOS:** \"Apple could not verify Mareader\". Choose Done, then open\n  System Settings › Privacy & Security and choose Open Anyway next to\n  Mareader. Later launches open directly.\n- **Windows:** \"Windows protected your PC\". Choose More info, then Run\n  anyway.\n- **Linux:** nothing to approve. The AppImage only needs to be executable.\n\n## Known limits\n\n- Neural voices are downloads of 24 MB to 327 MB each. The system voices\n  need none. On Linux, the system voices go through Speech Dispatcher.\n- Only Kokoro, Piper and Kitten say when each word is heard. With Phonon\n  and the system voices the lit word follows the reading pace, so it can\n  run a little ahead or behind.\n- Skipping tables, lists, figures and asides works in EPUB, Markdown and\n  text books, not PDFs.\n- Your library stays on this computer; syncing between machines comes in\n  a later release.\n- Linux packages are for x86_64 only; ARM Linux and Windows on ARM have\n  no build yet.\n\nBefore publishing, CI built every installer on its own system, then\ninstalled each one, opened a book with it and removed it again.\n",
@@ -21,47 +165,47 @@ export const RELEASES: Release[] = [
       {
         "name": "Mareader_0.0.5_aarch64.dmg",
         "size": 28091756,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.5/Mareader_0.0.5_aarch64.dmg"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.5/Mareader_0.0.5_aarch64.dmg"
       },
       {
         "name": "Mareader_0.0.5_x64.dmg",
         "size": 30840388,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.5/Mareader_0.0.5_x64.dmg"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.5/Mareader_0.0.5_x64.dmg"
       },
       {
         "name": "PKGBUILD",
         "size": 553,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.5/PKGBUILD"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.5/PKGBUILD"
       },
       {
         "name": "SHA256SUMS",
         "size": 730,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.5/SHA256SUMS"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.5/SHA256SUMS"
       },
       {
         "name": "mareader_0.0.5_amd64.deb",
         "size": 34009850,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.5/mareader_0.0.5_amd64.deb"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.5/mareader_0.0.5_amd64.deb"
       },
       {
         "name": "mareader_0.0.5_x64-setup.exe",
         "size": 24302235,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.5/mareader_0.0.5_x64-setup.exe"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.5/mareader_0.0.5_x64-setup.exe"
       },
       {
         "name": "mareader_0.0.5_x64_en-US.msi",
         "size": 31961088,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.5/mareader_0.0.5_x64_en-US.msi"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.5/mareader_0.0.5_x64_en-US.msi"
       },
       {
         "name": "mareader_0.0.5_x86_64.AppImage",
         "size": 32987640,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.5/mareader_0.0.5_x86_64.AppImage"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.5/mareader_0.0.5_x86_64.AppImage"
       },
       {
         "name": "mareader_0.0.5_x86_64.tar.gz",
         "size": 34009110,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.5/mareader_0.0.5_x86_64.tar.gz"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.5/mareader_0.0.5_x86_64.tar.gz"
       }
     ]
   },
@@ -73,47 +217,47 @@ export const RELEASES: Release[] = [
       {
         "name": "Mareader_0.0.4_aarch64.dmg",
         "size": 27368290,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.4/Mareader_0.0.4_aarch64.dmg"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.4/Mareader_0.0.4_aarch64.dmg"
       },
       {
         "name": "Mareader_0.0.4_x64.dmg",
         "size": 30064585,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.4/Mareader_0.0.4_x64.dmg"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.4/Mareader_0.0.4_x64.dmg"
       },
       {
         "name": "PKGBUILD",
         "size": 553,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.4/PKGBUILD"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.4/PKGBUILD"
       },
       {
         "name": "SHA256SUMS",
         "size": 730,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.4/SHA256SUMS"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.4/SHA256SUMS"
       },
       {
         "name": "mareader_0.0.4_amd64.deb",
         "size": 33472428,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.4/mareader_0.0.4_amd64.deb"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.4/mareader_0.0.4_amd64.deb"
       },
       {
         "name": "mareader_0.0.4_x64-setup.exe",
         "size": 23873506,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.4/mareader_0.0.4_x64-setup.exe"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.4/mareader_0.0.4_x64-setup.exe"
       },
       {
         "name": "mareader_0.0.4_x64_en-US.msi",
         "size": 31354880,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.4/mareader_0.0.4_x64_en-US.msi"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.4/mareader_0.0.4_x64_en-US.msi"
       },
       {
         "name": "mareader_0.0.4_x86_64.AppImage",
         "size": 32516600,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.4/mareader_0.0.4_x86_64.AppImage"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.4/mareader_0.0.4_x86_64.AppImage"
       },
       {
         "name": "mareader_0.0.4_x86_64.tar.gz",
         "size": 33471700,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.4/mareader_0.0.4_x86_64.tar.gz"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.4/mareader_0.0.4_x86_64.tar.gz"
       }
     ]
   },
@@ -125,47 +269,47 @@ export const RELEASES: Release[] = [
       {
         "name": "Mareader_0.0.3_aarch64.dmg",
         "size": 22462174,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.3/Mareader_0.0.3_aarch64.dmg"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.3/Mareader_0.0.3_aarch64.dmg"
       },
       {
         "name": "Mareader_0.0.3_x64.dmg",
         "size": 24434609,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.3/Mareader_0.0.3_x64.dmg"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.3/Mareader_0.0.3_x64.dmg"
       },
       {
         "name": "PKGBUILD",
         "size": 524,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.3/PKGBUILD"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.3/PKGBUILD"
       },
       {
         "name": "SHA256SUMS",
         "size": 730,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.3/SHA256SUMS"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.3/SHA256SUMS"
       },
       {
         "name": "mareader_0.0.3_amd64.deb",
         "size": 28085972,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.3/mareader_0.0.3_amd64.deb"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.3/mareader_0.0.3_amd64.deb"
       },
       {
         "name": "mareader_0.0.3_x64-setup.exe",
         "size": 18510874,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.3/mareader_0.0.3_x64-setup.exe"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.3/mareader_0.0.3_x64-setup.exe"
       },
       {
         "name": "mareader_0.0.3_x64_en-US.msi",
         "size": 24264704,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.3/mareader_0.0.3_x64_en-US.msi"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.3/mareader_0.0.3_x64_en-US.msi"
       },
       {
         "name": "mareader_0.0.3_x86_64.AppImage",
         "size": 26937848,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.3/mareader_0.0.3_x86_64.AppImage"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.3/mareader_0.0.3_x86_64.AppImage"
       },
       {
         "name": "mareader_0.0.3_x86_64.tar.gz",
         "size": 28085265,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.3/mareader_0.0.3_x86_64.tar.gz"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.3/mareader_0.0.3_x86_64.tar.gz"
       }
     ]
   },
@@ -177,47 +321,47 @@ export const RELEASES: Release[] = [
       {
         "name": "Mareader_0.0.2_aarch64.dmg",
         "size": 22008216,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.2/Mareader_0.0.2_aarch64.dmg"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.2/Mareader_0.0.2_aarch64.dmg"
       },
       {
         "name": "Mareader_0.0.2_x64.dmg",
         "size": 23921657,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.2/Mareader_0.0.2_x64.dmg"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.2/Mareader_0.0.2_x64.dmg"
       },
       {
         "name": "PKGBUILD",
         "size": 524,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.2/PKGBUILD"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.2/PKGBUILD"
       },
       {
         "name": "SHA256SUMS",
         "size": 730,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.2/SHA256SUMS"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.2/SHA256SUMS"
       },
       {
         "name": "mareader_0.0.2_amd64.deb",
         "size": 27585126,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.2/mareader_0.0.2_amd64.deb"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.2/mareader_0.0.2_amd64.deb"
       },
       {
         "name": "mareader_0.0.2_x64-setup.exe",
         "size": 18161936,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.2/mareader_0.0.2_x64-setup.exe"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.2/mareader_0.0.2_x64-setup.exe"
       },
       {
         "name": "mareader_0.0.2_x64_en-US.msi",
         "size": 23752704,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.2/mareader_0.0.2_x64_en-US.msi"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.2/mareader_0.0.2_x64_en-US.msi"
       },
       {
         "name": "mareader_0.0.2_x86_64.AppImage",
         "size": 26495480,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.2/mareader_0.0.2_x86_64.AppImage"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.2/mareader_0.0.2_x86_64.AppImage"
       },
       {
         "name": "mareader_0.0.2_x86_64.tar.gz",
         "size": 27584419,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.2/mareader_0.0.2_x86_64.tar.gz"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.2/mareader_0.0.2_x86_64.tar.gz"
       }
     ]
   },
@@ -229,47 +373,47 @@ export const RELEASES: Release[] = [
       {
         "name": "Mareader_0.0.1_aarch64.dmg",
         "size": 19031117,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.1/Mareader_0.0.1_aarch64.dmg"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.1/Mareader_0.0.1_aarch64.dmg"
       },
       {
         "name": "Mareader_0.0.1_x64.dmg",
         "size": 20852561,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.1/Mareader_0.0.1_x64.dmg"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.1/Mareader_0.0.1_x64.dmg"
       },
       {
         "name": "PKGBUILD",
         "size": 524,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.1/PKGBUILD"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.1/PKGBUILD"
       },
       {
         "name": "SHA256SUMS",
         "size": 730,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.1/SHA256SUMS"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.1/SHA256SUMS"
       },
       {
         "name": "mareader_0.0.1_amd64.deb",
         "size": 24515508,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.1/mareader_0.0.1_amd64.deb"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.1/mareader_0.0.1_amd64.deb"
       },
       {
         "name": "mareader_0.0.1_x64-setup.exe",
         "size": 15641395,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.1/mareader_0.0.1_x64-setup.exe"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.1/mareader_0.0.1_x64-setup.exe"
       },
       {
         "name": "mareader_0.0.1_x64_en-US.msi",
         "size": 20709376,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.1/mareader_0.0.1_x64_en-US.msi"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.1/mareader_0.0.1_x64_en-US.msi"
       },
       {
         "name": "mareader_0.0.1_x86_64.AppImage",
         "size": 23480824,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.1/mareader_0.0.1_x86_64.AppImage"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.1/mareader_0.0.1_x86_64.AppImage"
       },
       {
         "name": "mareader_0.0.1_x86_64.tar.gz",
         "size": 24514805,
-        "url": "https://github.com/codewiththiha/mareader2/releases/download/v0.0.1/mareader_0.0.1_x86_64.tar.gz"
+        "url": "https://github.com/codewiththiha/mareader/releases/download/v0.0.1/mareader_0.0.1_x86_64.tar.gz"
       }
     ]
   }

@@ -5,9 +5,11 @@
   import Pill from "@/lib/components/Pill.svelte";
   import PlatformMark from "@/lib/components/icons/PlatformMark.svelte";
   import { bestFor, KIND_LABEL, OS_LABEL } from "@/lib/downloads";
+  import { RELEASES } from "@/lib/constants";
   import { platform } from "@/lib/platform.svelte";
   import { dateLabel, kindOf, sizeLabel } from "@/lib/releases/assets";
   import type { Release } from "@/lib/releases/data";
+  import { isLegacyRelease, releaseSummary } from "@/lib/releases/notes";
   import { releases } from "@/lib/releases/refresh.svelte";
   import { href } from "@/lib/router.svelte";
 
@@ -94,7 +96,22 @@
 {/snippet}
 
 {#snippet releaseBody(release: Release)}
-  <Markdown source={release.body} />
+  {@const legacy = isLegacyRelease(release.tag)}
+  {@const notes = legacy ? release.body : releaseSummary(release.body)}
+  {#if notes !== null}
+    <Markdown source={notes} className={legacy ? "" : "rel-summary"} />
+  {:else}
+    <p class="rel-summary-empty">A summary isn’t available here yet.</p>
+  {/if}
+  {#if !legacy}
+    <a
+      class="rel-more"
+      href={`${RELEASES}/tag/${encodeURIComponent(release.tag)}`}
+      aria-label={`Read the full ${release.tag} release notes on GitHub`}
+    >
+      Read full notes on GitHub <ArrowUpRight size={15} aria-hidden="true" />
+    </a>
+  {/if}
   {#if release.assets.length}
     <section class="rel-files-section" aria-label={`Files for ${release.tag}`}>
       <div class="rel-files-heading">

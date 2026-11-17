@@ -14,14 +14,15 @@ export interface Best {
 const META: Record<string, string> = {
   "mac-arm": "Apple Silicon · DMG",
   "mac-intel": "Intel · DMG",
-  "win-exe": "Windows 10/11 · installer",
+  "win-exe": "Windows 10/11 · x64 installer",
+  "win-arm-exe": "Windows 11 on ARM · installer",
   "win-msi": "MSI · managed machines",
-  "linux-deb": "Debian/Ubuntu · .deb"
+  "linux-deb": "Debian/Ubuntu · x86_64 .deb",
+  "linux-arm-deb": "Debian/Ubuntu · ARM64 .deb"
 };
 
 export function bestFor(os: OS, arch: "arm64" | "x64" | "", altKind?: AssetKind): Best | null {
   if (os !== "mac" && os !== "windows" && os !== "linux") return null;
-  if ((os === "windows" || os === "linux") && arch === "arm64") return null;
   const rel = releases.latest;
   if (!rel) return null;
   const kind: AssetKind =
@@ -31,8 +32,12 @@ export function bestFor(os: OS, arch: "arm64" | "x64" | "", altKind?: AssetKind)
         ? "mac-intel"
         : "mac-arm"
       : os === "windows"
-        ? "win-exe"
-        : "linux-deb");
+        ? arch === "arm64"
+          ? "win-arm-exe"
+          : "win-exe"
+        : arch === "arm64"
+          ? "linux-arm-deb"
+          : "linux-deb");
   const asset = assetOf(rel, kind);
   if (!asset) return null;
   return {
@@ -52,11 +57,15 @@ export const OS_LABEL: Record<string, string> = {
 export const KIND_LABEL: Record<string, string> = {
   "mac-arm": "macOS · Apple Silicon",
   "mac-intel": "macOS · Intel",
-  "win-exe": "Windows · installer",
-  "win-msi": "Windows · MSI",
-  "linux-deb": "Debian / Ubuntu",
-  "linux-appimage": "AppImage · any Linux",
-  "linux-arch": "Arch · tar.gz",
+  "win-exe": "Windows · x64 installer",
+  "win-arm-exe": "Windows · ARM64 installer",
+  "win-msi": "Windows · x64 MSI",
+  "linux-deb": "Debian / Ubuntu · x86_64",
+  "linux-arm-deb": "Debian / Ubuntu · ARM64",
+  "linux-appimage": "AppImage · x86_64",
+  "linux-arm-appimage": "AppImage · ARM64",
+  "linux-arch": "Arch · x86_64 tar.gz",
+  "linux-arm-arch": "Arch · ARM64 tar.gz",
   "linux-pkgbuild": "Arch · PKGBUILD",
   checksums: "Checksums"
 };

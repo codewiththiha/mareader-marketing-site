@@ -7,6 +7,11 @@ const WIN_UA =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
 const IPHONE_UA =
   "Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1";
+const API = "https://api.github.com/repos/codewiththiha/mareader/releases?per_page=30";
+
+test.beforeEach(async ({ page }) => {
+  await page.route(API, (route) => route.abort());
+});
 
 async function withUA(browser: Browser, userAgent: string, arm = false) {
   const ctx = await browser.newContext({ userAgent });
@@ -41,7 +46,7 @@ test("detects macOS and offers the dmg", async ({ browser }) => {
 test("detects windows and offers the exe", async ({ browser }) => {
   const { ctx, page } = await withUA(browser, WIN_UA);
   await expect(page.locator('[data-testid="hero-dl"]')).toHaveText(/Download for Windows/);
-  await expect(page.locator('[data-testid="hero-dl"]')).toHaveAttribute("href", /-setup\.exe$/);
+  await expect(page.locator('[data-testid="hero-dl"]')).toHaveAttribute("href", /x64-setup\.exe$/);
   await ctx.close();
 });
 
@@ -72,6 +77,10 @@ test("mac arch toggle switches the asset", async ({ page }) => {
 
 test("nav pill routes between pages", async ({ page }) => {
   await page.goto("/", { waitUntil: "networkidle" });
+  await expect(page.locator(".ftr").getByRole("link", { name: "GitHub" })).toHaveAttribute(
+    "href",
+    "https://github.com/codewiththiha/mareader"
+  );
   await page.locator(".hdr").getByRole("link", { name: "Releases" }).click();
   await expect(page).toHaveURL(/#\/releases/);
   await expect(page.getByRole("heading", { name: "Release notes." })).toBeVisible();
@@ -85,9 +94,9 @@ test("nav pill routes between pages", async ({ page }) => {
 test("releases page opens on the latest build", async ({ page }) => {
   await page.goto("/#/releases", { waitUntil: "networkidle" });
   const panel = page.getByRole("tabpanel");
-  await expect(panel).toHaveAttribute("data-version", "v0.0.5");
-  await expect(panel.locator(".notes")).toContainText("Read along");
-  await expect(page.getByRole("tab", { name: /v0\.0\.5/ })).toHaveAttribute(
+  await expect(panel).toHaveAttribute("data-version", "v0.0.7");
+  await expect(panel.locator(".notes")).toContainText("Unified word lookup and AI context cards");
+  await expect(page.getByRole("tab", { name: /v0\.0\.7/ })).toHaveAttribute(
     "aria-selected",
     "true"
   );

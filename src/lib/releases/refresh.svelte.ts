@@ -1,7 +1,7 @@
-// refresh — baked data ships in the bundle; a newer release swaps in live
+// refresh — live releases replace the baked data when available
 import { RELEASES, type Release } from "./data";
 
-const API = "https://api.github.com/repos/codewiththiha/mareader2/releases?per_page=30";
+const API = "https://api.github.com/repos/codewiththiha/mareader/releases?per_page=30";
 
 let all = $state<Release[]>(RELEASES);
 let live = $state(false);
@@ -38,7 +38,7 @@ export const releases = {
       const res = await fetch(API, { headers: { Accept: "application/vnd.github+json" } });
       if (!res.ok) return;
       const fresh = shape(await res.json());
-      if (fresh.length && fresh[0].tag !== all[0]?.tag) {
+      if (fresh.length) {
         all = fresh;
         live = true;
       }

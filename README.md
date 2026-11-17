@@ -1,6 +1,6 @@
 # Mareader Marketing Site
 
-Marketing site for [Mareader](https://github.com/codewiththiha/mareader2), a calm
+Marketing site for [Mareader](https://github.com/codewiththiha/mareader), a calm
 reader for PDF and EPUB. Svelte 5 + TypeScript + Vite, with independent feature
 previews, platform-aware downloads, release notes and a donation desk.
 
@@ -29,7 +29,7 @@ npm run test         # playwright: behaviour + screenshot capture
 npm run screenshots  # screenshot capture only
 npm run test:browsers # previews, downloads, releases and support across browsers
 npm run demos:record # regenerate preview clips; requires ffmpeg and Playwright Chromium
-npm run releases     # pull release notes from mareader2 into src/lib/releases
+npm run releases     # pull releases from mareader into src/lib/releases
 npm run ci:watch     # wait on a CI run from the terminal
 python3 scripts/eval.py  # self review: build, shots, structure, addresses
 ```
@@ -40,10 +40,15 @@ Hash routes: `#/` home (previews + download), `#/downloads` every latest-release
 file with the detected desktop OS first and highlighted, `#/releases` notes per version,
 and `#/support` donation desk. On desktop, a keyboard-accessible version outline
 switches the release notes; on mobile, each release, including the latest, can be
-folded. Download links are taken from the same live or baked release data as the
-notes; unknown files and checksums are listed too. Phones and unknown systems see
-all choices without a guessed highlight. Deploy the whole `dist/` directory: its
-relative asset URLs also work when hosted under a subdirectory.
+folded. Versions through v0.0.5 keep their full notes; newer versions show the
+marked `## Summary` and link to the full GitHub release. If a newer summary is
+missing, the page links to GitHub without showing the full note inline. Download
+links are taken from the same live or baked release data as the notes; unknown
+files and checksums are listed too. Native Windows and Linux ARM64 files are
+separate from x64, and a missing ARM file never falls back to x64. Phones and
+unknown systems see all choices without a guessed highlight. Deploy the whole
+`dist/` directory: its relative asset URLs also work when hosted under a
+subdirectory.
 
 ## Feature previews
 
@@ -82,6 +87,7 @@ npx playwright install firefox webkit
 - `src/lib/support/geo.svelte.ts` — locale/timezone hint for the local view
 - `src/lib/support/myanmar.ts` — local methods, mocked until live
 - `src/lib/releases/data.ts` — generated release notes (do not hand edit)
+- `src/lib/releases/notes.ts` — version cutoff and structured summary parsing
 - `src/lib/stores/theme.svelte.ts` — light/dark with persistence
 
 ## Donations

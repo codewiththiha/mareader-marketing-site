@@ -6,6 +6,10 @@ test.setTimeout(90_000);
 test.describe.configure({ retries: 2 });
 
 test.beforeEach(async ({ page }) => {
+  await page.route(
+    "https://api.github.com/repos/codewiththiha/mareader/releases?per_page=30",
+    (route) => route.abort()
+  );
   await page.goto("/", { waitUntil: "networkidle" });
   await page.evaluate(() => document.fonts.ready.then(() => 1));
 });
@@ -99,12 +103,16 @@ test.describe("mobile", () => {
     await page.goto("/#/releases", { waitUntil: "networkidle" });
     await dark(page, false);
     await page.screenshot({ path: "screenshots/mobile-light-releases-open.png" });
+    await show(page, ".rel-mobile .rel-more");
+    await page.screenshot({ path: "screenshots/mobile-light-releases-summary-end.png" });
     await page.locator(".rel-mobile-trigger").first().click();
     await page.screenshot({ path: "screenshots/mobile-light-releases-closed.png", fullPage: true });
     await dark(page, true);
     await page.screenshot({ path: "screenshots/mobile-dark-releases-closed.png", fullPage: true });
     await page.locator(".rel-mobile-trigger").first().click();
     await page.screenshot({ path: "screenshots/mobile-dark-releases-open.png" });
+    await show(page, ".rel-mobile .rel-more");
+    await page.screenshot({ path: "screenshots/mobile-dark-releases-summary-end.png" });
     await page.goto("/?support=local#/support", { waitUntil: "networkidle" });
     await dark(page, false);
     await page.screenshot({ path: "screenshots/mobile-light-support-local.png" });

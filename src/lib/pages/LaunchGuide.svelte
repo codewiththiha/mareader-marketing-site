@@ -4,6 +4,7 @@
   import Icon from "$lib/icons/Icon.svelte";
   import { X } from "$lib/icons/nodes";
   import { router } from "$lib/site/router.svelte";
+  import { portal } from "$lib/utils/portal";
   import type { Os } from "$lib/site/downloads";
 
   let { os, open, onClose }: { os: Os; open: boolean; onClose: () => void } = $props();
@@ -77,6 +78,7 @@
   <div
     class="lg-back"
     class:on={open}
+    use:portal
     role="presentation"
     onclick={(event) => {
       if (event.target === event.currentTarget) onClose();

@@ -37,6 +37,16 @@ export function kindOf(name: string): AssetKind | null {
   return null;
 }
 
+export function guideForFile(name: string): "mac" | "windows" | undefined {
+  const kind = kindOf(name);
+  if (kind === "mac-arm" || kind === "mac-intel") return "mac";
+  if (kind === "win-exe" || kind === "win-arm-exe" || kind === "win-msi") return "windows";
+  if (!/^mareader(?:[._-]|$)/i.test(name)) return undefined;
+  if (/\.(dmg|pkg)$/i.test(name)) return "mac";
+  if (/\.(exe|msi)$/i.test(name)) return "windows";
+  return undefined;
+}
+
 export function assetOf(release: Release, kind: AssetKind): ReleaseAsset | undefined {
   return release.assets.find((a) => kindOf(a.name) === kind);
 }

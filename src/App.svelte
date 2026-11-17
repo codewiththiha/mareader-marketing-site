@@ -2,6 +2,7 @@
   // App — routes, theme and the page frame
   import Header from "@/lib/components/Header.svelte";
   import Footer from "@/lib/components/Footer.svelte";
+  import DownloadGuide from "@/lib/components/DownloadGuide.svelte";
   import Home from "@/lib/sections/Home.svelte";
   import { router, type Route } from "@/lib/router.svelte";
   import { useTheme, applyThemeClass } from "@/lib/stores/theme.svelte";
@@ -93,4 +94,5 @@
     {/key}
   </main>
   <Footer />
+  <DownloadGuide />
 </div>

@@ -8,6 +8,7 @@
   import { router, href, type Route } from "@/lib/router.svelte";
   import { platform } from "@/lib/platform.svelte";
   import { bestFor } from "@/lib/downloads";
+  import { guideForFile } from "@/lib/releases/assets";
 
   let { dark, onToggle }: { dark: boolean; onToggle: () => void } = $props();
 
@@ -50,7 +51,13 @@
       />
       <ThemeToggle {dark} {onToggle} />
       {#if best}
-        <a href={best.asset.url} class="hdr-dl" title={best.meta} data-testid="hdr-dl">
+        <a
+          href={best.asset.url}
+          class="hdr-dl"
+          title={best.meta}
+          data-download-guide={guideForFile(best.asset.name)}
+          data-testid="hdr-dl"
+        >
           <PlatformMark os={best.os} size={15} />
           <span>Download</span>
         </a>

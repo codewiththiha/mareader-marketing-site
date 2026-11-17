@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { kindOf } from "../src/lib/releases/assets";
+import { guideForFile, kindOf } from "../src/lib/releases/assets";
 
 const API = "https://api.github.com/repos/codewiththiha/mareader/releases?per_page=30";
 const IPHONE_UA =
@@ -16,6 +16,27 @@ test("unknown installer architectures are not mislabeled as x64", () => {
   expect(kindOf("mareader_0.0.9_arm64_en-US.msi")).toBeNull();
   expect(kindOf("mareader_0.0.9_arm64-setup.exe")).toBe("win-arm-exe");
   expect(kindOf("mareader_0.0.9_aarch64.AppImage")).toBe("linux-arm-appimage");
+});
+
+test("first-launch guides follow the selected installer, not other release files", () => {
+  expect(guideForFile("Mareader_aarch64.DMG")).toBe("mac");
+  expect(guideForFile("Mareader.pkg")).toBe("mac");
+  expect(guideForFile("mareader_arm64-setup.exe")).toBe("windows");
+  expect(guideForFile("mareader_arm64.msi")).toBe("windows");
+  expect(guideForFile("reader_x64.dmg")).toBe("mac");
+  expect(guideForFile("reader_x64-setup.exe")).toBe("windows");
+  for (const name of [
+    "mareader_amd64.deb",
+    "mareader.AppImage",
+    "PKGBUILD",
+    "SHA256SUMS",
+    "mareader-setup.exe.sha256",
+    "unrelated.exe",
+    "helper.msi",
+    "another-app.dmg"
+  ]) {
+    expect(guideForFile(name)).toBeUndefined();
+  }
 });
 
 test("Other systems opens its own page and leaves every installer available", async ({ page }) => {

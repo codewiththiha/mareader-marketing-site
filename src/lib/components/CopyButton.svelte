@@ -3,25 +3,28 @@
   let {
     text,
     label = "Copy",
-    compact = false
-  }: { text: string; label?: string; compact?: boolean } = $props();
+    compact = false,
+    item = label === "Copy" ? "address" : label
+  }: { text: string; label?: string; compact?: boolean; item?: string } = $props();
 
   let done = $state(false);
   let timer: ReturnType<typeof setTimeout> | undefined;
 
   function legacy(value: string): boolean {
+    const previous = document.activeElement;
+    const ta = document.createElement("textarea");
     try {
-      const ta = document.createElement("textarea");
       ta.value = value;
       ta.style.position = "fixed";
       ta.style.opacity = "0";
-      document.body.append(ta);
+      (previous?.closest("dialog[open]") ?? document.body).append(ta);
       ta.select();
-      const ok = document.execCommand("copy");
-      ta.remove();
-      return ok;
+      return document.execCommand("copy");
     } catch {
       return false;
+    } finally {
+      ta.remove();
+      if (previous instanceof HTMLElement) previous.focus({ preventScroll: true });
     }
   }
 
@@ -44,7 +47,7 @@
   type="button"
   class="copy {compact ? 'compact' : ''} {done ? 'done' : ''}"
   onclick={copy}
-  aria-label={done ? "Copied" : `Copy ${label === "Copy" ? "address" : label}`}
+  aria-label={done ? "Copied" : `Copy ${item}`}
 >
   <span class="copy-ico" aria-hidden="true">
     <svg viewBox="0 0 24 24" class="c-clip">
@@ -76,5 +79,5 @@
   {#if !compact}
     <span class="copy-label">{done ? "Copied" : label}</span>
   {/if}
-  <span class="sr-only" aria-live="polite">{done ? "Address copied to clipboard" : ""}</span>
+  <span class="sr-only" aria-live="polite">{done ? `${item} copied to clipboard` : ""}</span>
 </button>

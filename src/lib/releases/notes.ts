@@ -55,7 +55,7 @@ function summarySection(body: string): string | null {
     .map(
       (section) => `### ${section}\n\n${entries[section].map((item) => `- ${item}`).join("\n")}`
     );
-  return sections.length ? `## Summary\n\n${sections.join("\n\n")}` : null;
+  return sections.length ? sections.join("\n\n") : null;
 }
 
 export function releaseSummary(body: string): string | null {

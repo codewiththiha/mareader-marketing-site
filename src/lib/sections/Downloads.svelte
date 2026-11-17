@@ -3,7 +3,13 @@
   import PlatformMark from "@/lib/components/icons/PlatformMark.svelte";
   import { bestFor, FIRST_LAUNCH, OS_LABEL } from "@/lib/downloads";
   import { platform } from "@/lib/platform.svelte";
-  import { dateLabel, kindOf, sizeLabel, type AssetKind } from "@/lib/releases/assets";
+  import {
+    dateLabel,
+    guideForFile,
+    kindOf,
+    sizeLabel,
+    type AssetKind
+  } from "@/lib/releases/assets";
   import { releases } from "@/lib/releases/refresh.svelte";
   import { href } from "@/lib/router.svelte";
   import type { OS } from "@/lib/platform";
@@ -185,6 +191,7 @@
                   href={file.asset.url}
                   title={file.asset.name}
                   data-kind={file.kind}
+                  data-download-guide={guideForFile(file.asset.name)}
                 >
                   <span class="downloads-file-copy">
                     <strong>{file.name}</strong>
@@ -219,7 +226,12 @@
       </div>
       <div class="downloads-extra-list">
         {#each extraFiles as asset (asset.name)}
-          <a href={asset.url} class="downloads-extra" title={asset.name}>
+          <a
+            href={asset.url}
+            class="downloads-extra"
+            title={asset.name}
+            data-download-guide={guideForFile(asset.name)}
+          >
             <span>{kindOf(asset.name) === "checksums" ? "SHA-256 checksums" : asset.name}</span>
             <span>{sizeLabel(asset.size)}</span>
             <span class="downloads-file-action" aria-hidden="true">

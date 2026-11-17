@@ -21,6 +21,8 @@ test("desktop versions show new summaries and preserve the full old notes", asyn
   await expect(panel).toHaveAttribute("data-version", "v0.0.7");
   await expect(panel.locator(".notes")).toContainText("Unified word lookup and AI context cards");
   await expect(panel.locator(".notes")).toContainText("Eliminated animation hitches");
+  await expect(panel.locator(".notes").getByRole("heading", { name: "Summary" })).toHaveCount(0);
+  await expect(panel.locator(".notes").getByRole("heading", { name: "New" })).toBeVisible();
   await expect(panel.locator(".rel-summary ul").first()).toHaveCSS("list-style-type", "disc");
   await expect(panel.locator(".notes")).not.toContainText("Unified Lookup and AI word cards.");
   await expect(panel.locator(".notes")).not.toContainText("Mareader brings unified dictionary");
@@ -170,6 +172,7 @@ test("on mobile every release can fold and new summaries stay short", async ({ p
   await triggers.nth(1).click();
   await expect(triggers.nth(1)).toHaveAttribute("aria-expanded", "true");
   await expect(previous.locator(".notes")).toContainText("Built-in update checks");
+  await expect(previous.getByRole("heading", { name: "Summary" })).toHaveCount(0);
   await expect(previous.locator(".rel-more")).toHaveAttribute("href", `${GITHUB_RELEASES}/v0.0.6`);
   await expect(previous.locator(".rel-file")).toHaveCount(13);
   await triggers.nth(2).click();

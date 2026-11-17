@@ -7,7 +7,7 @@
   import { bestFor, KIND_LABEL, OS_LABEL } from "@/lib/downloads";
   import { RELEASES } from "@/lib/constants";
   import { platform } from "@/lib/platform.svelte";
-  import { dateLabel, kindOf, sizeLabel } from "@/lib/releases/assets";
+  import { dateLabel, guideForFile, kindOf, sizeLabel } from "@/lib/releases/assets";
   import type { Release } from "@/lib/releases/data";
   import { isLegacyRelease, releaseSummary } from "@/lib/releases/notes";
   import { releases } from "@/lib/releases/refresh.svelte";
@@ -69,7 +69,12 @@
 {#snippet latestAction()}
   <div class="rel-action">
     {#if best}
-      <a class="rel-action-primary" href={best.asset.url} data-testid="rel-latest-download">
+      <a
+        class="rel-action-primary"
+        href={best.asset.url}
+        data-download-guide={guideForFile(best.asset.name)}
+        data-testid="rel-latest-download"
+      >
         <PlatformMark os={best.os} size={16} />
         Download for {OS_LABEL[best.os]}
       </a>
@@ -121,7 +126,12 @@
       <div class="rel-files">
         {#each release.assets as asset (asset.name)}
           {@const kind = kindOf(asset.name)}
-          <a class="rel-file" href={asset.url} title={asset.name}>
+          <a
+            class="rel-file"
+            href={asset.url}
+            title={asset.name}
+            data-download-guide={guideForFile(asset.name)}
+          >
             <span class="rel-file-name">{kind ? (KIND_LABEL[kind] ?? asset.name) : asset.name}</span
             >
             <span class="rel-file-size">{sizeLabel(asset.size)}</span>

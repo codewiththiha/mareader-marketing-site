@@ -46,7 +46,9 @@ missing, the page links to GitHub without showing the full note inline. Download
 links are taken from the same live or baked release data as the notes; unknown
 files and checksums are listed too. Native Windows and Linux ARM64 files are
 separate from x64, and a missing ARM file never falls back to x64. Phones and
-unknown systems see all choices without a guessed highlight. Deploy the whole
+unknown systems see all choices without a guessed highlight. Downloading a Mac
+or Windows installer starts the download and opens a dismissible first-launch
+guide for the selected file; Linux files do not open a guide. Deploy the whole
 `dist/` directory: its relative asset URLs also work when hosted under a
 subdirectory.
 

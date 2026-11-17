@@ -28,7 +28,7 @@ test("marked summaries win over similarly named headings elsewhere", () => {
     "- A long detail that should not appear."
   ].join("\n");
   expect(releaseSummary(body)).toBe(
-    "## Summary\n\n### New\n\n- A reader-facing feature.\n\n### Fixes\n\n- A reader-facing fix."
+    "### New\n\n- A reader-facing feature.\n\n### Fixes\n\n- A reader-facing fix."
   );
 });
 
@@ -42,7 +42,7 @@ test("unmarked summaries stop at the next top-level section", () => {
     "### Fixes",
     "- A long fix detail."
   ].join("\r\n");
-  expect(releaseSummary(body)).toBe("## Summary\n\n### Fixes\n\n- A fixes-only change.");
+  expect(releaseSummary(body)).toBe("### Fixes\n\n- A fixes-only change.");
 });
 
 test("invalid, missing and empty summaries never fall back to full notes", () => {
@@ -57,7 +57,7 @@ test("invalid, missing and empty summaries never fall back to full notes", () =>
     releaseSummary(
       "<!-- release-summary:start -->\n## Summary\n### New\n- A usable summary.\n## Details\n- Not a summary."
     )
-  ).toBe("## Summary\n\n### New\n\n- A usable summary.");
+  ).toBe("### New\n\n- A usable summary.");
 });
 
 test("only allowed subsections and their direct bullets are used", () => {
@@ -79,6 +79,6 @@ test("only allowed subsections and their direct bullets are used", () => {
     "<!-- release-summary:end -->"
   ].join("\n");
   expect(releaseSummary(body)).toBe(
-    "## Summary\n\n### New\n\n- A visible feature.\n\n### Fixes\n\n- A visible fix."
+    "### New\n\n- A visible feature.\n\n### Fixes\n\n- A visible fix."
   );
 });

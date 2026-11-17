@@ -2,6 +2,7 @@
 @import "./lib/sections/home.css";
 @import "./lib/sections/downloads.css";
 @import "./lib/sections/releases.css";
+@import "./lib/components/download-guide.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 

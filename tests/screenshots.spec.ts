@@ -133,6 +133,47 @@ test.describe("mobile", () => {
   });
 });
 
+test("first-launch guides", async ({ page }) => {
+  fs.mkdirSync("screenshots", { recursive: true });
+  await page.route("https://github.com/codewiththiha/mareader/releases/download/**", (route) =>
+    route.fulfill({
+      contentType: "application/octet-stream",
+      headers: { "Content-Disposition": 'attachment; filename="mareader-test-installer"' },
+      body: "download fixture"
+    })
+  );
+  const open = async (kind: string) => {
+    await Promise.all([
+      page.waitForEvent("download"),
+      page.locator(`[data-kind="${kind}"]`).click()
+    ]);
+    await page.getByRole("dialog").waitFor({ state: "visible" });
+  };
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/?os=mac#/downloads", { waitUntil: "networkidle" });
+  await dark(page, false);
+  await open("mac-arm");
+  await page.screenshot({ path: "screenshots/guide-mac-light.png" });
+  await page.keyboard.press("Escape");
+  await dark(page, true);
+  await open("win-exe");
+  await page.screenshot({ path: "screenshots/guide-windows-dark.png" });
+  await page.keyboard.press("Escape");
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/?os=other#/downloads", { waitUntil: "networkidle" });
+  await dark(page, false);
+  await open("mac-intel");
+  await page.screenshot({ path: "screenshots/guide-mobile-mac-light.png" });
+  await page.locator(".guide-scroll").evaluate((node) => (node.scrollTop = node.scrollHeight));
+  await page.screenshot({ path: "screenshots/guide-mobile-mac-light-end.png" });
+  await page.keyboard.press("Escape");
+  await dark(page, true);
+  await open("win-arm-exe");
+  await page.screenshot({ path: "screenshots/guide-mobile-windows-dark.png" });
+  await page.keyboard.press("Escape");
+});
+
 test("routes", async ({ page }) => {
   fs.mkdirSync("screenshots", { recursive: true });
   await page.setViewportSize({ width: 1280, height: 900 });

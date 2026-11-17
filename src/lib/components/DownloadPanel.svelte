@@ -2,7 +2,7 @@
   // Keep the preferred Mac chip for the direct download on subsequent visits.
   import { ArrowRight, Download } from "@lucide/svelte";
   import { platform } from "@/lib/platform.svelte";
-  import { sizeLabel } from "@/lib/releases/assets";
+  import { guideForFile, sizeLabel } from "@/lib/releases/assets";
   import { bestFor, OS_LABEL } from "@/lib/downloads";
   import { href } from "@/lib/router.svelte";
   import PlatformMark from "./icons/PlatformMark.svelte";
@@ -29,7 +29,12 @@
 <div class="dl" data-variant={variant}>
   {#if best}
     <div class="dl-primary">
-      <a class="btn-primary dl-btn" href={best.asset.url} data-testid="dl-main">
+      <a
+        class="btn-primary dl-btn"
+        href={best.asset.url}
+        data-download-guide={guideForFile(best.asset.name)}
+        data-testid="dl-main"
+      >
         <PlatformMark os={best.os} size={18} />
         Download for {OS_LABEL[best.os]}
       </a>
@@ -56,7 +61,11 @@
         {#if b}
           <div class="dl-card">
             <span class="dl-card-os"><PlatformMark {os} size={20} />{OS_LABEL[os]}</span>
-            <a class="btn-primary dl-btn sm" href={b.asset.url}>
+            <a
+              class="btn-primary dl-btn sm"
+              href={b.asset.url}
+              data-download-guide={guideForFile(b.asset.name)}
+            >
               {os === "mac" ? (arch === "x64" ? "Intel" : "Apple Silicon") : "Download"}
             </a>
             <span class="dl-card-meta">

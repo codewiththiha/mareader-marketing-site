@@ -5,6 +5,7 @@
   import { useTheme } from "@/lib/stores/theme.svelte";
   import { platform } from "@/lib/platform.svelte";
   import { bestFor, OS_LABEL } from "@/lib/downloads";
+  import { guideForFile } from "@/lib/releases/assets";
   import { href } from "@/lib/router.svelte";
   import Facts from "./Facts.svelte";
   import DownloadSection from "./DownloadSection.svelte";
@@ -26,6 +27,7 @@
         <a
           href={heroBest ? heroBest.asset.url : href("downloads")}
           class="btn-primary"
+          data-download-guide={heroBest ? guideForFile(heroBest.asset.name) : undefined}
           data-testid="hero-dl"
         >
           <Download size={17} strokeWidth={2} />

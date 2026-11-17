@@ -71,8 +71,8 @@ export const KIND_LABEL: Record<string, string> = {
 };
 
 export const FIRST_LAUNCH: Record<string, string> = {
-  mac: "Not signed by Apple yet: if macOS hesitates, open System Settings › Privacy & Security and choose Open Anyway. Once is enough.",
+  mac: "Not signed or notarized yet: if macOS hesitates, open System Settings › Privacy & Security and choose Open Anyway. Once is enough.",
   windows:
-    "Not signed by Microsoft yet: if SmartScreen asks, choose More info, then Run anyway. Once is enough.",
+    "Not signed yet: if SmartScreen asks, choose More info, then Run anyway. Once is enough.",
   linux: "Nothing to approve. The AppImage only needs chmod +x; the .deb installs as usual."
 };

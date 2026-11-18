@@ -2,10 +2,9 @@
 @import "./fonts.css";
 @import "./looks.css";
 @import "./theme.css";
-@import "./film.css";
-@import "./captions.css";
 @import "./controls.css";
 @import "./nav.css";
+@import "./home.css";
 @import "./window.css";
 @import "./pages.css";
 @import "./spot.css";
@@ -15,6 +14,5 @@
 @import "./wordcard.css";
 @import "./player.css";
 @import "./settings.css";
-@import "./bake.css";
 @import "./routes.css";
 @import "./launch.css";

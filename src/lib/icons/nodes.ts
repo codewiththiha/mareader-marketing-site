@@ -1,6 +1,7 @@
 import type { IconNode } from "lucide";
 
 export {
+  ArrowDownRight,
   Ban,
   BookA,
   ChartNoAxesColumnIncreasing,
@@ -29,6 +30,7 @@ export {
   Pin,
   Play,
   Plus,
+  Scale,
   ScrollText,
   Search,
   Server,

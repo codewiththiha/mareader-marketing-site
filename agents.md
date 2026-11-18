@@ -18,15 +18,16 @@
 
 - TypeScript plus Svelte 5 runes; idiomatic Svelte, not React-flavoured.
 - Markup in `src/lib` components, styles in `src/styles` partials.
-- Output must stay pixel-identical to the reference design: after any visual
-  change run `npm run shots` then `npm run visual` and keep every view passing.
+- Output must stay true to the reference design: after any visual change run
+  `npm run shots` then `npm run visual` and keep every view passing.
+- The home previews are live: they render `$lib/window/Window.svelte` from the
+  frames in `$lib/site/previews.ts`. No video, no stills, no baked blurs.
 
 ## Commands
 
 - `npm run dev` serve; `npm run build` single-file bundle in `dist`.
 - `npm run lint` eslint; `npm run format:check` prettier; `npm run check` svelte-check.
 - `npm run test` vitest unit tests; `npm run guard` policy guard.
-- `npm run bake` regenerate lens blurs; `scripts/compare-blur.py` checks them.
 - `npm run releases` refresh the embedded release-notes snapshot.
 - `npm run ci:watch` poll this head's CI run to a verdict (0 green, 1 red, 2 running).
 - `npm run shots` capture screenshots; `npm run visual` compare to baselines.
@@ -35,5 +36,5 @@
 ## CI
 
 - Jobs: quality (lint, format, check, tests, audit, guard), visual (build,
-  screenshots, compare, review), bake (lens blur reproducibility), commits.
+  screenshots, compare, review), commits.
 - Push only when every job is green, then wait with `npm run ci:watch`.

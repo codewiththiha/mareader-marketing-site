@@ -2,6 +2,7 @@ import { readFileSync, readdirSync, writeFileSync, mkdirSync } from "node:fs";
 import path from "node:path";
 import { PNG } from "pngjs";
 import pixelmatch from "pixelmatch";
+import { VIEWS } from "./manifest.mjs";
 
 // usage: node compare.mjs <baseDir> <newDir> <outDir> [maxDefaultDiff]
 const [baseDir, newDir, outDir, maxDefault = "0.002"] = process.argv.slice(2);
@@ -30,7 +31,8 @@ for (const n of names) {
   const diff = new PNG({ width: a.width, height: a.height });
   const bad = pixelmatch(a.data, b.data, diff.data, a.width, a.height, { threshold: 0.1, includeAA: false });
   const ratio = bad / (a.width * a.height);
-  const max = n.startsWith("bake-") ? 0.0005 : n.startsWith("step-listen") || n.startsWith("step-voices") ? 0.01 : Number(maxDefault);
+  const view = VIEWS.find((v) => v.name + ".png" === n);
+  const max = view?.maxDiff ?? Number(maxDefault);
   const ok = ratio <= max;
   if (!ok) {
     fail++;

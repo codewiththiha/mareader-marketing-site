@@ -14,7 +14,7 @@ describe("home preview timelines", () => {
         expect(STEPS[shot.step].frames[shot.frame]).toBeDefined();
         expect(shot.ms).toBeGreaterThan(0);
         expect(shotState(shot).panes).toBeGreaterThanOrEqual(1);
-        if ("focus" in shot) {
+        if ("focus" in shot && shot.focus) {
           expect(shot.focus.x).toBeGreaterThanOrEqual(0);
           expect(shot.focus.y).toBeGreaterThanOrEqual(0);
           expect(shot.focus.x + shot.focus.w).toBeLessThanOrEqual(WIN_W);

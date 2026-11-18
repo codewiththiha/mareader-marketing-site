@@ -15,9 +15,7 @@ export interface Timeline {
 }
 
 const wordFocus = { x: 750, y: 140, w: 786, h: 600 };
-const modelFocus = { x: 48, y: 30, w: 1440, h: 900 };
-const voiceFocus = { x: 480, y: 80, w: 820, h: 600 };
-const playerFocus = { x: 300, y: 285, w: 1080, h: 675 };
+const settingsFocus = { x: 48, y: 30, w: 1440, h: 900 };
 const noPopover: Partial<WinState> = { popover: null };
 
 export const TIMELINES = {
@@ -67,16 +65,16 @@ export const TIMELINES = {
   models: {
     poster: 0,
     shots: [
-      { step: 7, frame: 0, ms: 3200, focus: modelFocus },
-      { step: 6, frame: 0, ms: 7000, focus: modelFocus },
+      { step: 7, frame: 0, ms: 3200, focus: settingsFocus },
+      { step: 6, frame: 0, ms: 7000, focus: settingsFocus },
     ],
   },
   voice: {
     poster: 2,
     shots: [
-      { step: 9, frame: 0, ms: 4000, focus: voiceFocus },
-      { step: 9, frame: 1, ms: 2500, focus: voiceFocus },
-      { step: 8, frame: 0, ms: 10000, focus: playerFocus },
+      { step: 9, frame: 0, ms: 4000, focus: settingsFocus },
+      { step: 9, frame: 1, ms: 2500, focus: settingsFocus },
+      { step: 8, frame: 0, ms: 10000 },
     ],
   },
 } satisfies Record<string, Timeline>;

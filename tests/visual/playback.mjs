@@ -55,8 +55,10 @@ try {
       assert.notEqual(await preview.locator(".st-keys").innerText(), before, "key rotation should animate");
     }
     if (name === "voice") {
+      assert(await fits(preview, ".st"), "the complete read-aloud settings window should fit");
       await page.waitForFunction(() => document.querySelector('[data-timeline="voice"]').dataset.frame === "2", null, { timeout: 6000 });
       await page.waitForTimeout(1000);
+      assert(await fits(preview, ".mr-win"), "the full reader window should fit during read-aloud playback");
       const visible = await preview.evaluate((el) => {
         const outer = el.getBoundingClientRect();
         const player = el.querySelector(".pl");
@@ -100,6 +102,7 @@ try {
   for (const [name, selector] of [
     ["appearance", ".pop"],
     ["models", ".st"],
+    ["voice", ".st"],
   ]) {
     const preview = mobile.locator(`[data-timeline="${name}"]`);
     await preview.scrollIntoViewIfNeeded();

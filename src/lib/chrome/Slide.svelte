@@ -14,8 +14,13 @@
   let jump = $state(false);
   let was = false;
 
-  // both rects come from one tick and are divided by the host's own scale, so a scaled ancestor (camera, popover) cannot skew them
+  // Offset geometry stays immune to scaled camera ancestors and skips layout readbacks.
   const place = (host: HTMLElement, el: HTMLElement) => {
+    if (el.offsetParent === host) {
+      const w = el.offsetWidth;
+      off = { x: el.offsetLeft, y: el.offsetTop, w, h: el.offsetHeight };
+      return w > 0;
+    }
     const h = host.getBoundingClientRect();
     const t = el.getBoundingClientRect();
     const k = host.offsetWidth > 0 ? h.width / host.offsetWidth : 1;
@@ -38,8 +43,7 @@
       was = false;
       return;
     }
-    const first = !was;
-    if (first) {
+    if (!was) {
       on = false;
       jump = true;
     }
@@ -66,8 +70,7 @@
   class="slide-mark"
   class:on={on && group.shown}
   class:jump
-  style:left="{off.x}px"
-  style:top="{off.y}px"
+  style:transform="translate3d({off.x}px, {off.y}px, 0)"
   style:width="{off.w}px"
   style:height="{off.h}px"
   style:border-radius="{radius}px"
@@ -86,8 +89,7 @@
     opacity: 0;
     pointer-events: none;
     transition:
-      left 0.34s var(--e-pane),
-      top 0.34s var(--e-pane),
+      transform 0.34s var(--e-pane),
       width 0.34s var(--e-pane),
       height 0.34s var(--e-pane),
       border-radius 0.34s var(--e-pane),

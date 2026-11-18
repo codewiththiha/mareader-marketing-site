@@ -1,4 +1,5 @@
 /** Critically damped spring on (centre, log-scale, anchor): the film camera. */
+import { perf } from "$lib/utils/perf.svelte";
 import type { V5 } from "./layout";
 
 export class Camera {
@@ -7,7 +8,7 @@ export class Camera {
   t: V5;
   raf = 0;
   last = 0;
-  omega = 6.4;
+  omega = 6.8;
 
   constructor(
     init: V5,
@@ -20,8 +21,7 @@ export class Camera {
   to(t: V5, snap: boolean) {
     this.t = [...t] as V5;
     if (snap) {
-      cancelAnimationFrame(this.raf);
-      this.raf = 0;
+      this.stop();
       this.x = [...t] as V5;
       this.v = [0, 0, 0, 0, 0];
       this.apply();
@@ -35,10 +35,19 @@ export class Camera {
     }
   }
 
+  stop() {
+    if (this.raf) {
+      cancelAnimationFrame(this.raf);
+      this.raf = 0;
+    }
+  }
+
   tick = (now: number) => {
-    const dt = Math.min(0.05, Math.max(0.001, (now - this.last) / 1000));
+    const rawMs = now - this.last;
     this.last = now;
-    const w = this.omega;
+    perf.sample(rawMs);
+    const dt = Math.min(0.05, Math.max(0.001, rawMs / 1000));
+    const w = perf.lite ? 8.2 : this.omega;
     const e = Math.exp(-w * dt);
     let moving = false;
     for (let k = 0; k < 5; k++) {
@@ -49,10 +58,13 @@ export class Camera {
       const v = (v0 - w * c * dt) * e;
       this.x[k] = this.t[k] + x;
       this.v[k] = v;
-      const tol = k === 2 ? 0.0006 : 0.3;
+      const tol = k === 2 ? 0.0008 : 0.35;
       if (Math.abs(x) > tol || Math.abs(v) > tol * 3) moving = true;
     }
-    if (!moving) this.x = [...this.t] as V5;
+    if (!moving) {
+      this.x = [...this.t] as V5;
+      this.v = [0, 0, 0, 0, 0];
+    }
     this.apply();
     if (moving) this.raf = requestAnimationFrame(this.tick);
     else {

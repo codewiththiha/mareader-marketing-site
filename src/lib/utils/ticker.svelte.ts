@@ -1,12 +1,25 @@
-/** Interval counter used by the read-aloud player and the key rotation demo. */
+/** Adaptive interval counter that speeds up with scroll pace and pauses off-tab. */
+import { perf } from "./perf.svelte";
+
 export function ticker(on: () => boolean, ms: () => number): () => number {
   let n = $state(0);
   $effect(() => {
-    if (!on()) return;
-    n = 0;
-    const id = window.setInterval(() => n++, ms());
+    if (!on()) {
+      n = 0;
+      return;
+    }
+    if (perf.hidden) return;
+    let id = 0;
+    const arm = () => {
+      const delay = Math.max(120, ms());
+      id = window.setTimeout(() => {
+        n++;
+        arm();
+      }, delay);
+    };
+    arm();
     return () => {
-      window.clearInterval(id);
+      window.clearTimeout(id);
     };
   });
   return () => n;

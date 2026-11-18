@@ -88,6 +88,18 @@
 .icon-btn:hover {
   background: color-mix(in srgb, var(--ink) 10%, transparent);
 }
+[data-lite="1"] .nav-brand:hover,
+[data-lite="1"] .nav-routes,
+[data-lite="1"] .icon-btn {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+}
+[data-lite="1"] .nav-dl {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  background: var(--accent);
+}
 @media (max-width: 767px) {
   .nav-gh {
     display: none;
@@ -127,5 +139,26 @@
   .nav-dl svg {
     width: 14px;
     height: 14px;
+  }
+}
+@media (max-width: 382px) {
+  .nav {
+    padding: 0 8px;
+  }
+  .nav-brand {
+    padding: 3px 4px;
+  }
+  .nav-brand img {
+    width: 26px;
+    height: 26px;
+  }
+  .nav .btn-sm {
+    height: 30px;
+    padding: 0 7px;
+    font-size: 11.5px;
+  }
+  .icon-btn {
+    width: 30px;
+    height: 30px;
   }
 }

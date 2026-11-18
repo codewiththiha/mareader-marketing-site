@@ -1,57 +1,46 @@
-/* ---------------------------------------------------------------- the app, recreated */
+/* Recreated Mareader window: strict containment and compositor-only pane splits. */
 .mr-win {
   position: relative;
   overflow: hidden;
+  contain: strict;
   font-family: Inter, system-ui, sans-serif;
   color: var(--u);
   background: var(--p);
   line-height: 1.25;
   -webkit-font-smoothing: antialiased;
 }
-.look {
-  transition:
-    --p 0.6s ease,
-    --k 0.6s ease,
-    --u 0.6s ease,
-    --m 0.6s ease,
-    --s 0.6s ease,
-    --l 0.6s ease,
-    --a 0.6s ease,
-    --as 0.6s ease,
-    --ai 0.6s ease,
-    --c 0.6s ease,
-    --hl 0.6s ease,
-    --lk 0.6s ease,
-    --mk 0.6s ease,
-    --mks 0.6s ease,
-    --th 0.6s ease,
-    --tx 0.6s ease;
-}
 .pane {
   position: absolute;
+  left: 0;
+  top: 0;
   overflow: hidden;
+  contain: strict;
   background: var(--p);
   color: var(--k);
   transition:
-    left 0.8s var(--e-pane),
-    top 0.8s var(--e-pane),
-    width 0.8s var(--e-pane),
-    height 0.8s var(--e-pane),
-    opacity 0.5s ease,
-    --p 0.6s ease,
-    --k 0.6s ease,
-    --u 0.6s ease,
-    --m 0.6s ease,
-    --s 0.6s ease,
-    --l 0.6s ease,
-    --a 0.6s ease,
-    --as 0.6s ease,
-    --c 0.6s ease,
-    --hl 0.6s ease,
-    --lk 0.6s ease,
-    --mk 0.6s ease,
-    --mks 0.6s ease,
-    --tx 0.6s ease;
+    transform calc(0.78s / var(--rate, 1)) var(--e-pane),
+    clip-path calc(0.78s / var(--rate, 1)) var(--e-pane),
+    opacity calc(0.45s / var(--rate, 1)) ease,
+    background-color calc(0.5s / var(--rate, 1)) ease,
+    color calc(0.5s / var(--rate, 1)) ease;
+}
+.pane.enter-r {
+  @starting-style {
+    opacity: 0;
+    transform: translate3d(1536px, var(--py, 0px), 0);
+  }
+}
+.pane.enter-b {
+  @starting-style {
+    opacity: 0;
+    transform: translate3d(768px, 960px, 0);
+  }
+}
+[data-lite="1"] .pane {
+  transition:
+    transform calc(0.48s / var(--rate, 1)) var(--e-out),
+    opacity calc(0.32s / var(--rate, 1)) ease,
+    background-color 0.24s ease;
 }
 .tex {
   position: absolute;
@@ -59,16 +48,17 @@
   pointer-events: none;
   background-image: var(--tex-fine), var(--tex-mottle);
   background-size:
-    180px 180px,
+    160px 160px,
     420px 420px;
-  opacity: calc(var(--tx) * 0.75);
-  mix-blend-mode: multiply;
+  transition: opacity calc(0.5s / var(--rate, 1)) ease;
 }
 [data-dark="true"] > .tex {
   background-image: var(--tex-fine-dk);
-  background-size: 180px 180px;
-  opacity: calc(var(--tx) * 0.22);
-  mix-blend-mode: screen;
+  background-size: 160px 160px;
+}
+.tex.off {
+  opacity: 0 !important;
+  visibility: hidden;
 }
 .pv {
   position: absolute;
@@ -76,26 +66,32 @@
   top: 0;
   transform-origin: 0 0;
   transition:
-    transform 0.8s var(--e-pane),
-    opacity 0.45s ease;
+    transform calc(0.78s / var(--rate, 1)) var(--e-pane),
+    opacity calc(0.42s / var(--rate, 1)) ease;
+  @starting-style {
+    opacity: 0;
+  }
 }
 .pv-x {
-  transition: left 0.8s var(--e-pane);
+  transition: transform calc(0.78s / var(--rate, 1)) var(--e-pane);
 }
 .pane-title {
   position: absolute;
   left: 14px;
+  top: 0;
   font-size: 13.5px;
   line-height: 18px;
   color: var(--m);
   white-space: nowrap;
   font-family: Inter, RedChamber, sans-serif;
-  transition: top 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    color 0.5s ease;
 }
 .pane-count {
   position: absolute;
-  right: 14px;
-  bottom: 13px;
+  left: 0;
+  top: 0;
   padding: 3px 9px;
   font-size: 12.5px;
   line-height: 16px;
@@ -105,6 +101,16 @@
   border-radius: 9px;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+  transition:
+    transform calc(0.78s / var(--rate, 1)) var(--e-pane),
+    background-color 0.5s ease,
+    border-color 0.5s ease,
+    color 0.5s ease;
+}
+[data-lite="1"] .pv,
+[data-lite="1"] .pv-x,
+[data-lite="1"] .pane-count {
+  transition-duration: 0.45s;
 }
 .pane-dl {
   position: absolute;

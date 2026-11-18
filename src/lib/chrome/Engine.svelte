@@ -1,6 +1,7 @@
 <script lang="ts">
   import Icon from "$lib/icons/Icon.svelte";
   import { ChevronDown, ChevronRight, Download, Pause } from "$lib/icons/nodes";
+  import { perf } from "$lib/utils/perf.svelte";
 
   let {
     name,
@@ -10,6 +11,7 @@
     dl = false,
     ready = false,
     picked,
+    speed = 1,
   }: {
     name: string;
     sub: string;
@@ -18,21 +20,36 @@
     dl?: boolean;
     ready?: boolean;
     picked: boolean;
+    speed?: number;
   } = $props();
 
-  let mb = $state(12.4);
+  let prog = $state(0.04);
+  let rate = 1;
   $effect(() => {
-    if (!dl) return;
-    mb = 12.4;
-    const start = performance.now();
+    rate = speed;
+  });
+
+  $effect(() => {
+    if (!dl) {
+      prog = 0.04;
+      return;
+    }
+    let elapsed = 0;
+    let last = performance.now();
     const id = window.setInterval(() => {
-      const k = Math.min(1, (performance.now() - start) / 3400);
-      mb = 12.4 + (347.9 - 12.4) * (1 - Math.pow(1 - k, 1.6));
-    }, 90);
+      const now = performance.now();
+      if (!perf.hidden) elapsed += (now - last) * rate;
+      last = now;
+      const k = Math.min(1, elapsed / 3400);
+      prog = 0.04 + 0.96 * (1 - Math.pow(1 - k, 1.6));
+      if (k >= 1) window.clearInterval(id);
+    }, 85);
     return () => {
       window.clearInterval(id);
     };
   });
+
+  const mb = $derived(12.4 + (347.9 - 12.4) * ((prog - 0.04) / 0.96));
 </script>
 
 <div class="st-eng">
@@ -56,6 +73,6 @@
   {/if}
   {#if !size || ready}<span class="st-radio" class:on={picked}></span>{/if}
   {#if dl}
-    <span class="st-prog"><i class="dl-bar"></i></span>
+    <span class="st-prog"><i class="dl-bar" style:transform="scaleX({prog.toFixed(3)})"></i></span>
   {/if}
 </div>

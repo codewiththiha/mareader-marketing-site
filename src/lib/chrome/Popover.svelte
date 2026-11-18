@@ -100,9 +100,9 @@
 {#snippet dial(name: string, v: number, label: string, dim = false)}
   <div class="dial" style:opacity={dim ? 0.45 : 1}>
     <span class="dial-n">{name}</span>
-    <span class="dial-t">
-      <span class="dial-f" style:width={`${v}%`}></span>
-      <span class="dial-k" style:left={`${v}%`}></span>
+    <span class="dial-t" style="--v:{v / 100}">
+      <span class="dial-f"></span>
+      <span class="dial-k"></span>
     </span>
     <span class="dial-v">{label}</span>
   </div>
@@ -118,8 +118,8 @@
     {@render segs(MODES, L.mode, 4, modeG, modeEls)}
     <div class="dial">
       <span class="dial-n">Hue</span>
-      <span class="hue" style:background={HUE_STRIP}>
-        <span class="dial-k" style:left={`${(L.hue / 359) * 100}%`}></span>
+      <span class="hue" style:background={HUE_STRIP} style="--v:{L.hue / 359}">
+        <span class="dial-k"></span>
       </span>
       <span class="dial-v">{L.hue}°</span>
     </div>

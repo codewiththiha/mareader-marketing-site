@@ -311,6 +311,13 @@ export function rgba(hex: string, a: number) {
   return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`;
 }
 
+export function blendOver(fgHex: string, bgHex: string, a: number): string {
+  const f = parseInt(fgHex.slice(1), 16);
+  const b = parseInt(bgHex.slice(1), 16);
+  const mix = (shift: number) => Math.round(((f >> shift) & 255) * a + ((b >> shift) & 255) * (1 - a));
+  return `rgb(${mix(16)}, ${mix(8)}, ${mix(0)})`;
+}
+
 export function varsOf(l: Look): string {
   return [
     `--p:${l.p}`,

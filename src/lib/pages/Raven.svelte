@@ -4,7 +4,7 @@
   let { w }: { w: number } = $props();
 </script>
 
-<div class="epub pv-x" style="position: absolute; left: {(w - 305) / 2}px; top: 0; width: 305px">
+<div class="epub pv-x" style="position: absolute; left: 0; top: 0; width: 305px; transform: translate3d({(w - 305) / 2}px, 0, 0)">
   <div
     style="position: absolute; top: 188px; width: 305px; text-align: center; font-weight: 700; font-size: 26.5px; line-height: 32px; letter-spacing: 0.01em"
   >

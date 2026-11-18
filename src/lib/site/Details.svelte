@@ -12,7 +12,7 @@
   ];
 </script>
 
-<section class="mx-auto max-w-[1080px] px-6 pb-24 pt-28 sm:pt-36">
+<section class="below-fold mx-auto max-w-[1080px] px-6 pb-24 pt-28 sm:pt-36">
   <h2 class="serif max-w-[16ch] text-[clamp(30px,4vw,48px)] font-[540] leading-[1.08] tracking-[-0.02em]">And the quiet details.</h2>
   <div class="mt-12 grid gap-x-12 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
     {#each DETAILS as [node, title, text] (title)}

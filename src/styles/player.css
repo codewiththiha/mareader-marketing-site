@@ -20,6 +20,10 @@
 .pl.on {
   opacity: 1;
   transform: none;
+  @starting-style {
+    opacity: 0;
+    transform: translateY(10px);
+  }
 }
 .pl-b {
   position: absolute;
@@ -52,22 +56,22 @@
 }
 .pl-track i {
   position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
+  inset: 0;
   border-radius: 2px;
   background: color-mix(in srgb, var(--a) 70%, transparent);
-  transition: width 1.4s linear;
+  transform-origin: 0 50%;
+  transition: transform 1.2s linear;
 }
 .pl-track b {
   position: absolute;
+  left: 0;
   top: 50%;
   width: 8px;
   height: 8px;
   margin: -4px 0 0 -4px;
   border-radius: 50%;
   background: var(--a);
-  transition: left 1.4s linear;
+  transition: transform 1.2s linear;
 }
 .pl-div {
   position: absolute;

@@ -13,9 +13,13 @@
   opacity: 0;
   transform: translateY(-6px) scale(0.98);
   transform-origin: 88% 0;
+  contain: layout paint style;
   transition:
     opacity 0.2s ease,
-    transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
+    background-color 0.5s ease,
+    border-color 0.5s ease,
+    color 0.5s ease;
   font-size: 13px;
   color: var(--u);
 }
@@ -26,6 +30,10 @@
 .pop.on {
   opacity: 1;
   transform: none;
+  @starting-style {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
 }
 .fold {
   display: flex;
@@ -163,16 +171,27 @@
 }
 .dial-f {
   position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
+  inset: 0;
   border-radius: 2px;
   background: var(--a);
-  transition: width 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transform-origin: 0 50%;
+  transform: scaleX(var(--v, 0));
+  transition: transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .dial-k {
   position: absolute;
+  left: 0;
+  right: 0;
   top: 50%;
+  height: 0;
+  transform: translate3d(calc(var(--v, 0) * 100%), 0, 0);
+  transition: transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.dial-k::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
   width: 14px;
   height: 14px;
   margin: -7px 0 0 -7px;
@@ -180,7 +199,6 @@
   background: var(--c);
   border: 1px solid var(--l);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
-  transition: left 0.55s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .dial-v {
   width: 38px;

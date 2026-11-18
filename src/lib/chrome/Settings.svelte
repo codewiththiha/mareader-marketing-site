@@ -23,7 +23,14 @@
     lit,
     voice,
     active,
-  }: { page: "keys" | "local" | "voices" | null; lit: string | null; voice: "downloading" | "ready"; active: boolean } = $props();
+    speed = 1,
+  }: {
+    page: "keys" | "local" | "voices" | null;
+    lit: string | null;
+    voice: "downloading" | "ready";
+    active: boolean;
+    speed?: number;
+  } = $props();
 
   const NAV: [string, { name: string; node: IconNode | null }[]][] = [
     [
@@ -60,7 +67,7 @@
   });
   const tick = ticker(
     () => active && page === "keys",
-    () => 950,
+    () => 950 / speed,
   );
   const sel = $derived(pg === "voices" ? "Read aloud" : "AI models");
 </script>
@@ -90,9 +97,9 @@
       <Icon node={X} size={22} strokeWidth={1.8} ariaHidden />
     </div>
     <div class="st-clip">
-      <div class="st-scroll" style:transform={`translateY(${pg === "keys" ? -236 : 0}px)`}>
+      <div class="st-scroll" style:transform={`translate3d(0, ${pg === "keys" ? -236 : 0}px, 0)`}>
         {#if pg === "voices"}
-          <ReadAloud {voice} />
+          <ReadAloud {voice} {speed} />
         {:else}
           <AiModels local={pg === "local"} {lit} tick={tick()} />
         {/if}

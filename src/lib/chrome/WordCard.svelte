@@ -29,7 +29,7 @@
   const left = $derived(at ? Math.max(8, Math.min(roomW - 8 - CARD_W, mid - CARD_W / 2)) : 0);
   const top = $derived(at ? at.y - GAP - h : 0);
   const cx = $derived(Math.max(CORNER, Math.min(CARD_W - CORNER, mid - left)));
-  const delay = (i: number) => `animation-delay: ${120 + i * 110}ms`;
+  const delay = (i: number) => `animation-delay: calc(${120 + i * 110}ms / var(--rate, 1))`;
 </script>
 
 {#if at}

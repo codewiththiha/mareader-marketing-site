@@ -19,6 +19,10 @@
 .wc.on {
   opacity: 1;
   transform: none;
+  @starting-style {
+    opacity: 0;
+    transform: translateY(4px);
+  }
 }
 .wc-head {
   display: flex;

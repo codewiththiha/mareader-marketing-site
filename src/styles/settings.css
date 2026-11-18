@@ -12,6 +12,9 @@
 }
 .st-back.on {
   opacity: 1;
+  @starting-style {
+    opacity: 0;
+  }
 }
 .st {
   position: absolute;
@@ -38,6 +41,10 @@
 .st.on {
   opacity: 1;
   transform: none;
+  @starting-style {
+    opacity: 0;
+    transform: scale(0.97);
+  }
 }
 .st-nav {
   width: 236px;
@@ -175,7 +182,8 @@
 }
 .st-tiles-wrap {
   overflow: hidden;
-  transition: height 0.75s var(--e-pane);
+  contain: layout paint;
+  transition: height 0.72s var(--e-pane);
   margin: 0 -8px;
   padding: 0 8px;
 }
@@ -390,13 +398,5 @@
   inset: 0;
   background: var(--a);
   transform-origin: 0 50%;
-  animation: dl 3.5s cubic-bezier(0.35, 0.1, 0.3, 1) both;
-}
-@keyframes dl {
-  from {
-    transform: scaleX(0.04);
-  }
-  to {
-    transform: scaleX(1);
-  }
+  transition: transform 0.1s linear;
 }

@@ -1,6 +1,6 @@
 /** Look resolution and the CSS custom properties each look emits. */
 import { describe, expect, it } from "vitest";
-import { LOOKS, look, resolve, rgba, varsOf } from "../../src/lib/looks";
+import { LOOKS, blendOver, look, resolve, rgba, varsOf } from "../../src/lib/looks";
 
 describe("resolve", () => {
   it("maps home to the site default", () => {
@@ -20,6 +20,12 @@ describe("resolve", () => {
 describe("rgba", () => {
   it("expands hex with an alpha", () => {
     expect(rgba("#f6f1e8", 0.26)).toBe("rgba(246, 241, 232, 0.26)");
+  });
+
+  it("pre-multiplies paper over site background cleanly", () => {
+    expect(blendOver("#e6d9c3", "#f6f1e8", 1)).toBe("rgb(230, 217, 195)");
+    expect(blendOver("#e6d9c3", "#f6f1e8", 0)).toBe("rgb(246, 241, 232)");
+    expect(blendOver("#e6d9c3", "#f6f1e8", 0.9)).toBe("rgb(232, 219, 199)");
   });
 });
 

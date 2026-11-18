@@ -1,19 +1,56 @@
 <script lang="ts">
-  import Bake from "./Bake.svelte";
+  import type { Component } from "svelte";
   import Film from "$lib/film/Film.svelte";
   import Details from "$lib/site/Details.svelte";
-  import DonatePage from "$lib/pages/DonatePage.svelte";
-  import DownloadPage from "$lib/pages/DownloadPage.svelte";
   import Footer from "$lib/site/Footer.svelte";
   import Get from "$lib/site/Get.svelte";
   import More from "$lib/site/More.svelte";
   import Nav from "$lib/site/Nav.svelte";
-  import ReleasesPage from "$lib/pages/ReleasesPage.svelte";
-  import { router } from "$lib/site/router.svelte";
+  import { router, type Route } from "$lib/site/router.svelte";
   import { theme } from "$lib/site/theme.svelte";
+  import { perf } from "$lib/utils/perf.svelte";
+  import { mountTextures } from "$lib/utils/textures";
   import favicon from "./assets/icon32.png";
 
   const isBake = /[?&](bake|bakelist)\b/.test(window.location.search);
+
+  const loaders: Record<Exclude<Route, "home">, () => Promise<{ default: Component }>> = {
+    releases: () => import("$lib/pages/ReleasesPage.svelte"),
+    donate: () => import("$lib/pages/DonatePage.svelte"),
+    download: () => import("$lib/pages/DownloadPage.svelte"),
+  };
+
+  let pages = $state<Partial<Record<Exclude<Route, "home">, Component>>>({});
+  let BakeComp = $state<Component | null>(null);
+
+  $effect(() => {
+    if (!isBake) return;
+    void import("./Bake.svelte").then((m) => {
+      BakeComp = m.default;
+    });
+  });
+
+  $effect(() => {
+    const r = router.current;
+    if (r === "home" || pages[r]) return;
+    void loaders[r]().then((m) => {
+      pages = { ...pages, [r]: m.default };
+    });
+  });
+
+  $effect(() => {
+    if (isBake) return;
+    mountTextures();
+    if (perf.lite) return;
+    const warm = window.setTimeout(() => {
+      void loaders.download().then((m) => {
+        pages = { ...pages, download: m.default };
+      });
+    }, 1800);
+    return () => {
+      window.clearTimeout(warm);
+    };
+  });
 
   $effect(() => {
     document.documentElement.dataset.theme = theme.current;
@@ -38,22 +75,21 @@
 </script>
 
 {#if isBake}
-  <Bake />
+  {#if BakeComp}<BakeComp />{/if}
 {:else}
   <Nav />
   {#key router.current}
-    {#if router.current === "releases"}
-      <main id="top"><ReleasesPage /></main>
-    {:else if router.current === "donate"}
-      <main id="top"><DonatePage /></main>
-    {:else if router.current === "download"}
-      <main id="top"><DownloadPage /></main>
-    {:else}
+    {#if router.current === "home"}
       <main id="top">
         <Film site={theme.current} />
         <Details />
         <Get />
         <More />
+      </main>
+    {:else}
+      {@const Page = pages[router.current]}
+      <main id="top" class="min-h-[70svh]">
+        {#if Page}<Page />{/if}
       </main>
     {/if}
   {/key}

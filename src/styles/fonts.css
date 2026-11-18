@@ -1,4 +1,4 @@
-/* ---------------------------------------------------------------- fonts (all OFL, from the app) */
+/* Subsetted OFL typefaces with non-blocking swap display for fast first paint. */
 @font-face {
   font-family: "Inter";
   src: url("../assets/fonts/Inter-Regular.woff2") format("woff2");
@@ -20,14 +20,14 @@
 @font-face {
   font-family: "Literata";
   src: url("../assets/fonts/Literata.woff2") format("woff2");
-  font-weight: 200 900;
+  font-weight: 400 700;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: "Literata";
   src: url("../assets/fonts/Literata-Italic.woff2") format("woff2");
-  font-weight: 200 900;
+  font-weight: 400 540;
   font-style: italic;
   font-display: swap;
 }
@@ -36,26 +36,31 @@
   src: url("../assets/fonts/LibSerif-Regular.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
+  font-display: swap;
 }
 @font-face {
   font-family: "PdfSerif";
   src: url("../assets/fonts/LibSerif-Italic.woff2") format("woff2");
   font-weight: 400;
   font-style: italic;
+  font-display: swap;
 }
 @font-face {
   font-family: "PdfSerif";
   src: url("../assets/fonts/LibSerif-Bold.woff2") format("woff2");
   font-weight: 700;
   font-style: normal;
+  font-display: swap;
 }
 @font-face {
   font-family: "PdfMono";
   src: url("../assets/fonts/LibMono-Italic.woff2") format("woff2");
   font-weight: 400;
   font-style: italic;
+  font-display: swap;
 }
 @font-face {
   font-family: "RedChamber";
   src: url("../assets/fonts/NotoSerifTC-sub.woff2") format("woff2");
+  font-display: swap;
 }

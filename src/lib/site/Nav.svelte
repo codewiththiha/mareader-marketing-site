@@ -3,7 +3,7 @@
   import GithubMark from "$lib/icons/GithubMark.svelte";
   import Download from "$lib/icons/lively/Download.svelte";
   import SunMoon from "$lib/icons/lively/SunMoon.svelte";
-  import { OS_LABEL } from "$lib/site/downloads";
+  import { OS_LABEL } from "$lib/site/os";
   import { router } from "$lib/site/router.svelte";
   import { theme } from "$lib/site/theme.svelte";
   import { platform } from "$lib/utils/platform.svelte";

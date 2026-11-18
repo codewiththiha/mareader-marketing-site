@@ -12,7 +12,7 @@
   };
 </script>
 
-<footer class="site-foot">
+<footer class="site-foot below-fold">
   <div class="foot-grid">
     <div class="foot-brand">
       <div class="foot-logo">

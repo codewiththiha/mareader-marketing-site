@@ -1,12 +1,24 @@
 // Self-review: fail on visual regressions or bundle growth, summarise for CI.
-import { readFile, stat } from "node:fs/promises";
+import { readdir, readFile, stat } from "node:fs/promises";
+import path from "node:path";
 
-const MAX_BUNDLE = 2_600_000;
+const MAX_BUNDLE = 1_200_000;
+
+async function dirSize(root) {
+  let total = 0;
+  const entries = await readdir(root, { withFileTypes: true }).catch(() => []);
+  for (const e of entries) {
+    const full = path.join(root, e.name);
+    total += e.isDirectory() ? await dirSize(full) : (await stat(full)).size;
+  }
+  return total;
+}
+
 const report = await readFile(".visual-diff/report.txt", "utf8").catch(() => "");
 const lines = report.split("\n").filter((l) => l.includes("\t"));
 const fails = lines.filter((l) => l.includes("FAIL"));
 const worst = lines.map((l) => l.split("\t")).sort((a, b) => Number.parseFloat(b[1]) - Number.parseFloat(a[1]))[0];
-const size = (await stat("dist/index.html").catch(() => ({ size: 0 }))).size;
+const size = await dirSize("dist");
 const summary = [
   `## Self review`,
   `- views compared: ${lines.length}`,

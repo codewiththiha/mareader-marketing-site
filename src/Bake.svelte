@@ -1,12 +1,14 @@
 <script lang="ts">
   import Window from "$lib/window/Window.svelte";
   import { bakeList, stateOf } from "$lib/film/steps";
+  import { mountTextures } from "$lib/utils/textures";
 
   const params = new URLSearchParams(location.search);
   const list = bakeList();
   const item = list.find((x) => x.key === params.get("bake"));
 
   $effect(() => {
+    mountTextures(true);
     document.documentElement.style.background = "transparent";
     document.body.style.background = "transparent";
     (window as unknown as { __BAKE__: unknown }).__BAKE__ = list;

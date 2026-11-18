@@ -9,6 +9,16 @@ const [target, outDir, which = "all"] = process.argv.slice(2);
 const mkdir = async (d) => (await import("node:fs/promises")).mkdir(d, { recursive: true });
 await mkdir(outDir);
 
+const MIME = {
+  ".html": "text/html; charset=utf-8",
+  ".js": "text/javascript; charset=utf-8",
+  ".css": "text/css; charset=utf-8",
+  ".woff2": "font/woff2",
+  ".png": "image/png",
+  ".webp": "image/webp",
+  ".svg": "image/svg+xml",
+};
+
 let url = target;
 let server;
 if (!/^https?:/.test(target)) {
@@ -17,7 +27,7 @@ if (!/^https?:/.test(target)) {
     const p = path.join(target, q === "/" || q === "" ? "index.html" : q.slice(1));
     try {
       const b = await readFile(p);
-      res.writeHead(200, { "content-type": p.endsWith(".html") ? "text/html" : "application/octet-stream" });
+      res.writeHead(200, { "content-type": MIME[path.extname(p)] ?? "application/octet-stream" });
       res.end(b);
     } catch {
       res.writeHead(404);

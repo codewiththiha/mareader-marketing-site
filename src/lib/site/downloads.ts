@@ -1,29 +1,9 @@
 /** Platform download matrix, resolved from the embedded release snapshot. */
+import { GH, OS_LABEL, parseArm, parseOs, type Arch, type KnownOs, type Os } from "./os";
 import { RELEASES } from "./releases";
 import type { ReleaseAsset } from "./releases-type";
 
-export type Os = "mac" | "windows" | "linux" | "unknown";
-export type KnownOs = Exclude<Os, "unknown">;
-export type Arch = "arm" | "x64";
-
-export const OS_LABEL: Record<Os, string> = {
-  mac: "macOS",
-  windows: "Windows",
-  linux: "Linux",
-  unknown: "your system",
-};
-
-export function parseOs(ua: string, uadPlatform = ""): Os {
-  const p = uadPlatform.toLowerCase();
-  if (p.includes("mac") || /macintosh|mac os x/i.test(ua)) return "mac";
-  if (p.includes("windows") || /windows/i.test(ua)) return "windows";
-  if (p.includes("linux") || /linux|android/i.test(ua)) return "linux";
-  return "unknown";
-}
-
-export function parseArm(ua: string, uaFull = ""): boolean {
-  return /arm64|aarch64|apple silicon|armv8/i.test(ua + uaFull);
-}
+export { GH, OS_LABEL, parseArm, parseOs, type Arch, type KnownOs, type Os };
 
 export interface DlOption {
   id: string;
@@ -41,7 +21,6 @@ export interface DlGroup {
   options: DlOption[];
 }
 
-export const GH = "https://github.com/codewiththiha/mareader";
 const latest = RELEASES[0];
 const FALLBACK = `${GH}/releases/latest`;
 const find = (test: (n: string) => boolean) => latest.assets.find((a) => test(a.name));

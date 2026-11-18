@@ -1,5 +1,5 @@
 /** Reads the visitor's platform once; architecture arrives async when the browser offers it. */
-import { parseArm, parseOs, type Os } from "$lib/site/downloads";
+import { parseArm, parseOs, type Os } from "$lib/site/os";
 
 interface Uad {
   platform?: string;

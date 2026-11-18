@@ -1,14 +1,14 @@
 <!-- Two quiet cards linking the release notes and support routes. -->
 <script lang="ts">
   import Heart from "$lib/icons/lively/Heart.svelte";
+  import { LATEST_TAG } from "$lib/site/os";
   import { router } from "$lib/site/router.svelte";
-  import { latestTag } from "$lib/site/downloads";
 
   const cards = [
     {
       route: "releases" as const,
       kicker: "Release notes",
-      title: `See what changed in ${latestTag}`,
+      title: `See what changed in ${LATEST_TAG}`,
       body: "Every build, its highlights, and checksums — kept short and honest.",
       cta: "Read the notes",
     },
@@ -22,7 +22,7 @@
   ];
 </script>
 
-<section class="mx-auto max-w-[1080px] px-6 pb-24">
+<section class="below-fold mx-auto max-w-[1080px] px-6 pb-24">
   <div class="grid gap-4 sm:grid-cols-2">
     {#each cards as card (card.route)}
       <a href={router.href(card.route)} class="more-card group">

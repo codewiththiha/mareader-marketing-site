@@ -10,6 +10,7 @@
     dl = false,
     ready = false,
     picked,
+    active = true,
   }: {
     name: string;
     sub: string;
@@ -18,11 +19,12 @@
     dl?: boolean;
     ready?: boolean;
     picked: boolean;
+    active?: boolean;
   } = $props();
 
   let mb = $state(12.4);
   $effect(() => {
-    if (!dl) return;
+    if (!dl || !active) return;
     mb = 12.4;
     const start = performance.now();
     const id = window.setInterval(() => {
@@ -56,6 +58,6 @@
   {/if}
   {#if !size || ready}<span class="st-radio" class:on={picked}></span>{/if}
   {#if dl}
-    <span class="st-prog"><i class="dl-bar"></i></span>
+    <span class="st-prog"><i class="dl-bar" style:animation-play-state={active ? "running" : "paused"}></i></span>
   {/if}
 </div>

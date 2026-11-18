@@ -1,5 +1,6 @@
 <script lang="ts">
   import Preview from "./Preview.svelte";
+  import type { TimelineId } from "./timelines";
   import Details from "$lib/site/Details.svelte";
   import Get from "$lib/site/Get.svelte";
   import More from "$lib/site/More.svelte";
@@ -7,16 +8,14 @@
   import { router } from "$lib/site/router.svelte";
   import { theme } from "$lib/site/theme.svelte";
 
-  const previews = [
+  const previews: { chapter: string; title: string; body: string; details: string[]; label: string; timeline: TimelineId }[] = [
     {
       chapter: "Make it yours",
       title: "Limitless themes.",
       body: "Tint it, texture it, add grain. Find a look you love and save it as your own, for PDF and EPUB alike.",
       details: ["Presets & custom colours", "PDF + EPUB"],
       label: "Mareader's appearance settings beside a book page.",
-      step: 1,
-      frames: [2, 3, 4, 5],
-      focus: { x: 800, y: 0, w: 736, h: 650 },
+      timeline: "appearance",
     },
     {
       chapter: "Make room",
@@ -24,8 +23,7 @@
       body: "Read side by side in up to four panes. Keep the same look throughout, or give each pane its own.",
       details: ["Up to four panes", "Per-pane themes"],
       label: "Four reading panes showing different books and page themes.",
-      step: 4,
-      frames: [5],
+      timeline: "panes",
     },
     {
       chapter: "Stay in the story",
@@ -33,9 +31,7 @@
       body: "Select a word and discover its meaning in context, without breaking the flow. Bring the model you trust.",
       details: ["Context-aware", "Your choice of model"],
       label: "A contextual dictionary card explaining a selected word in a book.",
-      step: 5,
-      frames: [2],
-      focus: { x: 750, y: 140, w: 786, h: 600 },
+      timeline: "dictionary",
     },
     {
       chapter: "Your models, your rules",
@@ -43,9 +39,7 @@
       body: "Use Ollama, LM Studio or Apple's on-device models. Prefer a cloud provider? Bring your own keys and let the rotator handle the rest.",
       details: ["Local models", "Key rotation"],
       label: "Mareader's AI model settings with local and cloud model providers.",
-      step: 7,
-      frames: [0],
-      focus: { x: 480, y: 90, w: 820, h: 600 },
+      timeline: "models",
     },
     {
       chapter: "Listen a little longer",
@@ -53,9 +47,7 @@
       body: "Download a voice once, then listen anywhere. Follow along as Mareader highlights the words for you.",
       details: ["Offline voices", "Read-along highlighting"],
       label: "A read-aloud player and highlighted words on a book page.",
-      step: 8,
-      frames: [0],
-      focus: { x: 450, y: 120, w: 1086, h: 740 },
+      timeline: "voice",
     },
   ];
 </script>
@@ -71,7 +63,7 @@
       </div>
       <p class="hero-footnote">Free &amp; open source <span>·</span> Made for desktop</p>
     </div>
-    <Preview site={theme.current} step={4} frames={[5]} label="Four reading panes open in Mareader, showing books and PDFs." />
+    <Preview site={theme.current} timeline="hero" label="Four reading panes open in Mareader, showing books and PDFs." />
   </div>
 </section>
 
@@ -90,7 +82,7 @@
             {#each preview.details as detail (detail)}<li>{detail}</li>{/each}
           </ul>
         </div>
-        <Preview site={theme.current} step={preview.step} frames={preview.frames} label={preview.label} focus={preview.focus} />
+        <Preview site={theme.current} timeline={preview.timeline} label={preview.label} />
       </article>
     {/each}
   </div>

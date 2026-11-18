@@ -87,6 +87,7 @@
   width: 1536px;
   height: 960px;
   transform-origin: 0 0;
+  transition: transform 0.8s var(--e-pane);
   pointer-events: none;
 }
 .showcase {
@@ -219,5 +220,15 @@
   }
   .home-pitch {
     padding-top: 65px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-preview-window {
+    transition: none;
+  }
+  .home-preview :is(.pane, .pv, .look, .st, .st-back, .st-scroll, .st-tiles-wrap) {
+    transition: none;
+    animation: none;
   }
 }

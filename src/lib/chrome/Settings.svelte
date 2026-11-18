@@ -92,7 +92,7 @@
     <div class="st-clip">
       <div class="st-scroll" style:transform={`translateY(${pg === "keys" ? -236 : 0}px)`}>
         {#if pg === "voices"}
-          <ReadAloud {voice} />
+          <ReadAloud {voice} active={active && page === "voices"} />
         {:else}
           <AiModels local={pg === "local"} {lit} tick={tick()} />
         {/if}

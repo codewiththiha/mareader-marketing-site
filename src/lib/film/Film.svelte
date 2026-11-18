@@ -1,38 +1,44 @@
 <script lang="ts">
-  import { look as lookOf, rgba, type Site } from "$lib/looks";
   import Window from "$lib/window/Window.svelte";
   import Caption from "./Caption.svelte";
   import { Camera } from "./camera";
-  import { camOf, layoutOf, maskFor, type Layout, type Side } from "./layout";
-  import { STEPS, bakeKey, stateOf } from "./steps";
+  import { camOf, layoutOf, veilFor } from "./layout";
+  import { STEPS, needsOf, stateOf } from "./steps";
+  import { lite } from "$lib/utils/power";
+  import type { Site } from "$lib/looks";
 
   let { site }: { site: Site } = $props();
 
-  const BLURS = import.meta.glob<string>("../../blur/*.webp", { eager: true, query: "?url", import: "default" });
-  const blurUrl = (key: string): string | undefined => BLURS[`../../blur/${key}.webp`];
-
   const STEP_VH = 92;
-  const SIDES: Side[] = ["left", "right", "top", "bottom"];
+  const N = STEPS.length;
+  const IDLE = 2400;
+  const pad = (v: number) => String(v).padStart(2, "0");
 
   let filmEl = $state(null as HTMLElement | null);
   let stageEl = $state(null as HTMLDivElement | null);
   let camEl = $state(null as HTMLDivElement | null);
-  let lensEls = $state([] as (HTMLDivElement | null)[]);
+  let barEl = $state(null as HTMLSpanElement | null);
   let camera = null as Camera | null;
   let snapNext = true;
+  let lastScroll = 0;
 
   let vp = $state({ w: window.innerWidth, h: window.innerHeight });
   let active = $state(0);
   let tl = $state({ step: 0, frame: 0 });
+  let near = $state(true);
+  let idle = $state(false);
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   const weights = STEPS.map((s) => s.weight ?? 1);
   const total = weights.reduce((a, b) => a + b, 0);
   const bounds = weights.reduce<number[]>((acc, w) => [...acc, acc[acc.length - 1] + w / total], [0]);
 
+  const span = () => Math.max(1, (filmEl?.offsetHeight ?? 0) - window.innerHeight);
+  const top = () => filmEl?.offsetTop ?? 0;
+
   $effect(() => {
     const el = stageEl;
-    if (!el) return;
+    if (el === null) return;
     const ro = new ResizeObserver(() => {
       snapNext = true;
       vp = { w: el.clientWidth, h: el.clientHeight };
@@ -48,15 +54,16 @@
     const read = () => {
       raf = 0;
       const el = filmEl;
-      if (!el) return;
-      const r = el.getBoundingClientRect();
-      const span = el.offsetHeight - window.innerHeight;
-      const p = Math.max(0, Math.min(0.99999, -r.top / Math.max(1, span)));
+      if (el === null) return;
+      const p = Math.max(0, Math.min(0.99999, -el.getBoundingClientRect().top / span()));
       let i = 0;
-      while (i < STEPS.length - 1 && p >= bounds[i + 1]) i++;
+      while (i < N - 1 && p >= bounds[i + 1]) i++;
       active = i;
+      if (barEl !== null) barEl.style.transform = `scaleX(${Math.min(1, p * 1.002)})`;
     };
     const on = () => {
+      lastScroll = performance.now();
+      if (idle) idle = false;
       if (!raf) raf = requestAnimationFrame(read);
     };
     read();
@@ -69,7 +76,38 @@
     };
   });
 
+  // a still reader gets told, once, that the page carries on
   $effect(() => {
+    if (reduced) return;
+    const t = window.setInterval(() => {
+      if (!near || active === N - 1) {
+        idle = false;
+        return;
+      }
+      idle = performance.now() - lastScroll > IDLE;
+    }, 500);
+    return () => {
+      window.clearInterval(t);
+    };
+  });
+
+  $effect(() => {
+    const el = filmEl;
+    if (el === null) return;
+    const io = new IntersectionObserver(
+      (es) => {
+        near = es[0].isIntersecting;
+      },
+      { rootMargin: "180px 0px" },
+    );
+    io.observe(el);
+    return () => {
+      io.disconnect();
+    };
+  });
+
+  $effect(() => {
+    if (!near) return;
     const s = STEPS[active];
     tl = { step: active, frame: 0 };
     let f = 0;
@@ -95,14 +133,14 @@
 
   const layouts = $derived(STEPS.map((s) => layoutOf(s, vp.w, vp.h)));
   const L = $derived(layouts[active]);
-  const step = $derived(STEPS[active]);
-  const frame = $derived(tl.step === active ? tl.frame : 0);
-  const st = $derived(stateOf(active, frame));
+  const reach = $derived(needsOf(active));
+  const st = $derived(stateOf(active, tl.step === active ? tl.frame : 0));
+  const veil = $derived(veilFor(L.side, L, vp.w, vp.h));
 
   $effect(() => {
     const target = camOf(L);
-    if (!camera) {
-      camera = new Camera(target, () => [camEl, ...lensEls].filter(Boolean) as HTMLElement[]);
+    if (camera === null) {
+      camera = new Camera(target, () => (camEl !== null ? [camEl] : []));
       camera.to(target, true);
       snapNext = false;
       return;
@@ -111,58 +149,71 @@
     snapNext = false;
   });
 
-  const lensLook = $derived(step.lens === "chrome" ? lookOf(st.chrome, site) : lookOf(st.looks[0], site));
-  const url = $derived(step.zoom ? blurUrl(bakeKey(active, frame, site)) : undefined);
-  let bag: string[] = [];
-  const recent = $derived.by(() => {
-    if (url && bag[bag.length - 1] !== url) bag = [...bag.filter((u) => u !== url), url].slice(-3);
-    return bag;
-  });
-  const tone = $derived(rgba(lensLook.p, url ? (lensLook.dark ? 0.34 : 0.26) : 0.9));
-  const ink = $derived(
-    step.zoom
-      ? lensLook.dark
-        ? { i: "#f6efe4", m: "rgba(246,239,228,.80)" }
-        : { i: "#1c1610", m: "rgba(28,22,16,.74)" }
-      : { i: "var(--ink)", m: "var(--muted)" },
-  );
+  const jump = (i: number) => {
+    const p = (bounds[i] + bounds[i + 1]) / 2;
+    window.scrollTo({ top: top() + p * span(), behavior: reduced ? "auto" : "smooth" });
+  };
 
-  let bagL: Partial<Record<Side, Layout>> = {};
-  const lastLayout = $derived.by(() => {
-    bagL[L.side] = L;
-    return bagL;
-  });
+  const next = $derived(active < N - 1 ? STEPS[active + 1] : null);
 </script>
 
 <section bind:this={filmEl} id="tour" class="film" data-film data-bounds={JSON.stringify(bounds)} style="height: {total * STEP_VH + 100}vh">
   <div bind:this={stageEl} class="stage">
     <div bind:this={camEl} class="cam" aria-hidden="true">
       <div class="win-frame">
-        <Window {st} {site} active />
+        <Window {st} {site} active {reach} quick {lite} />
       </div>
     </div>
 
-    {#each SIDES as side, i (side)}
-      {@const fit = (side === "left" || side === "right") === L.landscape}
-      {#if fit}
-        {@const show = !!step.zoom && L.side === side}
-        {@const LL = show ? L : (lastLayout[side] ?? L)}
-        {@const mask = maskFor(side, LL, vp.w, vp.h)}
-        <div class="lens" style:opacity={show ? 1 : 0} style:-webkit-mask-image={mask} style:mask-image={mask} aria-hidden="true">
-          <div class="lens-base"></div>
-          <div bind:this={lensEls[i]} class="lens-cam">
-            {#each recent as u (u)}
-              <img src={u} alt="" class="lens-img" style:opacity={u === url ? 1 : 0} />
-            {/each}
-          </div>
-          <div class="lens-tone" style:background={tone}></div>
-          <div class="lens-grain"></div>
-        </div>
-      {/if}
-    {/each}
+    <div class="veil" style:background={veil} aria-hidden="true"></div>
+    <div class="aperture" aria-hidden="true"></div>
 
     {#each STEPS as s, i (s.id)}
-      <Caption step={s} L={layouts[i]} on={i === active} ink={i === active ? ink : { i: "var(--ink)", m: "var(--muted)" }} />
+      <Caption
+        step={s}
+        n={i}
+        total={N}
+        L={layouts[i]}
+        on={i === active}
+        cue={() => {
+          jump(1);
+        }}
+      />
     {/each}
+
+    <nav class="rail" aria-label="The reel">
+      {#each STEPS as s, i (s.id)}
+        <button
+          class="rail-t"
+          class:on={i === active}
+          aria-current={i === active ? "step" : undefined}
+          aria-label={s.kicker}
+          onclick={() => {
+            jump(i);
+          }}
+        >
+          <span class="rail-l">{s.kicker}</span>
+        </button>
+      {/each}
+    </nav>
+
+    <div class="hud" class:show={idle}>
+      <span class="hud-k">{active === 0 ? "Opening" : `${pad(active)} / ${pad(N - 1)}`}</span>
+      <span class="hud-n">{next !== null ? `Next · ${next.kicker}` : "End of the reel"}</span>
+      {#if next !== null}
+        <svg class="hud-a" viewBox="0 0 10 16" width="9" height="14" aria-hidden="true"
+          ><path
+            d="M5 1v13M1 10l4 4 4-4"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.3"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          /></svg
+        >
+      {/if}
+    </div>
+
+    <div class="bar" aria-hidden="true"><span bind:this={barEl}></span></div>
   </div>
 </section>

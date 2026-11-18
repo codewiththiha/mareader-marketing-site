@@ -9,8 +9,7 @@
   height: 100svh;
   overflow: hidden;
 }
-.cam,
-.lens-cam {
+.cam {
   position: absolute;
   left: 0;
   top: 0;
@@ -26,39 +25,188 @@
   box-shadow: var(--win-shadow);
 }
 
-/* The lens: a baked lens blur of the very frame on screen, toned for reading. */
-.lens {
+/* The explanation sits on a scrim: page colour under the words, app on the far side. */
+.veil {
   position: absolute;
   inset: 0;
-  pointer-events: none;
-  transition: opacity 0.7s ease;
   z-index: 3;
+  pointer-events: none;
 }
-.lens-base {
+
+/* The app runs off the frame; let it dissolve rather than cut. */
+.stage {
+  --edge: clamp(18px, 6.5vw, 110px);
+}
+.aperture {
   position: absolute;
   inset: 0;
-  background: var(--bg);
-  transition: background-color 0.4s ease;
+  z-index: 4;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    var(--bg) 0px,
+    color-mix(in srgb, var(--bg) 0%, transparent) var(--edge),
+    color-mix(in srgb, var(--bg) 0%, transparent) calc(100% - var(--edge) - 22px),
+    var(--bg) calc(100% - 22px)
+  );
 }
-.lens-img {
+
+/* Chapters down the side: where you are, and that there is more. */
+.rail {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  z-index: 7;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  transform: translateY(-50%);
+}
+.rail-t {
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  width: 30px;
+  height: 12px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  color: inherit;
+}
+.rail-t::before {
+  content: "";
+  width: 13px;
+  height: 1px;
+  background: color-mix(in srgb, var(--muted) 52%, transparent);
+  transition:
+    width 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.3s ease;
+}
+.rail-t:hover::before,
+.rail-t:focus-visible::before {
+  width: 19px;
+  background: var(--ink);
+}
+.rail-t.on::before {
+  width: 26px;
+  background: var(--accent);
+}
+.rail-t:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+.rail-l {
+  position: absolute;
+  right: 100%;
+  margin-right: 12px;
+  padding: 2px 0;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--muted);
+  opacity: 0;
+  transform: translateX(5px);
+  transition:
+    opacity 0.25s ease,
+    transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+.rail-t:hover .rail-l,
+.rail-t:focus-visible .rail-l {
+  opacity: 1;
+  transform: none;
+}
+
+/* A still reader is offered the way on. */
+.hud {
+  position: absolute;
+  left: 50%;
+  bottom: 24px;
+  z-index: 7;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 16px 9px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--bg) 96%, transparent);
+  box-shadow: 0 12px 34px -16px color-mix(in srgb, var(--ink) 30%, transparent);
+  backdrop-filter: blur(8px);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  opacity: 0;
+  transform: translate(-50%, 10px);
+  transition:
+    opacity 0.35s ease,
+    transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+.hud.show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+.hud-k {
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+.hud-n {
+  color: var(--muted);
+}
+.hud-a {
+  color: var(--accent);
+  animation: hud-bob 1.9s ease-in-out infinite;
+}
+
+/* How far the reel has run. */
+.bar {
   position: absolute;
   left: 0;
-  top: 0;
-  width: 1536px;
-  height: 960px;
-  border-radius: 14px;
-  transition: opacity 0.6s ease;
+  right: 0;
+  bottom: 0;
+  z-index: 6;
+  height: 1px;
+  background: color-mix(in srgb, var(--line) 70%, transparent);
 }
-.lens-tone {
-  position: absolute;
-  inset: 0;
-  transition: background-color 0.6s ease;
+.bar span {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  opacity: 0.5;
+  transform: scaleX(0);
+  transform-origin: 0 50%;
 }
-.lens-grain {
-  position: absolute;
-  inset: 0;
-  background-image: var(--grain);
-  background-size: 160px 160px;
-  opacity: 0.07;
-  mix-blend-mode: overlay;
+
+@keyframes hud-bob {
+  0%,
+  100% {
+    transform: translateY(-2px);
+    opacity: 0.45;
+  }
+  50% {
+    transform: translateY(2px);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 899px) {
+  .hud,
+  .rail {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hud,
+  .rail-t::before,
+  .rail-l {
+    transition: none;
+  }
+  .hud-a {
+    animation: none;
+  }
 }

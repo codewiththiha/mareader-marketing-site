@@ -20,14 +20,14 @@ export function layoutOf(s: Step, vw: number, vh: number): Layout {
   const landscape = vw >= 820 && vw / vh >= 1.12;
   if (s.hero) {
     const top = NAV + (landscape ? clamp(vh * 0.055, 18, 60) : 12);
-    const th = landscape ? clamp(vh * 0.4, 300, 390) : clamp(vh * 0.47, 330, 420);
+    const th = landscape ? clamp(vh * 0.46, 330, 420) : clamp(vh * 0.56, 360, 500);
     const pad = landscape ? 48 : 14;
     const sc = Math.min((vw - pad * 2) / WIN_W, landscape ? 0.82 : 1);
     const w = WIN_W * sc;
     return {
       landscape,
       side: "top",
-      text: { x: 0, y: top, w: vw, h: th },
+      text: { x: pad, y: top, w: vw - pad * 2, h: th },
       fa: { x: (vw - w) / 2, y: top + th + 6, w, h: WIN_H * sc },
       focus: s.focus,
       maxS: 1,
@@ -46,7 +46,7 @@ export function layoutOf(s: Step, vw: number, vh: number): Layout {
       side === "left" ? { x: padX + tw + gap, y: top, w: faW, h: vh - top - 36 } : { x: padX * 0.5, y: top, w: faW, h: vh - top - 36 };
     return { landscape, side, text, fa, focus, maxS: s.maxS ?? 1.6 };
   }
-  const th = clamp(vh * 0.31, 196, 300);
+  const th = clamp(vh * 0.26, 190, 270);
   const maxS = s.maxS ?? 1.2;
   const make = (side: "top" | "bottom"): Layout => {
     const text: R = side === "bottom" ? { x: 22, y: vh - th, w: vw - 44, h: th - 20 } : { x: 22, y: NAV + 8, w: vw - 44, h: th };
@@ -79,21 +79,27 @@ export function camOf(L: Layout): V5 {
   return [L.focus.x + L.focus.w / 2, L.focus.y + L.focus.h / 2, Math.log(s), L.fa.x + L.fa.w / 2, L.fa.y + L.fa.h / 2];
 }
 
-export function maskFor(side: Side, L: Layout, vw: number, vh: number) {
+/** The scrim a caption sits on: page colour solid under the text, gone by the app. */
+export function veilFor(side: Side, L: Layout, vw: number, vh: number): string {
+  const bg = "var(--bg)";
+  const fade = "color-mix(in srgb, var(--bg) 0%, transparent)";
+  const tail = Math.min(190, L.fa.w * 0.26);
   if (side === "left") {
-    const a = L.text.x + L.text.w * 0.92;
-    const b = L.fa.x + 18;
-    return `linear-gradient(90deg, #000 0px, #000 ${a}px, transparent ${b}px)`;
+    const a = L.text.x + L.text.w - 10;
+    const b = L.fa.x + tail;
+    return `linear-gradient(90deg, ${bg} 0px, ${bg} ${a}px, ${fade} ${b}px)`;
   }
   if (side === "right") {
-    const a = vw - (L.text.x + L.text.w * 0.08);
-    const b = vw - (L.fa.x + L.fa.w) + 18;
-    return `linear-gradient(270deg, #000 0px, #000 ${a}px, transparent ${b}px)`;
+    const a = vw - L.text.x - 10;
+    const b = vw - L.fa.x - L.fa.w + tail;
+    return `linear-gradient(270deg, ${bg} 0px, ${bg} ${a}px, ${fade} ${b}px)`;
   }
   if (side === "bottom") {
-    const a = vh - L.text.y - 6;
-    return `linear-gradient(0deg, #000 0px, #000 ${a}px, transparent ${a + 40}px)`;
+    const a = vh - L.text.y - 10;
+    const b = a + Math.min(150, L.fa.h * 0.3);
+    return `linear-gradient(0deg, ${bg} 0px, ${bg} ${a}px, ${fade} ${b}px)`;
   }
-  const a = L.text.y + L.text.h + 6;
-  return `linear-gradient(180deg, #000 0px, #000 ${a}px, transparent ${a + 40}px)`;
+  const a = L.text.y + L.text.h - 10;
+  const b = Math.min(a + 64, L.fa.y + 24);
+  return `linear-gradient(180deg, ${bg} 0px, ${bg} ${a}px, ${fade} ${b}px)`;
 }

@@ -1,12 +1,32 @@
 /* Captions */
 .cap {
   position: absolute;
+  color: var(--ink);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: flex-start;
   pointer-events: none;
   z-index: 5;
+}
+.cap-k {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 0 0 14px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.cap-i {
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+}
+.cap.port .cap-k {
+  margin-bottom: 10px;
+  font-size: 10.5px;
 }
 .cap.port {
   justify-content: flex-start;
@@ -16,11 +36,14 @@
   justify-content: flex-end;
   padding: 0 0 12px;
 }
+.cap.port.bottom {
+  justify-content: flex-end;
+  padding: 0 0 26px;
+}
 .cap.hero {
   justify-content: center;
   align-items: center;
   text-align: center;
-  padding: 0 22px;
 }
 .cap.on {
   pointer-events: auto;
@@ -47,7 +70,9 @@
   font-size: clamp(34px, 9.6vw, 46px);
 }
 .cap-b {
+  width: 100%;
   margin-top: 18px;
+  color: var(--muted);
   font-size: clamp(15.5px, 1.16vw, 19px);
   line-height: 1.55;
   max-width: 31ch;
@@ -102,4 +127,68 @@
 }
 .cap.port .cap-cta {
   margin-top: 20px;
+}
+
+/* The hero says, plainly, that the page carries on. */
+.cue {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-top: 30px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: var(--muted);
+  cursor: pointer;
+}
+.cue-a {
+  color: var(--accent);
+  animation: cue-drop 2.3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+.cue-t {
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.cue-n {
+  font-size: 12.5px;
+  letter-spacing: 0.01em;
+}
+.cue:hover .cue-a,
+.cue:focus-visible .cue-a {
+  color: var(--ink);
+}
+.cue:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 6px;
+  border-radius: 4px;
+}
+.cap.port .cue {
+  margin-top: 22px;
+}
+@keyframes cue-drop {
+  0% {
+    opacity: 0;
+    transform: translateY(-7px);
+  }
+  35% {
+    opacity: 1;
+  }
+  72% {
+    opacity: 1;
+    transform: translateY(2px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cue-a {
+    animation: none;
+  }
 }

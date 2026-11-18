@@ -1,7 +1,7 @@
-/** Caption placement, lens mask and camera target maths. */
+/** Caption placement, scrim gradient and camera target maths. */
 import { describe, expect, it } from "vitest";
 import { STEPS } from "../../src/lib/film/steps";
-import { camOf, layoutOf, maskFor } from "../../src/lib/film/layout";
+import { camOf, layoutOf, veilFor } from "../../src/lib/film/layout";
 
 const hero = STEPS[0];
 const keys = STEPS[6];
@@ -11,7 +11,8 @@ describe("layoutOf", () => {
     const L = layoutOf(hero, 1440, 900);
     expect(L.landscape).toBe(true);
     expect(L.side).toBe("top");
-    expect(L.text.w).toBe(1440);
+    expect(L.text.w).toBe(1440 - 96);
+    expect(L.text.x).toBe(48);
     expect(L.fa.x + L.fa.w / 2).toBeCloseTo(720);
   });
 
@@ -29,12 +30,27 @@ describe("layoutOf", () => {
   });
 });
 
-describe("maskFor", () => {
-  it("fades the lens out before the caption edge", () => {
+describe("veilFor", () => {
+  it("keeps the page colour solid under a side caption", () => {
     const L = layoutOf(keys, 1440, 900);
-    const m = maskFor("left", L, 1440, 900);
-    const a = L.text.x + L.text.w * 0.92;
-    expect(m).toBe(`linear-gradient(90deg, #000 0px, #000 ${a}px, transparent ${L.fa.x + 18}px)`);
+    const v = veilFor("left", L, 1440, 900);
+    expect(v.startsWith("linear-gradient(90deg, var(--bg) 0px")).toBe(true);
+    expect(v).toContain(`var(--bg) ${L.text.x + L.text.w - 10}px`);
+    expect(v).toContain(`color-mix(in srgb, var(--bg) 0%, transparent) ${L.fa.x + Math.min(190, L.fa.w * 0.26)}px`);
+  });
+
+  it("fills behind a bottom caption on phones", () => {
+    const L = layoutOf(keys, 390, 844);
+    const v = veilFor(L.side, L, 390, 844);
+    expect(v).toContain("linear-gradient(0deg");
+    expect(v).toContain(`var(--bg) ${844 - L.text.y - 10}px`);
+  });
+
+  it("fades away from the hero window", () => {
+    const L = layoutOf(hero, 1440, 900);
+    const v = veilFor("top", L, 1440, 900);
+    expect(v).toContain(`var(--bg) ${L.text.y + L.text.h - 10}px`);
+    expect(v.endsWith("px)")).toBe(true);
   });
 });
 

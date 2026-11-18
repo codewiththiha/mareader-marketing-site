@@ -54,7 +54,7 @@
   </div>
   <a class="reel-cue" href="#tour">
     <span class="reel-cue-bob"><Icon node={ChevronDown} size={15} strokeWidth={2.2} ariaHidden /></span>
-    <span>Scroll — nine loops, nothing to press</span>
+    <span>Scroll — nine takes, nothing to press</span>
   </a>
 {/snippet}
 

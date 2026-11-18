@@ -33,7 +33,7 @@ export const STEPS: Step[] = [
     id: "hero",
     kicker: "The reel",
     hero: true,
-    weight: 0.7,
+    weight: 0.16,
     title: "Shaped around the way you read.",
     body: "A calm reader for PDFs and EPUBs. Your colours on every page, four books at once, and AI and voices that stay on your computer.",
     focus: FULL,

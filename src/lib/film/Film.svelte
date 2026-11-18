@@ -5,14 +5,14 @@
   import { camOf, layoutOf, veilFor } from "./layout";
   import { STEPS, needsOf, stateOf } from "./steps";
   import { lite } from "$lib/utils/power";
+  import { SvelteSet } from "svelte/reactivity";
   import type { Site } from "$lib/looks";
 
   let { site }: { site: Site } = $props();
 
-  const STEP_VH = 92;
+  const STEP_VH = 60;
   const N = STEPS.length;
-  const IDLE = 2400;
-  const pad = (v: number) => String(v).padStart(2, "0");
+  const TICK = 100;
 
   let filmEl = $state(null as HTMLElement | null);
   let stageEl = $state(null as HTMLDivElement | null);
@@ -20,13 +20,16 @@
   let barEl = $state(null as HTMLSpanElement | null);
   let camera = null as Camera | null;
   let snapNext = true;
-  let lastScroll = 0;
+  let lastY = 0;
+  let lastT = 0;
+  let vel = 0;
 
   let vp = $state({ w: window.innerWidth, h: window.innerHeight });
   let active = $state(0);
   let tl = $state({ step: 0, frame: 0 });
   let near = $state(true);
-  let idle = $state(false);
+  let prog = $state(1);
+  const seen = new SvelteSet<number>();
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   const weights = STEPS.map((s) => s.weight ?? 1);
@@ -35,6 +38,9 @@
 
   const span = () => Math.max(1, (filmEl?.offsetHeight ?? 0) - window.innerHeight);
   const top = () => filmEl?.offsetTop ?? 0;
+
+  // A hard scroll carries the clip with it; a slow one lets it play out.
+  const pace = () => (reduced ? 0.7 : Math.min(3.2, 1 + vel * 2.6));
 
   $effect(() => {
     const el = stageEl;
@@ -51,6 +57,8 @@
 
   $effect(() => {
     let raf = 0;
+    lastY = window.scrollY;
+    lastT = performance.now();
     const read = () => {
       raf = 0;
       const el = filmEl;
@@ -62,8 +70,12 @@
       if (barEl !== null) barEl.style.transform = `scaleX(${Math.min(1, p * 1.002)})`;
     };
     const on = () => {
-      lastScroll = performance.now();
-      if (idle) idle = false;
+      const y = window.scrollY;
+      const t = performance.now();
+      const dt = Math.max(8, t - lastT);
+      vel = vel * 0.55 + (Math.abs(y - lastY) / dt) * 0.45;
+      lastY = y;
+      lastT = t;
       if (!raf) raf = requestAnimationFrame(read);
     };
     read();
@@ -73,21 +85,6 @@
       window.removeEventListener("scroll", on);
       window.removeEventListener("resize", on);
       cancelAnimationFrame(raf);
-    };
-  });
-
-  // a still reader gets told, once, that the page carries on
-  $effect(() => {
-    if (reduced) return;
-    const t = window.setInterval(() => {
-      if (!near || active === N - 1) {
-        idle = false;
-        return;
-      }
-      idle = performance.now() - lastScroll > IDLE;
-    }, 500);
-    return () => {
-      window.clearInterval(t);
     };
   });
 
@@ -109,25 +106,36 @@
   $effect(() => {
     if (!near) return;
     const s = STEPS[active];
+    const last = s.frames.length - 1;
     tl = { step: active, frame: 0 };
+    prog = 0;
     let f = 0;
-    let t = 0;
-    const next = () => {
-      const last = f >= s.frames.length - 1;
-      if (last && !s.loop) return;
-      const dur = Array.isArray(s.ms) ? (s.ms[f] ?? 1700) : (s.ms ?? 1700);
-      t = window.setTimeout(
-        () => {
-          f = last ? (s.loopFrom ?? 0) : f + 1;
-          tl = { step: active, frame: f };
-          next();
-        },
-        dur * (reduced ? 1.6 : 1),
-      );
+    let held = 0;
+    const done = () => {
+      prog = 1;
+      seen.add(active);
     };
-    next();
+    const tick = window.setInterval(() => {
+      vel *= 0.86;
+      const dur = Array.isArray(s.ms) ? (s.ms[f] ?? 1700) : (s.ms ?? 1700);
+      held += TICK * pace();
+      if (held < dur) return;
+      held = 0;
+      if (f >= last) {
+        done();
+        if (!s.loop) {
+          window.clearInterval(tick);
+          return;
+        }
+        f = s.loopFrom ?? 0;
+      } else {
+        f += 1;
+      }
+      tl = { step: active, frame: f };
+      prog = f / Math.max(1, last);
+    }, TICK);
     return () => {
-      window.clearTimeout(t);
+      window.clearInterval(tick);
     };
   });
 
@@ -136,6 +144,7 @@
   const reach = $derived(needsOf(active));
   const st = $derived(stateOf(active, tl.step === active ? tl.frame : 0));
   const veil = $derived(veilFor(L.side, L, vp.w, vp.h));
+  const first = $derived(!seen.has(active));
 
   $effect(() => {
     const target = camOf(L);
@@ -153,8 +162,6 @@
     const p = (bounds[i] + bounds[i + 1]) / 2;
     window.scrollTo({ top: top() + p * span(), behavior: reduced ? "auto" : "smooth" });
   };
-
-  const next = $derived(active < N - 1 ? STEPS[active + 1] : null);
 </script>
 
 <section bind:this={filmEl} id="tour" class="film" data-film data-bounds={JSON.stringify(bounds)} style="height: {total * STEP_VH + 100}vh">
@@ -175,6 +182,8 @@
         total={N}
         L={layouts[i]}
         on={i === active}
+        playing={i === active && first}
+        {prog}
         cue={() => {
           jump(1);
         }}
@@ -196,23 +205,6 @@
         </button>
       {/each}
     </nav>
-
-    <div class="hud" class:show={idle}>
-      <span class="hud-k">{active === 0 ? "Opening" : `${pad(active)} / ${pad(N - 1)}`}</span>
-      <span class="hud-n">{next !== null ? `Next · ${next.kicker}` : "End of the reel"}</span>
-      {#if next !== null}
-        <svg class="hud-a" viewBox="0 0 10 16" width="9" height="14" aria-hidden="true"
-          ><path
-            d="M5 1v13M1 10l4 4 4-4"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.3"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          /></svg
-        >
-      {/if}
-    </div>
 
     <div class="bar" aria-hidden="true"><span bind:this={barEl}></span></div>
   </div>

@@ -28,6 +28,23 @@
   margin-bottom: 10px;
   font-size: 10.5px;
 }
+/* The first time a take plays, say so with a hairline rather than a label. */
+.cap-p {
+  display: block;
+  width: 72px;
+  height: 2px;
+  margin: -6px 0 14px;
+  border-radius: 2px;
+  background: var(--line);
+  overflow: hidden;
+}
+.cap-p i {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  transform-origin: 0 50%;
+  transition: transform 0.18s linear;
+}
 .cap.port {
   justify-content: flex-start;
   padding-top: 16px;

@@ -5,7 +5,25 @@
   import type { Layout } from "./layout";
   import type { Step } from "./steps";
 
-  let { step, n, total, L, on, cue }: { step: Step; n: number; total: number; L: Layout; on: boolean; cue?: () => void } = $props();
+  let {
+    step,
+    n,
+    total,
+    L,
+    on,
+    playing,
+    prog,
+    cue,
+  }: {
+    step: Step;
+    n: number;
+    total: number;
+    L: Layout;
+    on: boolean;
+    playing: boolean;
+    prog: number;
+    cue?: () => void;
+  } = $props();
 
   const GH = "https://github.com/codewiththiha/mareader2";
   const SEP = " ";
@@ -24,6 +42,9 @@
 >
   {#if !step.hero}
     <p class="cap-k b"><span class="cap-i">{pad(n)} / {pad(total - 1)}</span> {step.kicker}</p>
+    {#if playing}
+      <span class="cap-p" aria-hidden="true"><i style:transform="scaleX({Math.min(1, prog)})"></i></span>
+    {/if}
   {/if}
   {#if step.hero}
     <h1 class="cap-t">

@@ -143,8 +143,9 @@
   transition: transform 0.24s linear;
 }
 
-@media (max-width: 899px) {
-  .rail {
+@media (max-width: 899px), (orientation: portrait) {
+  .rail,
+  .aperture {
     display: none;
   }
 }

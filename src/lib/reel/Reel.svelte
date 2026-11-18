@@ -69,7 +69,7 @@
           jump(i);
         }}
         aria-current={active === i ? "true" : undefined}
-        aria-label="Shot {i}: {s.kicker}"
+        aria-label={i === 0 ? "Back to the start of the reel" : `Jump to ${s.kicker}`}
       >
         <span></span>
       </button>

@@ -1,6 +1,5 @@
 <script lang="ts">
-  import Bake from "./Bake.svelte";
-  import Film from "$lib/film/Film.svelte";
+  import Reel from "$lib/reel/Reel.svelte";
   import Details from "$lib/site/Details.svelte";
   import DonatePage from "$lib/pages/DonatePage.svelte";
   import DownloadPage from "$lib/pages/DownloadPage.svelte";
@@ -12,8 +11,6 @@
   import { router } from "$lib/site/router.svelte";
   import { theme } from "$lib/site/theme.svelte";
   import favicon from "./assets/icon32.png";
-
-  const isBake = /[?&](bake|bakelist)\b/.test(window.location.search);
 
   $effect(() => {
     document.documentElement.dataset.theme = theme.current;
@@ -37,25 +34,21 @@
   });
 </script>
 
-{#if isBake}
-  <Bake />
-{:else}
-  <Nav />
-  {#key router.current}
-    {#if router.current === "releases"}
-      <main id="top"><ReleasesPage /></main>
-    {:else if router.current === "donate"}
-      <main id="top"><DonatePage /></main>
-    {:else if router.current === "download"}
-      <main id="top"><DownloadPage /></main>
-    {:else}
-      <main id="top">
-        <Film site={theme.current} />
-        <Details />
-        <Get />
-        <More />
-      </main>
-    {/if}
-  {/key}
-  <Footer />
-{/if}
+<Nav />
+{#key router.current}
+  {#if router.current === "releases"}
+    <main id="top"><ReleasesPage /></main>
+  {:else if router.current === "donate"}
+    <main id="top"><DonatePage /></main>
+  {:else if router.current === "download"}
+    <main id="top"><DownloadPage /></main>
+  {:else}
+    <main id="top">
+      <Reel site={theme.current} />
+      <Details />
+      <Get />
+      <More />
+    </main>
+  {/if}
+{/key}
+<Footer />

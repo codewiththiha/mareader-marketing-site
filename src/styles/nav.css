@@ -11,6 +11,19 @@
   justify-content: space-between;
   padding: 0 clamp(14px, 3.6vw, 40px);
 }
+.nav::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 96px;
+  pointer-events: none;
+  background: linear-gradient(180deg, var(--bg) 0%, var(--bg) 58%, color-mix(in srgb, var(--bg) 84%, transparent) 74%, transparent 100%);
+}
+.nav > * {
+  position: relative;
+}
 .nav-brand {
   flex: none;
   display: inline-flex;
@@ -102,6 +115,19 @@
   .nav {
     gap: 4px;
     padding: 0 10px;
+  }
+  .nav::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 84px;
+    pointer-events: none;
+    background: linear-gradient(180deg, var(--bg) 0%, color-mix(in srgb, var(--bg) 70%, transparent) 62%, transparent 100%);
+  }
+  .nav > * {
+    position: relative;
   }
   .nav-brand {
     gap: 8px;

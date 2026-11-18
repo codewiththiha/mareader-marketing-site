@@ -1,0 +1,336 @@
+/* The reel: full-width takes, each one looping while it is in view. */
+.reel {
+  position: relative;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 84px clamp(14px, 3.4vw, 34px) 8px;
+}
+.shot {
+  scroll-margin-top: 74px;
+  padding: clamp(34px, 4.6vw, 62px) 0 clamp(18px, 2.4vw, 30px);
+  contain: layout style;
+}
+.shot.hero {
+  padding-top: clamp(16px, 3vw, 40px);
+}
+.shot-lead {
+  text-align: center;
+  padding: 0 0 clamp(26px, 3.4vw, 42px);
+}
+.shot-kicker {
+  margin: 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.shot-t {
+  font-family: Literata, Georgia, serif;
+  font-weight: 540;
+  letter-spacing: -0.021em;
+  line-height: 1.1;
+  font-size: clamp(23px, 2.4vw, 33px);
+  margin: 0;
+  text-wrap: balance;
+}
+.hero-t {
+  font-size: clamp(38px, 5.6vw, 76px);
+  line-height: 1.02;
+  max-width: 15ch;
+  margin: 14px auto 0;
+}
+.shot-b {
+  color: var(--muted);
+  font-size: clamp(15px, 1.12vw, 17px);
+  line-height: 1.6;
+  max-width: 46ch;
+  margin: 0;
+  text-wrap: pretty;
+}
+.hero-b {
+  margin: 18px auto 0;
+  max-width: 48ch;
+}
+.shot-cta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: clamp(20px, 2.4vw, 28px);
+}
+.reel-cue {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  margin-top: clamp(26px, 3.4vw, 40px);
+  color: var(--muted);
+  font-size: 12.5px;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+}
+.reel-cue-bob {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  animation: reel-bob 2.4s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+}
+.reel-cue:hover .reel-cue-bob {
+  border-color: color-mix(in srgb, var(--accent) 50%, var(--line));
+  color: var(--accent);
+}
+
+/* the player itself */
+.shot-frame {
+  position: relative;
+  aspect-ratio: var(--shot-ar, 8 / 5);
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  box-shadow: var(--win-shadow);
+}
+.shot-screen {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  contain: paint;
+}
+.shot-inner {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1536px;
+  height: 960px;
+  transform-origin: 0 0;
+  transform: translate3d(var(--fit-x, 0px), var(--fit-y, 0px), 0) scale(var(--fit-k, 0.6));
+  backface-visibility: hidden;
+}
+.shot-hold {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--bg) 92%, var(--line)), var(--bg));
+}
+.shot-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 4px 9px;
+}
+.shot-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.085em;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.shot-meta {
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  color: color-mix(in srgb, var(--muted) 78%, transparent);
+  font-variant-numeric: tabular-nums;
+}
+.shot-tag em {
+  font-style: normal;
+  opacity: 0.58;
+  letter-spacing: 0.06em;
+}
+.shot-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.3;
+}
+.shot-dot.on {
+  opacity: 1;
+  background: var(--accent);
+  animation: reel-pulse 1.9s ease-in-out infinite;
+}
+.shot-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: color-mix(in srgb, var(--ink) 10%, transparent);
+}
+.shot-bar i {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+}
+.shot-bar.on i {
+  animation: reel-bar var(--d, 6s) linear infinite;
+}
+.shot-frame.calm .shot-bar i {
+  opacity: 0.3;
+}
+
+/* the label under each take */
+.shot-text {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  align-items: start;
+  gap: 4px clamp(24px, 4vw, 64px);
+  margin-top: clamp(18px, 2.2vw, 26px);
+}
+.shot-head {
+  display: flex;
+  gap: 14px;
+  align-items: baseline;
+}
+.shot-n {
+  flex: none;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  padding-top: 3px;
+}
+.shot-text .shot-b {
+  max-width: 52ch;
+  padding-top: 2px;
+}
+
+/* chapter rail */
+.reel-rail {
+  position: fixed;
+  right: clamp(10px, 1.8vw, 26px);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+  display: none;
+  flex-direction: column;
+  gap: 9px;
+  padding: 10px 7px;
+  border-radius: 999px;
+}
+.reel-tick {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  line-height: 0;
+}
+.reel-tick span {
+  display: block;
+  width: 14px;
+  height: 2px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--ink) 24%, transparent);
+  transition:
+    width 0.28s var(--e-pane),
+    background-color 0.28s ease;
+}
+.reel-tick:hover span {
+  width: 20px;
+  background: color-mix(in srgb, var(--ink) 48%, transparent);
+}
+.reel-tick.on span {
+  width: 26px;
+  background: var(--accent);
+}
+.reel-tick:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+.reel-end {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0;
+  padding: clamp(26px, 3.4vw, 44px) 0 clamp(10px, 2vw, 24px);
+  border-top: 1px solid var(--line);
+  font-size: 13.5px;
+  color: var(--muted);
+}
+.reel-top {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  font-weight: 550;
+  cursor: pointer;
+}
+.reel-top:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+@media (min-width: 1080px) {
+  .reel-rail {
+    display: flex;
+  }
+}
+@media (max-width: 819px) {
+  .shot-frame {
+    border-radius: 14px;
+  }
+  .shot-text {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .shot-head {
+    gap: 10px;
+  }
+  .shot-tag {
+    font-size: 10px;
+  }
+}
+
+@keyframes reel-bar {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes reel-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(5px);
+  }
+}
+@keyframes reel-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reel-cue-bob,
+  .shot-dot.on {
+    animation: none;
+  }
+  .shot-bar.on i {
+    animation: none;
+    transform: scaleX(1);
+  }
+}

@@ -14,9 +14,8 @@ export interface Timeline {
   poster: number;
 }
 
-const themeFocus = { x: 800, y: 0, w: 736, h: 650 };
 const wordFocus = { x: 750, y: 140, w: 786, h: 600 };
-const modelFocus = { x: 480, y: 90, w: 820, h: 600 };
+const modelFocus = { x: 48, y: 30, w: 1440, h: 900 };
 const voiceFocus = { x: 480, y: 80, w: 820, h: 600 };
 const playerFocus = { x: 300, y: 285, w: 1080, h: 675 };
 const noPopover: Partial<WinState> = { popover: null };
@@ -36,11 +35,11 @@ export const TIMELINES = {
   appearance: {
     poster: 1,
     shots: [
-      { step: 1, frame: 1, ms: 1600, focus: themeFocus },
-      { step: 1, frame: 2, ms: 2200, focus: themeFocus },
-      { step: 1, frame: 3, ms: 2200, focus: themeFocus },
-      { step: 1, frame: 4, ms: 2200, focus: themeFocus },
-      { step: 1, frame: 5, ms: 2200, focus: themeFocus },
+      { step: 1, frame: 1, ms: 1600 },
+      { step: 1, frame: 2, ms: 2200 },
+      { step: 1, frame: 3, ms: 2200 },
+      { step: 1, frame: 4, ms: 2200 },
+      { step: 1, frame: 5, ms: 2200 },
     ],
   },
   panes: {

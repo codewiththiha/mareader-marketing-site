@@ -17,6 +17,19 @@ try {
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto(`http://127.0.0.1:${server.address().port}/`);
 
+  const fits = async (preview, selector) =>
+    preview.evaluate((el, selector) => {
+      const outer = el.getBoundingClientRect();
+      const inner = el.querySelector(selector).getBoundingClientRect();
+      const epsilon = 1;
+      return (
+        inner.left >= outer.left - epsilon &&
+        inner.right <= outer.right + epsilon &&
+        inner.top >= outer.top - epsilon &&
+        inner.bottom <= outer.bottom + epsilon
+      );
+    }, selector);
+
   for (const name of ["hero", "appearance", "panes", "dictionary", "models", "voice"]) {
     const preview = page.locator(`[data-timeline="${name}"]`);
     await preview.scrollIntoViewIfNeeded();
@@ -28,8 +41,15 @@ try {
       { timeout: 6000 },
     );
     console.log(`${name} advances in view`);
+    if (name === "appearance") {
+      assert(await fits(preview, ".mr-win"), "the entire reader window should fit in the appearance preview");
+      assert(await fits(preview, ".pop"), "the entire appearance popover should fit in the preview");
+    }
     if (name === "models") {
+      await page.waitForFunction(() => document.querySelector('[data-timeline="models"]').dataset.frame === "1");
       await page.waitForTimeout(1100);
+      assert(await fits(preview, ".st"), "the complete model settings window should fit");
+      assert(await fits(preview, ".st-keys"), "the API key rows should fit");
       const before = await preview.locator(".st-keys").innerText();
       await page.waitForTimeout(1200);
       assert.notEqual(await preview.locator(".st-keys").innerText(), before, "key rotation should animate");
@@ -74,8 +94,21 @@ try {
   assert.equal(await dictionary.getAttribute("data-frame"), "2", "reduced motion should keep the poster still");
   await page.emulateMedia({ reducedMotion: "no-preference" });
   await page.waitForFunction(() => document.querySelector('[data-timeline="dictionary"]').dataset.playing === "true");
+  const mobile = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  mobile.on("pageerror", (error) => errors.push(error.message));
+  await mobile.goto(`http://127.0.0.1:${server.address().port}/`);
+  for (const [name, selector] of [
+    ["appearance", ".pop"],
+    ["models", ".st"],
+  ]) {
+    const preview = mobile.locator(`[data-timeline="${name}"]`);
+    await preview.scrollIntoViewIfNeeded();
+    await mobile.waitForTimeout(1000);
+    assert(await fits(preview, selector), `${name} controls should fit on mobile`);
+  }
+  await mobile.close();
   assert.deepEqual(errors, []);
-  console.log("looping, offscreen pause and reduced motion passed");
+  console.log("looping, framing, offscreen pause and reduced motion passed");
 } finally {
   await browser.close();
   server.close();

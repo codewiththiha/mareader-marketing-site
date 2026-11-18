@@ -4,7 +4,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { VIEWS } from "./manifest.mjs";
 
-// usage: node capture.mjs <distDirOrUrl> <outDir> [views|bake|all]
+// usage: node capture.mjs <distDirOrUrl> <outDir> [views|all]
 const [target, outDir, which = "all"] = process.argv.slice(2);
 const mkdir = async (d) => (await import("node:fs/promises")).mkdir(d, { recursive: true });
 await mkdir(outDir);
@@ -45,15 +45,9 @@ const scrollTo = (page, view) =>
     if (v.mode === "top") window.scrollTo(0, 0);
     else if (v.mode === "bottom") window.scrollTo(0, document.body.scrollHeight);
     else if (v.mode === "anchor") document.querySelector(v.sel).scrollIntoView({ block: "start" });
-    else if (v.mode === "step") {
-      const film = document.querySelector("[data-film]");
-      const b = JSON.parse(film.dataset.bounds);
-      const span = film.offsetHeight - window.innerHeight;
-      window.scrollTo(0, film.offsetTop + (b[v.step] + (b[v.step + 1] - b[v.step]) * 0.5) * span);
-    }
   }, view);
 
-if (which !== "bake") {
+if (which !== "none") {
   for (const v of VIEWS) {
     const { ctx, page } = await newPage(v.viewport, v.dark, v.ls);
     await page.goto(url + (v.hash ?? ""));
@@ -64,22 +58,6 @@ if (which !== "bake") {
     console.log("shot", v.name);
     await ctx.close();
   }
-}
-
-if (which !== "views") {
-  const { ctx, page } = await newPage([1536, 960], false);
-  await page.goto(url + "?bakelist");
-  await page.waitForFunction(() => document.body.dataset.ready === "1", null, { timeout: 20000 });
-  const list = await page.evaluate(() => window.__BAKE__);
-  for (let i = 0; i < list.length; i++) {
-    await page.goto(`${url}?bake=${list[i].key}`);
-    await page.waitForFunction(() => document.body.dataset.ready === "1", null, { timeout: 20000 });
-    await page.waitForTimeout(150);
-    const el = await page.$("#bake-root");
-    await el.screenshot({ path: path.join(outDir, `bake-${String(i).padStart(2, "0")}.png`), omitBackground: true });
-    console.log("shot", "bake-" + String(i).padStart(2, "0"), list[i].key);
-  }
-  await ctx.close();
 }
 
 await browser.close();

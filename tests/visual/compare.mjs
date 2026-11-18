@@ -30,7 +30,7 @@ for (const n of names) {
   const diff = new PNG({ width: a.width, height: a.height });
   const bad = pixelmatch(a.data, b.data, diff.data, a.width, a.height, { threshold: 0.1, includeAA: false });
   const ratio = bad / (a.width * a.height);
-  const max = n.startsWith("bake-") ? 0.0005 : n.startsWith("step-listen") || n.startsWith("step-voices") ? 0.01 : Number(maxDefault);
+  const max = Number(maxDefault);
   const ok = ratio <= max;
   if (!ok) {
     fail++;

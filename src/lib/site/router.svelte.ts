@@ -1,4 +1,4 @@
-/** Hash router: the film stays home, notes and support get their own pages. */
+/** Hash router: home is simple, notes and support get their own pages. */
 export type Route = "home" | "releases" | "donate" | "download";
 
 const parse = (hash: string): Route => {

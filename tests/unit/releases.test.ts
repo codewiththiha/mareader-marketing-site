@@ -11,6 +11,8 @@ describe("platform parsing", () => {
     expect(parseOs("Mozilla/5.0 (Windows NT 10.0; Win64; x64)", "Windows")).toBe("windows");
     expect(parseOs("Mozilla/5.0 (X11; Linux x86_64)", "Linux")).toBe("linux");
     expect(parseOs("Mozilla/5.0 (iPhone; CPU OS 17_0)", "")).toBe("unknown");
+    expect(parseOs("Mozilla/5.0 (Linux; Android 14; Pixel 8)", "Android")).toBe("unknown");
+    expect(parseOs("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)", "", 5)).toBe("unknown");
   });
 
   it("spots ARM in the agent string", () => {

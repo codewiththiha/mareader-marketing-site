@@ -70,7 +70,9 @@
   bind:this={el}
   bind:clientWidth={width}
 >
-  <div class="home-preview-window" style:transform="translate({x}px, {y}px) scale({scale})" inert aria-hidden="true">
-    <Window st={winState} {site} active={playing} />
-  </div>
+  {#if width > 0}
+    <div class="home-preview-window" style:transform="translate({x}px, {y}px) scale({scale})" inert aria-hidden="true">
+      <Window st={winState} {site} active={playing} />
+    </div>
+  {/if}
 </div>

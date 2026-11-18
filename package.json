@@ -23,7 +23,8 @@
     "releases": "node scripts/fetch-releases.mjs",
     "ci:watch": "python3 scripts/ci_wait.py watch",
     "prepare": "python3 scripts/install_hooks.py",
-    "test:playback": "node tests/visual/playback.mjs"
+    "test:playback": "node tests/visual/playback.mjs",
+    "test:mobile": "node tests/visual/mobile.mjs"
   },
   "dependencies": {
     "lucide": "^1.67.0",

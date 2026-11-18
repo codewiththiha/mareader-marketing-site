@@ -1,5 +1,5 @@
 /** Reads the visitor's platform once; architecture arrives async when the browser offers it. */
-import { parseArm, parseOs, type Os } from "$lib/site/downloads";
+import { isMobileDevice, parseArm, parseOs, type Os } from "$lib/site/downloads";
 
 interface Uad {
   platform?: string;
@@ -9,10 +9,12 @@ interface Uad {
 function make() {
   let os = $state<Os>("unknown");
   let arm = $state(true);
+  let mobile = false;
   if (typeof navigator !== "undefined") {
     const nav = navigator as Navigator & { userAgentData?: Uad };
     const uad = nav.userAgentData;
-    os = parseOs(nav.userAgent, uad?.platform ?? "");
+    mobile = isMobileDevice(nav.userAgent, uad?.platform ?? "", nav.maxTouchPoints);
+    os = parseOs(nav.userAgent, uad?.platform ?? "", nav.maxTouchPoints);
     arm = parseArm(nav.userAgent);
     uad
       ?.getHighEntropyValues?.(["architecture"])
@@ -29,6 +31,9 @@ function make() {
     },
     get arm() {
       return arm;
+    },
+    get mobile() {
+      return mobile;
     },
   };
 }

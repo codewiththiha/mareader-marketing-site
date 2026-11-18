@@ -15,7 +15,7 @@
   <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
     <a href={router.href("download")} class="btn btn-accent">
       <Download />
-      Download for {OS_LABEL[platform.os]}
+      <span class="home-desktop">Download for {OS_LABEL[platform.os]}</span><span class="home-mobile">See desktop downloads</span>
     </a>
   </div>
   <p class="mt-5 text-[13.5px] text-[var(--muted)]">

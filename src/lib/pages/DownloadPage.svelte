@@ -65,10 +65,20 @@
   <header class="route-head">
     <p class="eyebrow">Download</p>
     <img src={icon} alt="" width={76} height={76} class="dl-icon" />
-    <h1 class="serif">{platform.os === "unknown" ? "Pick your platform." : `Mareader for ${OS_LABEL[platform.os]}.`}</h1>
+    <h1 class="serif">
+      {platform.mobile
+        ? "Mareader for your desktop."
+        : platform.os === "unknown"
+          ? "Pick your platform."
+          : `Mareader for ${OS_LABEL[platform.os]}.`}
+    </h1>
     <p class="route-sub">
-      Free and open source — about {primary.size}, no account, no subscription. {latestTag} came out {latestDate}, and every file below is
-      that same release.
+      {#if platform.mobile}
+        Mareader is a desktop app. Choose a download for your computer below — free and open source, with no account or subscription.
+      {:else}
+        Free and open source — about {primary.size}, no account, no subscription. {latestTag} came out {latestDate}, and every file below is
+        that same release.
+      {/if}
     </p>
     {#if platform.os !== "unknown"}
       <a class="btn btn-accent dl-cta" href={primary.url} onclick={onceGuide}>

@@ -13,11 +13,16 @@ export const OS_LABEL: Record<Os, string> = {
   unknown: "your system",
 };
 
-export function parseOs(ua: string, uadPlatform = ""): Os {
+export function isMobileDevice(ua: string, uadPlatform = "", maxTouchPoints = 0): boolean {
+  return /android|iphone|ipad|ipod/i.test(ua + " " + uadPlatform) || (/macintosh/i.test(ua) && maxTouchPoints > 1);
+}
+
+export function parseOs(ua: string, uadPlatform = "", maxTouchPoints = 0): Os {
+  if (isMobileDevice(ua, uadPlatform, maxTouchPoints)) return "unknown";
   const p = uadPlatform.toLowerCase();
   if (p.includes("mac") || /macintosh|mac os x/i.test(ua)) return "mac";
   if (p.includes("windows") || /windows/i.test(ua)) return "windows";
-  if (p.includes("linux") || /linux|android/i.test(ua)) return "linux";
+  if (p.includes("linux") || /linux/i.test(ua)) return "linux";
   return "unknown";
 }
 

@@ -8,6 +8,11 @@
   import { router } from "$lib/site/router.svelte";
   import { theme } from "$lib/site/theme.svelte";
 
+  const showFeatures = () => {
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    document.getElementById("features")?.scrollIntoView({ behavior: reduced ? "instant" : "smooth" });
+  };
+
   const previews: { chapter: string; title: string; body: string; details: string[]; label: string; timeline: TimelineId }[] = [
     {
       chapter: "Make it yours",
@@ -55,11 +60,16 @@
 <section class="home-hero" aria-labelledby="hero-title">
   <div class="home-wrap hero-inner">
     <div class="hero-copy">
+      <p class="home-mobile hero-kicker">A LITTLE MORE ROOM TO READ</p>
       <h1 id="hero-title">Read the way <span>your eyes like.</span></h1>
       <p class="hero-description">A calm reader for PDF and EPUB, with themes, panes, AI and voices that bend to you.</p>
       <div class="hero-actions">
-        <a href={router.href("download")} class="btn btn-accent"><Download /> Download free</a>
-        <a href={router.href("download")} class="home-other">Other systems <span aria-hidden="true">↘</span></a>
+        <a href={router.href("download")} class="btn btn-accent"
+          ><Download /> <span class="home-desktop">Download free</span><span class="home-mobile">Get for desktop</span></a
+        >
+        <a href={router.href("download")} class="home-other home-desktop">Other systems <span aria-hidden="true">↘</span></a>
+        <button type="button" class="home-mobile hero-explore" onclick={showFeatures}>See features <span aria-hidden="true">↓</span></button
+        >
       </div>
       <p class="hero-footnote">Free &amp; open source <span>·</span> Made for desktop</p>
     </div>
@@ -69,7 +79,10 @@
 
 <section class="showcase" id="features" aria-labelledby="features-title">
   <div class="home-wrap">
-    <header class="showcase-heading"><h2 id="features-title">Good reading lives in the details.</h2></header>
+    <header class="showcase-heading">
+      <p class="home-mobile showcase-kicker">THE READING EXPERIENCE</p>
+      <h2 id="features-title">Good reading lives in the details.</h2>
+    </header>
     {#each previews as preview, index (preview.chapter)}
       <article class="feature-row" class:reverse={index % 2 === 0}>
         <div class="feature-copy">

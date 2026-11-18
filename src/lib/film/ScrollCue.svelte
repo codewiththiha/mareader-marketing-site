@@ -389,7 +389,6 @@
       </span>
 
       <span class="cue-track-layer" aria-hidden={mode !== "nudge"}>
-        <span class="cue-dot" aria-hidden="true"></span>
         <span class="cue-bar" aria-hidden="true">
           <i style:transform="scaleX({fillScale})"></i>
         </span>

@@ -153,14 +153,14 @@
 }
 
 .cue-btn[data-mode="progress"] .cue-pill {
-  width: 72px;
+  width: 68px;
   height: 26px;
   opacity: 0.84;
   border-color: color-mix(in srgb, var(--cue-ink) 13%, transparent);
   background: color-mix(in srgb, var(--cue-bg) 86%, transparent);
 }
 .cue-btn[data-mode="nudge"] .cue-pill {
-  width: 152px;
+  width: 144px;
   height: 28px;
   opacity: 1;
   background: color-mix(in srgb, var(--cue-bg) 95%, transparent);
@@ -223,7 +223,7 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 7px;
+  gap: 9px;
   opacity: 0;
   transform: scale(0.76);
   transition:
@@ -238,28 +238,9 @@
     transform 0.36s cubic-bezier(0.22, 1, 0.36, 1) 0.05s;
 }
 
-.cue-dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  flex: none;
-  background: var(--cue-muted);
-  opacity: 0.8;
-  transition:
-    background-color 0.26s ease,
-    transform 0.28s ease,
-    opacity 0.26s ease;
-}
-.cue-btn[data-mode="nudge"] .cue-dot,
-.cue-pill.bob .cue-dot {
-  background: var(--cue-accent);
-  opacity: 1;
-  transform: scale(1.2);
-}
-
 .cue-bar {
   position: relative;
-  width: 38px;
+  width: 44px;
   height: 2px;
   border-radius: 999px;
   flex: none;
@@ -272,7 +253,7 @@
   height: 100%;
   border-radius: inherit;
   background: var(--cue-ink);
-  opacity: 0.82;
+  opacity: 0.84;
   transform-origin: left center;
   transition:
     transform 0.12s linear,
@@ -286,7 +267,6 @@
 
 .cue-note {
   flex: none;
-  margin-left: 1px;
   font-family: var(--font-ui);
   font-size: 11px;
   font-weight: 500;
@@ -349,12 +329,18 @@
     width: 32px;
     height: 48px;
   }
+  .cue-track-layer {
+    padding: 0 10px;
+  }
+  .cue-bar {
+    width: 42px;
+  }
   .cue-btn[data-mode="progress"] .cue-pill {
-    width: 68px;
+    width: 64px;
     height: 25px;
   }
   .cue-btn[data-mode="nudge"] .cue-pill {
-    width: 146px;
+    width: 140px;
     height: 27px;
   }
   .cue-whisper {
@@ -388,7 +374,6 @@
   .cue-pill,
   .cue-arrow-layer,
   .cue-track-layer,
-  .cue-dot,
   .cue-bar > i,
   .cue-note,
   .cue-whisper {

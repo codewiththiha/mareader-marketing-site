@@ -12,21 +12,39 @@
   const STEP_VH = 60;
   const N = STEPS.length;
   const TICK = 100;
+  const KEY = "mr-reel-hold";
+
+  const optedOut = (): boolean => {
+    try {
+      return localStorage.getItem(KEY) === "0";
+    } catch {
+      return false;
+    }
+  };
 
   let filmEl = $state(null as HTMLElement | null);
   let stageEl = $state(null as HTMLDivElement | null);
   let camEl = $state(null as HTMLDivElement | null);
   let barEl = $state(null as HTMLSpanElement | null);
+  let riseEl = $state(null as HTMLDivElement | null);
   let camera = null as Camera | null;
   let snapNext = true;
   let lastY = 0;
   let lastT = 0;
   let vel = 0;
+  let hold = -1;
+  let lockY = 0;
+  let scrollBonus = 0;
+  let stretch = 0;
+  let rise = 0;
+  let muted = optedOut();
+  const seen: number[] = [];
 
   let vp = $state({ w: window.innerWidth, h: window.innerHeight });
   let active = $state(0);
   let tl = $state({ step: 0, frame: 0 });
   let near = $state(true);
+  let hint = $state(false);
   let playFill = 0;
   let scrollFill = 0;
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -43,6 +61,47 @@
 
   // A hard scroll carries the clip with it; a slow one lets it play out.
   const pace = () => (reduced ? 0.7 : Math.min(3.2, 1 + vel * 2.6));
+
+  // A take that has not played yet holds the reel still until it has.
+  const engageHold = () => {
+    if (hold >= 0 || muted || active <= 0 || seen.includes(active)) return;
+    hold = active;
+    lockY = window.scrollY;
+    scrollBonus = 0;
+    stretch = 0;
+    rise = 0;
+    if (riseEl !== null) riseEl.style.setProperty("--rise", "0");
+    hint = true;
+  };
+
+  const unlock = () => {
+    if (hold >= 0 && !seen.includes(hold)) seen.push(hold);
+    hold = -1;
+    hint = false;
+  };
+
+  const releaseHold = (advance: boolean) => {
+    unlock();
+    if (advance && active < N - 1) jump(active + 1);
+  };
+
+  // Scroll while held does not move the reel; it pulls the arrow up.
+  const feedScroll = (dy: number) => {
+    if (hold < 0 || dy === 0) return;
+    vel = vel * 0.55 + Math.min(1, Math.abs(dy) / 100) * 0.45;
+    scrollBonus = Math.max(0, Math.min(1, scrollBonus + dy / (window.innerHeight * 2.2)));
+    stretch = Math.max(-0.04, Math.min(0.14, stretch + dy * 0.00035));
+  };
+
+  const quiet = () => {
+    muted = true;
+    try {
+      localStorage.setItem(KEY, "0");
+    } catch {
+      /* private mode: the choice just won't stick */
+    }
+    unlock();
+  };
 
   $effect(() => {
     const el = stageEl;
@@ -65,10 +124,19 @@
       raf = 0;
       const el = filmEl;
       if (el === null) return;
+      if (hold >= 0) {
+        const dy = window.scrollY - lockY;
+        if (dy !== 0) {
+          feedScroll(dy);
+          window.scrollTo(0, lockY);
+        }
+        return;
+      }
       const p = Math.max(0, Math.min(0.99999, -el.getBoundingClientRect().top / span()));
       let i = 0;
       while (i < N - 1 && p >= bounds[i + 1]) i++;
       active = i;
+      engageHold();
       scrollFill = Math.min(1, p * 1.002);
       draw();
     };
@@ -88,6 +156,47 @@
       window.removeEventListener("scroll", on);
       window.removeEventListener("resize", on);
       cancelAnimationFrame(raf);
+    };
+  });
+
+  // While a take is held, scroll input is absorbed instead of moving the reel.
+  $effect(() => {
+    const onWheel = (e: WheelEvent) => {
+      if (hold < 0) return;
+      e.preventDefault();
+      feedScroll(e.deltaMode === 1 ? e.deltaY * 33 : e.deltaY);
+    };
+    let ty = 0;
+    const onTouchStart = (e: TouchEvent) => {
+      ty = e.touches[0].clientY;
+    };
+    const onTouchMove = (e: TouchEvent) => {
+      if (hold < 0) return;
+      e.preventDefault();
+      const y = e.touches[0].clientY;
+      feedScroll(ty - y);
+      ty = y;
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (hold < 0) return;
+      const t = e.target as HTMLElement | null;
+      if (t !== null && t.closest("button, a, input, textarea, select") !== null) return;
+      if (e.code === "Space" || e.code === "PageDown" || e.code === "ArrowDown") {
+        e.preventDefault();
+        feedScroll(140);
+      } else if (e.code === "PageUp" || e.code === "ArrowUp" || e.code === "Home" || e.code === "End") {
+        e.preventDefault();
+      }
+    };
+    window.addEventListener("wheel", onWheel, { passive: false });
+    window.addEventListener("touchstart", onTouchStart, { passive: true });
+    window.addEventListener("touchmove", onTouchMove, { passive: false });
+    window.addEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("wheel", onWheel);
+      window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("keydown", onKey);
     };
   });
 
@@ -119,16 +228,30 @@
       held += TICK * pace();
       if (held >= dur) {
         held = 0;
-        if (f >= last && !s.loop) {
-          window.clearInterval(tick);
+        if (f >= last) {
+          if (hold === active) releaseHold(true);
+          else if (!seen.includes(active)) seen.push(active);
+          if (!s.loop) {
+            window.clearInterval(tick);
+          } else {
+            f = s.loopFrom ?? 0;
+            tl = { step: active, frame: f };
+          }
         } else {
-          f = f >= last ? (s.loopFrom ?? 0) : f + 1;
+          f += 1;
           tl = { step: active, frame: f };
         }
       }
       const frac = (f + Math.min(1, held / dur)) / (last + 1);
       playFill = Math.min(1, (active + frac) / N);
       draw();
+      if (hold >= 0) {
+        const target = Math.min(1, frac + scrollBonus);
+        rise += (target - rise) * 0.25;
+        stretch *= 0.8;
+        if (riseEl !== null) riseEl.style.setProperty("--rise", String(Math.min(1, Math.max(0, rise + stretch))));
+        if (target >= 1) releaseHold(true);
+      }
     }, TICK);
     return () => {
       window.clearInterval(tick);
@@ -154,6 +277,7 @@
   });
 
   const jump = (i: number) => {
+    unlock();
     const p = (bounds[i] + bounds[i + 1]) / 2;
     window.scrollTo({ top: top() + p * span(), behavior: reduced ? "auto" : "smooth" });
   };
@@ -177,6 +301,7 @@
         total={N}
         L={layouts[i]}
         on={i === active}
+        {hint}
         cue={() => {
           jump(1);
         }}
@@ -198,6 +323,16 @@
         </button>
       {/each}
     </nav>
+
+    <div bind:this={riseEl} class="rise" class:show={hint} aria-hidden="true">
+      <span class="rise-line"></span>
+      <span class="rise-head">
+        <svg viewBox="0 0 18 12" fill="none" aria-hidden="true">
+          <path d="M2 10 L9 3 L16 10" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </span>
+    </div>
+    <button class="rise-x" class:show={hint} onclick={quiet} aria-label="Don't hold unplayed takes">Don't hold</button>
 
     <div class="bar" aria-hidden="true"><span bind:this={barEl}></span></div>
   </div>

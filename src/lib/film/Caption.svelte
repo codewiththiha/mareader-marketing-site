@@ -5,13 +5,23 @@
   import type { Layout } from "./layout";
   import type { Step } from "./steps";
 
-  let { step, n, total, L, on, cue }: { step: Step; n: number; total: number; L: Layout; on: boolean; cue?: () => void } = $props();
+  let {
+    step,
+    n,
+    total,
+    L,
+    on,
+    hint,
+    cue,
+  }: { step: Step; n: number; total: number; L: Layout; on: boolean; hint: boolean; cue?: () => void } = $props();
 
   const GH = "https://github.com/codewiththiha/mareader2";
   const SEP = " ";
   const pad = (v: number) => String(v).padStart(2, "0");
   const words = $derived(step.title.split(" "));
-  const cls = $derived(["cap", on ? "on" : "", L.landscape ? "land" : "port", step.hero ? "hero" : "", L.side].join(" "));
+  const cls = $derived(
+    ["cap", on ? "on" : "", L.landscape ? "land" : "port", step.hero ? "hero" : "", L.side, on && hint ? "push" : ""].join(" "),
+  );
 </script>
 
 <div

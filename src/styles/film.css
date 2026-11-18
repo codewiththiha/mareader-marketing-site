@@ -122,6 +122,107 @@
   transform: none;
 }
 
+/* A take that has not played yet holds the reel; the arrow shows the way up. */
+.rise {
+  position: absolute;
+  left: 50%;
+  bottom: 28px;
+  z-index: 8;
+  width: 0;
+  height: calc(100% - 140px);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.45s ease,
+    visibility 0.45s;
+  pointer-events: none;
+}
+.rise.show {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 0.6s ease,
+    visibility 0.6s;
+}
+.rise-line {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 2px;
+  height: 100%;
+  margin-left: -1px;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--muted) 55%, transparent);
+  transform: scaleY(var(--rise, 0));
+  transform-origin: 50% 100%;
+}
+.rise-head {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--rise, 0) * 100%);
+  transform: translate(-50%, 50%);
+}
+.rise-head svg {
+  display: block;
+  width: 18px;
+  height: 12px;
+  animation: rise-bob 2.8s ease-in-out infinite;
+}
+.rise-head path {
+  stroke: var(--accent);
+  stroke-width: 2;
+}
+@keyframes rise-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+.rise-x {
+  position: absolute;
+  right: 20px;
+  bottom: 22px;
+  z-index: 9;
+  padding: 6px 4px;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.4s ease,
+    visibility 0.4s,
+    color 0.25s ease;
+}
+.rise-x.show {
+  opacity: 1;
+  visibility: visible;
+}
+.rise-x:hover,
+.rise-x:focus-visible {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  outline: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rise,
+  .rise-x {
+    transition: none;
+  }
+  .rise-head svg {
+    animation: none;
+  }
+}
+
 /* How far the reel has run: one line, start to finish. */
 .bar {
   position: absolute;
@@ -147,6 +248,13 @@
   .rail,
   .aperture {
     display: none;
+  }
+  .rise {
+    bottom: 22px;
+  }
+  .rise-x {
+    right: 16px;
+    bottom: 16px;
   }
 }
 @media (prefers-reduced-motion: reduce) {

@@ -41,6 +41,10 @@
   justify-content: flex-end;
   padding: 0 0 26px;
 }
+.cap.port.bottom.push {
+  padding-bottom: 64px;
+  transition: padding 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
 .cap.hero {
   justify-content: center;
   align-items: center;

@@ -5,7 +5,6 @@
   import { camOf, layoutOf, veilFor } from "./layout";
   import { STEPS, needsOf, stateOf } from "./steps";
   import { lite } from "$lib/utils/power";
-  import { SvelteSet } from "svelte/reactivity";
   import type { Site } from "$lib/looks";
 
   let { site }: { site: Site } = $props();
@@ -28,8 +27,8 @@
   let active = $state(0);
   let tl = $state({ step: 0, frame: 0 });
   let near = $state(true);
-  let prog = $state(1);
-  const seen = new SvelteSet<number>();
+  let playFill = 0;
+  let scrollFill = 0;
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   const weights = STEPS.map((s) => s.weight ?? 1);
@@ -37,6 +36,9 @@
   const bounds = weights.reduce<number[]>((acc, w) => [...acc, acc[acc.length - 1] + w / total], [0]);
 
   const span = () => Math.max(1, (filmEl?.offsetHeight ?? 0) - window.innerHeight);
+  const draw = () => {
+    if (barEl !== null) barEl.style.transform = `scaleX(${Math.max(scrollFill, playFill).toFixed(4)})`;
+  };
   const top = () => filmEl?.offsetTop ?? 0;
 
   // A hard scroll carries the clip with it; a slow one lets it play out.
@@ -67,7 +69,8 @@
       let i = 0;
       while (i < N - 1 && p >= bounds[i + 1]) i++;
       active = i;
-      if (barEl !== null) barEl.style.transform = `scaleX(${Math.min(1, p * 1.002)})`;
+      scrollFill = Math.min(1, p * 1.002);
+      draw();
     };
     const on = () => {
       const y = window.scrollY;
@@ -108,31 +111,24 @@
     const s = STEPS[active];
     const last = s.frames.length - 1;
     tl = { step: active, frame: 0 };
-    prog = 0;
     let f = 0;
     let held = 0;
-    const done = () => {
-      prog = 1;
-      seen.add(active);
-    };
     const tick = window.setInterval(() => {
       vel *= 0.86;
       const dur = Array.isArray(s.ms) ? (s.ms[f] ?? 1700) : (s.ms ?? 1700);
       held += TICK * pace();
-      if (held < dur) return;
-      held = 0;
-      if (f >= last) {
-        done();
-        if (!s.loop) {
+      if (held >= dur) {
+        held = 0;
+        if (f >= last && !s.loop) {
           window.clearInterval(tick);
-          return;
+        } else {
+          f = f >= last ? (s.loopFrom ?? 0) : f + 1;
+          tl = { step: active, frame: f };
         }
-        f = s.loopFrom ?? 0;
-      } else {
-        f += 1;
       }
-      tl = { step: active, frame: f };
-      prog = f / Math.max(1, last);
+      const frac = (f + Math.min(1, held / dur)) / (last + 1);
+      playFill = Math.min(1, (active + frac) / N);
+      draw();
     }, TICK);
     return () => {
       window.clearInterval(tick);
@@ -144,7 +140,6 @@
   const reach = $derived(needsOf(active));
   const st = $derived(stateOf(active, tl.step === active ? tl.frame : 0));
   const veil = $derived(veilFor(L.side, L, vp.w, vp.h));
-  const first = $derived(!seen.has(active));
 
   $effect(() => {
     const target = camOf(L);
@@ -182,8 +177,6 @@
         total={N}
         L={layouts[i]}
         on={i === active}
-        playing={i === active && first}
-        {prog}
         cue={() => {
           jump(1);
         }}

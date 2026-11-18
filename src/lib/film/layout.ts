@@ -21,7 +21,7 @@ export function layoutOf(s: Step, vw: number, vh: number): Layout {
   if (s.hero) {
     const top = NAV + (landscape ? clamp(vh * 0.055, 18, 60) : 12);
     const th = landscape ? clamp(vh * 0.46, 330, 420) : clamp(vh * 0.56, 360, 500);
-    const pad = landscape ? 48 : 14;
+    const pad = landscape ? 48 : 20;
     const sc = Math.min((vw - pad * 2) / WIN_W, landscape ? 0.82 : 1);
     const w = WIN_W * sc;
     return {

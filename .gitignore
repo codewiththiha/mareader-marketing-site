@@ -7,3 +7,7 @@ dist
 .DS_Store
 tests/visual/baselines/
 src/blur/
+
+.env
+.env.*
+!.env.example

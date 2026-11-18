@@ -9,6 +9,7 @@
     size,
     dl = false,
     ready = false,
+    running = true,
     picked,
   }: {
     name: string;
@@ -17,18 +18,21 @@
     size?: string;
     dl?: boolean;
     ready?: boolean;
+    running?: boolean;
     picked: boolean;
   } = $props();
 
   let mb = $state(12.4);
+  let elapsed = 0;
   $effect(() => {
-    if (!dl) return;
-    mb = 12.4;
-    const start = performance.now();
+    if (!dl || !running) return;
+    const start = performance.now() - elapsed;
     const id = window.setInterval(() => {
-      const k = Math.min(1, (performance.now() - start) / 3400);
+      elapsed = performance.now() - start;
+      const k = Math.min(1, elapsed / 3400);
       mb = 12.4 + (347.9 - 12.4) * (1 - Math.pow(1 - k, 1.6));
-    }, 90);
+      if (k === 1) window.clearInterval(id);
+    }, 180);
     return () => {
       window.clearInterval(id);
     };
@@ -56,6 +60,6 @@
   {/if}
   {#if !size || ready}<span class="st-radio" class:on={picked}></span>{/if}
   {#if dl}
-    <span class="st-prog"><i class="dl-bar"></i></span>
+    <span class="st-prog"><i class="dl-bar" style:animation-play-state={running ? "running" : "paused"}></i></span>
   {/if}
 </div>

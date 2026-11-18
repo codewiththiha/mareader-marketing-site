@@ -1,6 +1,6 @@
 <script lang="ts">
   import { router } from "$lib/site/router.svelte";
-  import icon from "../../assets/icon.png";
+  import icon from "../../assets/icon.webp";
 
   const GH = "https://github.com/codewiththiha/mareader2";
   const year = new Date().getFullYear();

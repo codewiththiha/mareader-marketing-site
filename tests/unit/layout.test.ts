@@ -27,6 +27,19 @@ describe("layoutOf", () => {
     expect(L.landscape).toBe(false);
     expect(["top", "bottom"]).toContain(L.side);
   });
+  it("gives rotated phones both a readable caption and a camera aperture", () => {
+    const L = layoutOf(keys, 740, 360);
+    expect(L.landscape).toBe(true);
+    expect(L.fa.h).toBeGreaterThan(200);
+    expect(L.text.y).toBeGreaterThanOrEqual(60);
+    expect(L.text.y + L.text.h).toBeLessThan(310);
+  });
+
+  it("keeps the reader visible on a 320px phone", () => {
+    const L = layoutOf(hero, 320, 568);
+    expect(L.fa.y + L.fa.h).toBeLessThan(520);
+    expect(L.fa.w).toBeGreaterThan(275);
+  });
 });
 
 describe("maskFor", () => {
@@ -41,12 +54,9 @@ describe("maskFor", () => {
 describe("camOf", () => {
   it("frames the focus inside the lens aperture", () => {
     const L = layoutOf(keys, 1440, 900);
-    const [cx, cy, z, ax, ay] = camOf(L);
-    const s = Math.exp(z);
-    expect(s).toBeLessThanOrEqual(L.maxS + 1e-9);
-    expect(cx).toBeCloseTo(L.focus.x + L.focus.w / 2);
-    expect(ax).toBeCloseTo(L.fa.x + L.fa.w / 2);
-    expect(ay).toBeCloseTo(L.fa.y + L.fa.h / 2);
-    expect(cy * s).toBeLessThan(960 * s);
+    const { x, y, scale } = camOf(L);
+    expect(scale).toBeLessThanOrEqual(L.maxS + 1e-9);
+    expect(x + (L.focus.x + L.focus.w / 2) * scale).toBeCloseTo(L.fa.x + L.fa.w / 2);
+    expect(y + (L.focus.y + L.focus.h / 2) * scale).toBeCloseTo(L.fa.y + L.fa.h / 2);
   });
 });

@@ -23,9 +23,11 @@
 
 ## Commands
 
-- `npm run dev` serve; `npm run build` single-file bundle in `dist`.
+- `npm run dev` serves locally; `npm run build` outputs the cached web build in `dist`.
+- `npm run build:portable` outputs a standalone HTML file in `dist/portable`.
 - `npm run lint` eslint; `npm run format:check` prettier; `npm run check` svelte-check.
-- `npm run test` vitest unit tests; `npm run guard` policy guard.
+- `npm run test` runs unit tests; `npm run test:tour -- --all` checks the built tour in Chromium, Firefox and WebKit.
+- `npm run guard` runs the policy guard.
 - `npm run bake` regenerate lens blurs; `scripts/compare-blur.py` checks them.
 - `npm run releases` refresh the embedded release-notes snapshot.
 - `npm run ci:watch` poll this head's CI run to a verdict (0 green, 1 red, 2 running).

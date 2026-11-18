@@ -8,7 +8,7 @@
   import { theme } from "$lib/site/theme.svelte";
   import { platform } from "$lib/utils/platform.svelte";
   import { slideGroup } from "$lib/utils/slide.svelte";
-  import icon from "../../assets/icon.png";
+  import icon from "../../assets/icon.webp";
 
   const GH = "https://github.com/codewiththiha/mareader2";
 
@@ -70,10 +70,11 @@
     <a
       href={router.href("download")}
       class="btn btn-accent btn-sm nav-dl"
+      aria-label="Download"
       aria-current={router.current === "download" ? "page" : undefined}
     >
       <Download />
-      Download
+      <span class="nav-dl-label">Download</span>
       {#if platform.os !== "unknown"}<span class="dl-os">{OS_LABEL[platform.os]}</span>{/if}
     </a>
   </div>

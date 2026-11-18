@@ -1,5 +1,5 @@
 /** Platform download matrix, resolved from the embedded release snapshot. */
-import { RELEASES } from "./releases";
+import { LATEST_RELEASE as latest } from "./latest-release";
 import type { ReleaseAsset } from "./releases-type";
 
 export type Os = "mac" | "windows" | "linux" | "unknown";
@@ -42,7 +42,6 @@ export interface DlGroup {
 }
 
 export const GH = "https://github.com/codewiththiha/mareader";
-const latest = RELEASES[0];
 const FALLBACK = `${GH}/releases/latest`;
 const find = (test: (n: string) => boolean) => latest.assets.find((a) => test(a.name));
 const mb = (n?: number) => (n ? `${(n / 1048576).toFixed(1)} MB` : "");

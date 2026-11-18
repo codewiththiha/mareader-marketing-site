@@ -3,7 +3,7 @@
   import Engine from "./Engine.svelte";
   import { ChevronDown, Play } from "$lib/icons/nodes";
 
-  let { voice }: { voice: "downloading" | "ready" } = $props();
+  let { voice, running }: { voice: "downloading" | "ready"; running: boolean } = $props();
   const ready = $derived(voice === "ready");
 </script>
 
@@ -11,7 +11,7 @@
   <div class="st-sec">Engine</div>
   <div class="st-card">
     <Engine name="System voices" sub="Built into your system" picked={!ready} />
-    <Engine name="Kokoro" sub="7 languages · 49 voices" build="Full" size="347.9 MB" dl={!ready} {ready} picked={ready} />
+    <Engine name="Kokoro" sub="7 languages · 49 voices" build="Full" size="347.9 MB" dl={!ready} {ready} {running} picked={ready} />
     <Engine name="Piper" sub="English · 8 voices" size="83.7 MB" picked={false} />
     <Engine name="Kitten" sub="English · 8 voices" build="Mini" size="92.2 MB" picked={false} />
     <Engine name="Phonon" sub="English · 26 voices" size="65.1 MB" picked={false} />

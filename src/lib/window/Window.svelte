@@ -2,7 +2,7 @@
   import { look as lookOf, resolve, varsOf, type Site } from "$lib/looks";
   import { paneRects, SIDEBAR_W, WIN_H, WIN_W, type WinState } from "./state";
   import { CH6_CHUNKS } from "$lib/pages/texts";
-  import { ticker } from "$lib/utils/ticker.svelte";
+  import { retain } from "$lib/utils/presence.svelte";
   import Pane from "./Pane.svelte";
   import OpeningSpread from "$lib/pages/OpeningSpread.svelte";
   import Page12 from "$lib/pages/Page12.svelte";
@@ -18,7 +18,13 @@
   import WordCard from "$lib/chrome/WordCard.svelte";
   import type { Anchor } from "$lib/chrome/anchor";
 
-  let { st, site, active, bake = false }: { st: WinState; site: Site; active: boolean; bake?: boolean } = $props();
+  let {
+    st,
+    site,
+    tick = 0,
+    running = false,
+    bake = false,
+  }: { st: WinState; site: Site; tick?: number; running?: boolean; bake?: boolean } = $props();
 
   const PW = 612;
   const PW2 = PW * 2;
@@ -38,12 +44,20 @@
   const x1 = $derived((P.w - PW * s1) / 2);
   const y1 = $derived((P.h - PH * s1) / 2);
 
-  const tick = ticker(
-    () => active && st.player,
-    () => 1400,
-  );
-  const chunk = $derived(bake ? 6 : 3 + (tick() % (CH6_CHUNKS - 3)));
-  const track = $derived(bake ? 34 : Math.min(96, 30 + tick() * 2.2));
+  const chunk = $derived(bake ? 6 : 3 + (tick % (CH6_CHUNKS - 3)));
+  const track = $derived(bake ? 34 : Math.min(96, 30 + tick * 2.2));
+
+  const opening = retain(() => wide && st.pride === "opening", 470);
+  const chapterSix = retain(() => wide && st.pride === "ch6", 470);
+  const page12 = retain(() => !wide, 470);
+  const alice = retain(() => st.panes >= 2, 820);
+  const raven = retain(() => st.panes >= 3, 820);
+  const chamber = retain(() => st.panes >= 4, 820);
+  const sidebar = retain(() => st.sidebar, 580);
+  const titlebar = retain(() => st.titlebar, 470);
+  const popover = retain(() => st.popover !== null, 340);
+  const player = retain(() => st.player, 470);
+  const settings = retain(() => st.settings !== null, 430);
 
   const els = $state({ pane: null as HTMLDivElement | null, sel: null as HTMLElement | null });
   let anchor = $state(null as Anchor | null);
@@ -51,7 +65,9 @@
     if (!st.card) return;
     const w = P.w;
     const h = P.h;
+    let disposed = false;
     const measure = () => {
+      if (disposed) return;
       const p = els.pane;
       const s = els.sel;
       if (p === null || s === null) return;
@@ -67,6 +83,7 @@
     if (fonts) void fonts.ready.then(measure);
     window.addEventListener("resize", measure);
     return () => {
+      disposed = true;
       window.clearTimeout(t);
       window.removeEventListener("resize", measure);
     };
@@ -78,34 +95,48 @@
 
 <div class="mr-win look" class:bake style="{varsOf(chrome)};width:{WIN_W}px;height:{WIN_H}px" data-dark={chrome.dark}>
   <Pane r={P} lk={looks[0]} on title="Pride and Prejudice, by Jane Austen" count={prideCount} {low} bind:elBind={els.pane}>
-    <div class="pv" style="opacity:{wide && st.pride === 'opening' ? 1 : 0};transform:translate({oX}px, {oY}px) scale({sO})">
-      <OpeningSpread
-        marks={st.marks}
-        onSel={(el: HTMLElement) => {
-          els.sel = el;
-        }}
-      />
-    </div>
-    <div class="pv" style="opacity:{wide && st.pride === 'ch6' ? 1 : 0};transform:translate(0px, 2px) scale({s6})">
-      <Ch6Spread chunk={st.player ? chunk : -1} />
-    </div>
-    <div class="pv" style="opacity:{wide ? 0 : 1};transform:translate({x1}px, {y1}px) scale({s1})">
-      <Page12 />
-    </div>
+    {#if opening()}
+      <div class="pv" style="opacity:{wide && st.pride === 'opening' ? 1 : 0};transform:translate({oX}px, {oY}px) scale({sO})">
+        <OpeningSpread
+          marks={st.marks}
+          onSel={(el: HTMLElement) => {
+            els.sel = el;
+          }}
+        />
+      </div>
+    {/if}
+    {#if chapterSix()}
+      <div class="pv" style="opacity:{wide && st.pride === 'ch6' ? 1 : 0};transform:translate(0px, 2px) scale({s6})">
+        <Ch6Spread chunk={st.player ? chunk : -1} />
+      </div>
+    {/if}
+    {#if page12()}
+      <div class="pv" style="opacity:{wide ? 0 : 1};transform:translate({x1}px, {y1}px) scale({s1})">
+        <Page12 />
+      </div>
+    {/if}
     <WordCard open={st.card && !!anchor} at={anchor} roomW={P.w} />
   </Pane>
-  <Pane r={rects[1]} lk={looks[1]} on={st.panes >= 2} title="CHAPTER I. Down the Rabbit-Hole" count="42 / 498" low={false} divL>
-    <Alice />
-  </Pane>
-  <Pane r={rects[2]} lk={looks[2]} on={st.panes >= 3} title="COMMENT ON THE POEM." count="29 / 190" low={false} divL divT>
-    <Raven w={rects[2].w} />
-  </Pane>
-  <Pane r={rects[3]} lk={looks[3]} on={st.panes >= 4} title="紅樓夢" count="87 / 7386" low={false} divL divT>
-    <Chamber />
-  </Pane>
-  <Sidebar open={st.sidebar} />
-  <TitleBar shown={st.titlebar} title="Pride and Prejudice, by Jane Austen" lit={st.lit} />
-  <Popover shown={st.popover !== null} mode={st.popover ?? "themes"} sel={resolve(st.preset, site)} perPane={st.perPane} lit={st.lit} />
-  <Player shown={st.player} t={track} />
-  <Settings page={st.settings} lit={st.lit} voice={st.voice} {active} />
+  {#if alice()}
+    <Pane r={rects[1]} lk={looks[1]} on={st.panes >= 2} title="CHAPTER I. Down the Rabbit-Hole" count="42 / 498" low={false} divL>
+      <Alice />
+    </Pane>
+  {/if}
+  {#if raven()}
+    <Pane r={rects[2]} lk={looks[2]} on={st.panes >= 3} title="COMMENT ON THE POEM." count="29 / 190" low={false} divL divT>
+      <Raven w={rects[2].w} />
+    </Pane>
+  {/if}
+  {#if chamber()}
+    <Pane r={rects[3]} lk={looks[3]} on={st.panes >= 4} title="紅樓夢" count="87 / 7386" low={false} divL divT>
+      <Chamber />
+    </Pane>
+  {/if}
+  {#if sidebar()}<Sidebar open={st.sidebar} />{/if}
+  {#if titlebar()}<TitleBar shown={st.titlebar} title="Pride and Prejudice, by Jane Austen" lit={st.lit} />{/if}
+  {#if popover()}
+    <Popover shown={st.popover !== null} mode={st.popover ?? "themes"} sel={resolve(st.preset, site)} perPane={st.perPane} lit={st.lit} />
+  {/if}
+  {#if player()}<Player shown={st.player} t={track} />{/if}
+  {#if settings()}<Settings page={st.settings} lit={st.lit} voice={st.voice} {tick} {running} />{/if}
 </div>

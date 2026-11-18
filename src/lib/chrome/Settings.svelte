@@ -3,7 +3,6 @@
   import AiMark from "$lib/icons/AiMark.svelte";
   import AiModels from "./AiModels.svelte";
   import ReadAloud from "./ReadAloud.svelte";
-  import { ticker } from "$lib/utils/ticker.svelte";
   import {
     BookA,
     ChartNoAxesColumnIncreasing,
@@ -22,8 +21,10 @@
     page,
     lit,
     voice,
-    active,
-  }: { page: "keys" | "local" | "voices" | null; lit: string | null; voice: "downloading" | "ready"; active: boolean } = $props();
+    tick,
+    running,
+  }: { page: "keys" | "local" | "voices" | null; lit: string | null; voice: "downloading" | "ready"; tick: number; running: boolean } =
+    $props();
 
   const NAV: [string, { name: string; node: IconNode | null }[]][] = [
     [
@@ -58,10 +59,6 @@
     if (page) last = page;
     return page ?? last;
   });
-  const tick = ticker(
-    () => active && page === "keys",
-    () => 950,
-  );
   const sel = $derived(pg === "voices" ? "Read aloud" : "AI models");
 </script>
 
@@ -92,9 +89,9 @@
     <div class="st-clip">
       <div class="st-scroll" style:transform={`translateY(${pg === "keys" ? -236 : 0}px)`}>
         {#if pg === "voices"}
-          <ReadAloud {voice} />
+          <ReadAloud {voice} running={running && page === "voices"} />
         {:else}
-          <AiModels local={pg === "local"} {lit} tick={tick()} />
+          <AiModels local={pg === "local"} {lit} {tick} />
         {/if}
       </div>
     </div>

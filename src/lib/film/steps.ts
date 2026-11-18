@@ -19,10 +19,9 @@ export interface Step {
   base?: Partial<WinState>;
   frames: Partial<WinState>[];
   ms?: number | number[];
-  loop?: boolean;
-  loopFrom?: number;
+  still?: number;
+  beats?: { count: number; ms: number };
   bakeAs?: number[];
-  weight?: number;
 }
 
 const all = (l: LookRef): Partial<WinState> => ({ looks: [l, l, l, l], chrome: l, preset: l });
@@ -32,7 +31,6 @@ export const STEPS: Step[] = [
   {
     id: "hero",
     hero: true,
-    weight: 0.7,
     title: "Shaped around the way you read.",
     body: "A calm reader for PDFs and EPUBs. Your colours on every page, four books at once, and AI and voices that stay on your computer.",
     focus: FULL,
@@ -56,8 +54,7 @@ export const STEPS: Step[] = [
       { ...all("rose"), popover: "themes" },
     ],
     ms: [1100, 1900, 1700, 1700, 1700, 1700],
-    loop: true,
-    loopFrom: 1,
+    still: 1,
     bakeAs: [1, 1, 2, 3, 4, 5],
   },
   {
@@ -76,7 +73,7 @@ export const STEPS: Step[] = [
     base: { panes: 4 },
     frames: [all("home"), all("night"), all("green"), all("black"), all("sepia")],
     ms: 1700,
-    loop: true,
+    still: 0,
   },
   {
     id: "perpane",
@@ -114,6 +111,7 @@ export const STEPS: Step[] = [
     zoom: true,
     lens: "chrome",
     base: { settings: "keys", lit: "keys" },
+    beats: { count: 12, ms: 950 },
     frames: [{}],
   },
   {
@@ -135,6 +133,7 @@ export const STEPS: Step[] = [
     focusP: { x: 862, y: 196, w: 600, h: 420 },
     zoom: true,
     base: { pride: "ch6", titlebar: true, player: true },
+    beats: { count: 8, ms: 1400 },
     frames: [{}],
   },
   {

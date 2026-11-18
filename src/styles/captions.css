@@ -6,6 +6,11 @@
   justify-content: center;
   align-items: flex-start;
   pointer-events: none;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition:
+    opacity 220ms ease,
+    transform 240ms ease;
   z-index: 5;
 }
 .cap.port {
@@ -24,6 +29,8 @@
 }
 .cap.on {
   pointer-events: auto;
+  opacity: 1;
+  transform: none;
 }
 .cap-t {
   font-family: Literata, Georgia, serif;
@@ -66,32 +73,18 @@
 }
 .cap .w {
   display: inline-block;
-  opacity: 0;
-  transform: translateY(0.38em);
-  transition:
-    opacity 0.2s ease,
-    transform 0.3s ease;
 }
-.cap.on .w {
-  opacity: 1;
-  transform: none;
-  transition:
-    opacity 0.7s ease var(--d),
-    transform 0.95s cubic-bezier(0.16, 1, 0.3, 1) var(--d);
+.cap:not(.hero).on .w {
+  animation: cap-in 600ms cubic-bezier(0.16, 1, 0.3, 1) var(--d) both;
 }
-.cap .b {
-  opacity: 0;
-  transform: translateY(10px);
-  transition:
-    opacity 0.2s ease,
-    transform 0.3s ease;
+.cap:not(.hero).on .b {
+  animation: cap-in 620ms cubic-bezier(0.16, 1, 0.3, 1) 100ms both;
 }
-.cap.on .b {
-  opacity: 1;
-  transform: none;
-  transition:
-    opacity 0.8s ease 0.26s,
-    transform 1s cubic-bezier(0.16, 1, 0.3, 1) 0.26s;
+@keyframes cap-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.36em);
+  }
 }
 .cap-cta {
   display: flex;
@@ -102,4 +95,54 @@
 }
 .cap.port .cap-cta {
   margin-top: 20px;
+}
+
+@media (max-width: 380px) {
+  .cap.hero {
+    padding-inline: 14px;
+  }
+  .cap.port.hero .cap-t {
+    font-size: clamp(28px, 9.35vw, 35px);
+    max-width: 100%;
+  }
+  .cap.port.hero .cap-b {
+    font-size: 14px;
+  }
+  .cap-cta {
+    gap: 8px;
+  }
+  .cap-cta .btn {
+    padding-inline: 12px;
+    font-size: 13px;
+    height: 42px;
+  }
+}
+@media (max-height: 689px) {
+  .cap.hero .cap-b {
+    margin-top: 12px;
+  }
+  .cap.hero .cap-cta {
+    margin-top: 15px;
+  }
+}
+@media (max-height: 519px) and (min-width: 540px) {
+  .cap.land.hero .cap-t {
+    font-size: clamp(24px, 4.6vw, 42px);
+  }
+  .cap.land .cap-t {
+    font-size: clamp(24px, 3.8vw, 44px);
+  }
+  .cap.land .cap-b {
+    margin-top: 9px;
+    font-size: 13.5px;
+    line-height: 1.43;
+  }
+  .cap.land .cap-cta {
+    gap: 6px;
+  }
+  .cap.land .cap-cta .btn {
+    padding-inline: 9px;
+    height: 35px;
+    font-size: 12px;
+  }
 }

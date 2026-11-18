@@ -122,3 +122,39 @@
   height: 1px;
   background: var(--l);
 }
+
+.mr-win,
+.pane {
+  contain: layout paint;
+}
+.stage.lite .tex {
+  mix-blend-mode: normal;
+}
+.stage.lite .look {
+  transition: none;
+}
+.stage.lite .pane {
+  transition:
+    left 0.32s var(--e-pane),
+    top 0.32s var(--e-pane),
+    width 0.32s var(--e-pane),
+    height 0.32s var(--e-pane),
+    opacity 0.26s ease;
+}
+.stage.lite :is(.pv, .pv-x) {
+  transition-duration: 0.32s;
+}
+@starting-style {
+  .stage:not([data-scene="hero"]) :is(.pane, .pv) {
+    opacity: 0 !important;
+  }
+  .pop.on {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+  .st.on,
+  .st-back.on,
+  .pl.on {
+    opacity: 0;
+  }
+}

@@ -1,19 +1,20 @@
 <script lang="ts">
-  import Bake from "./Bake.svelte";
   import Film from "$lib/film/Film.svelte";
   import Details from "$lib/site/Details.svelte";
-  import DonatePage from "$lib/pages/DonatePage.svelte";
-  import DownloadPage from "$lib/pages/DownloadPage.svelte";
   import Footer from "$lib/site/Footer.svelte";
   import Get from "$lib/site/Get.svelte";
   import More from "$lib/site/More.svelte";
   import Nav from "$lib/site/Nav.svelte";
-  import ReleasesPage from "$lib/pages/ReleasesPage.svelte";
   import { router } from "$lib/site/router.svelte";
   import { theme } from "$lib/site/theme.svelte";
   import favicon from "./assets/icon32.png";
 
   const isBake = /[?&](bake|bakelist)\b/.test(window.location.search);
+  const routes = {
+    releases: () => import("$lib/pages/ReleasesPage.svelte"),
+    donate: () => import("$lib/pages/DonatePage.svelte"),
+    download: () => import("$lib/pages/DownloadPage.svelte"),
+  };
 
   $effect(() => {
     document.documentElement.dataset.theme = theme.current;
@@ -38,16 +39,22 @@
 </script>
 
 {#if isBake}
-  <Bake />
+  {#await import("./Bake.svelte") then { default: Bake }}
+    <Bake />
+  {/await}
 {:else}
   <Nav />
   {#key router.current}
-    {#if router.current === "releases"}
-      <main id="top"><ReleasesPage /></main>
-    {:else if router.current === "donate"}
-      <main id="top"><DonatePage /></main>
-    {:else if router.current === "download"}
-      <main id="top"><DownloadPage /></main>
+    {#if router.current !== "home"}
+      <main id="top">
+        {#await routes[router.current]()}
+          <p class="route-load" role="status">Opening…</p>
+        {:then { default: Page }}
+          <Page />
+        {:catch}
+          <p class="route-load" role="alert">This page couldn’t load. <a href="#/">Back to Mareader</a></p>
+        {/await}
+      </main>
     {:else}
       <main id="top">
         <Film site={theme.current} />

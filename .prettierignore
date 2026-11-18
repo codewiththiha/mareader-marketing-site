@@ -8,3 +8,4 @@ src/blur
 src/assets
 src/lib/site/releases.ts
 netlify.toml
+src/lib/site/latest-release.ts

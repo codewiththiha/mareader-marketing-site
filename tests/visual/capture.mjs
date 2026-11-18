@@ -1,32 +1,14 @@
 import { chromium } from "playwright";
-import http from "node:http";
-import { readFile } from "node:fs/promises";
+import { mkdir } from "node:fs/promises";
 import path from "node:path";
 import { VIEWS } from "./manifest.mjs";
+import { serveDist } from "../static-server.mjs";
 
 // usage: node capture.mjs <distDirOrUrl> <outDir> [views|bake|all]
 const [target, outDir, which = "all"] = process.argv.slice(2);
-const mkdir = async (d) => (await import("node:fs/promises")).mkdir(d, { recursive: true });
-await mkdir(outDir);
-
-let url = target;
-let server;
-if (!/^https?:/.test(target)) {
-  server = http.createServer(async (req, res) => {
-    const q = decodeURIComponent(req.url.split("?")[0]);
-    const p = path.join(target, q === "/" || q === "" ? "index.html" : q.slice(1));
-    try {
-      const b = await readFile(p);
-      res.writeHead(200, { "content-type": p.endsWith(".html") ? "text/html" : "application/octet-stream" });
-      res.end(b);
-    } catch {
-      res.writeHead(404);
-      res.end();
-    }
-  });
-  await new Promise((r) => server.listen(0, "127.0.0.1", r));
-  url = `http://127.0.0.1:${server.address().port}/`;
-}
+await mkdir(outDir, { recursive: true });
+const server = /^https?:/.test(target) ? undefined : await serveDist(target);
+const url = server?.url ?? target;
 
 const ARGS = ["--font-render-hinting=none", "--force-color-profile=srgb", "--disable-lcd-text"];
 const browser = await chromium.launch({ args: ARGS });
@@ -47,6 +29,11 @@ const scrollTo = (page, view) =>
     else if (v.mode === "anchor") document.querySelector(v.sel).scrollIntoView({ block: "start" });
     else if (v.mode === "step") {
       const film = document.querySelector("[data-film]");
+      if (film.dataset.stops) {
+        const stops = JSON.parse(film.dataset.stops);
+        window.scrollTo(0, film.offsetTop + Math.round((stops[v.step] + stops[v.step + 1]) / 2));
+        return;
+      }
       const b = JSON.parse(film.dataset.bounds);
       const span = film.offsetHeight - window.innerHeight;
       window.scrollTo(0, film.offsetTop + (b[v.step] + (b[v.step + 1] - b[v.step]) * 0.5) * span);

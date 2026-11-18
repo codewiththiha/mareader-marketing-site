@@ -21,6 +21,7 @@
   style:height="{L.text.h}px"
   style:color={ink.i}
   aria-hidden={!on ? "true" : undefined}
+  inert={!on}
 >
   {#if step.hero}
     <h1 class="cap-t">

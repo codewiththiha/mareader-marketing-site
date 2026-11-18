@@ -20,4 +20,7 @@ import type { Release } from "./releases-type";
 export const RELEASES: Release[] = ${JSON.stringify(list.map(pick), null, 2)};
 `;
 await writeFile(new URL("../src/lib/site/releases.ts", import.meta.url), ts);
+const { tag, published, assets } = pick(list[0]);
+const latest = `// Generated with the release notes snapshot by scripts/fetch-releases.mjs.\nexport const LATEST_RELEASE = ${JSON.stringify({ tag, published, assets }, null, 2)};\n`;
+await writeFile(new URL("../src/lib/site/latest-release.ts", import.meta.url), latest);
 console.log(`releases.ts: ${list.length} releases, latest ${list[0]?.tag_name}`);

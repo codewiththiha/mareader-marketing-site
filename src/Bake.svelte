@@ -23,6 +23,6 @@
 
 {#if item}
   <div id="bake-root" style="position: absolute; left: 0; top: 0; width: 1536px; height: 960px; border-radius: 14px; overflow: hidden">
-    <Window st={stateOf(item.step, item.frame)} site={item.site} active={false} bake />
+    <Window st={stateOf(item.step, item.frame)} site={item.site} bake />
   </div>
 {/if}

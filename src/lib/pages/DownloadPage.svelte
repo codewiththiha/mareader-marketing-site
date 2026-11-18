@@ -19,7 +19,7 @@
   import { router } from "$lib/site/router.svelte";
   import { platform } from "$lib/utils/platform.svelte";
   import { slideGroup } from "$lib/utils/slide.svelte";
-  import icon from "../../assets/icon.png";
+  import icon from "../../assets/icon.webp";
 
   const marks: Record<KnownOs, typeof AppleMark> = { mac: AppleMark, windows: WindowsMark, linux: LinuxMark };
   const groups = $derived(

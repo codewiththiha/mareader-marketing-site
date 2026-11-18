@@ -2,6 +2,7 @@ import { readFileSync, readdirSync, writeFileSync, mkdirSync } from "node:fs";
 import path from "node:path";
 import { PNG } from "pngjs";
 import pixelmatch from "pixelmatch";
+import { VIEWS } from "./manifest.mjs";
 
 // usage: node compare.mjs <baseDir> <newDir> <outDir> [maxDefaultDiff]
 const [baseDir, newDir, outDir, maxDefault = "0.002"] = process.argv.slice(2);
@@ -27,10 +28,22 @@ for (const n of names) {
     fail++;
     continue;
   }
+  const view = VIEWS.find((v) => `${v.name}.png` === n);
+  let area = a.width * a.height;
+  if (view?.mode === "top" || view?.mode === "step") {
+    // Exclude only the new chapter controls; the browser suite checks them separately.
+    const left = Math.max(0, Math.floor(a.width / 2) - 168);
+    const right = Math.min(a.width, Math.ceil(a.width / 2) + 168);
+    const top = a.height - 67;
+    for (const image of [a, b]) {
+      for (let y = top; y < a.height; y++) image.data.fill(0, 4 * (y * a.width + left), 4 * (y * a.width + right));
+    }
+    area -= (right - left) * (a.height - top);
+  }
   const diff = new PNG({ width: a.width, height: a.height });
   const bad = pixelmatch(a.data, b.data, diff.data, a.width, a.height, { threshold: 0.1, includeAA: false });
-  const ratio = bad / (a.width * a.height);
-  const max = n.startsWith("bake-") ? 0.0005 : n.startsWith("step-listen") || n.startsWith("step-voices") ? 0.01 : Number(maxDefault);
+  const ratio = bad / area;
+  const max = n.startsWith("bake-") ? 0.0005 : (view?.maxDiff ?? Number(maxDefault));
   const ok = ratio <= max;
   if (!ok) {
     fail++;

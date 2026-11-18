@@ -35,6 +35,3 @@ export const VIEWS = [
   { name: "mob-details", viewport: [390, 844], mode: "anchor", sel: "#tour + section", wait: 1400 },
   { name: "mob-get", viewport: [390, 844], mode: "anchor", sel: "#download", wait: 1400 },
 ];
-
-// Bake views: one per entry the app publishes on ?bakelist, paired by index.
-export const BAKE_COUNT = 16;

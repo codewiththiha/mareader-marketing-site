@@ -122,3 +122,16 @@
   height: 1px;
   background: var(--l);
 }
+
+/* reel takes cut between looks; geometry still eases */
+[data-cut].look,
+[data-cut] .look {
+  transition: none;
+}
+[data-cut] .pane {
+  transition-property: left, top, width, height, opacity;
+}
+/* weak devices skip the blended paper texture, the biggest paint of all */
+[data-lite] .tex {
+  display: none;
+}

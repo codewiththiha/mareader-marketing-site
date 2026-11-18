@@ -1,6 +1,8 @@
-/* Captions */
+/* Step captions: compositor-placed columns with staggered word rise. */
 .cap {
   position: absolute;
+  left: 0;
+  top: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -10,7 +12,7 @@
 }
 .cap.port {
   justify-content: flex-start;
-  padding-top: 16px;
+  padding-top: 14px;
 }
 .cap.port.top {
   justify-content: flex-end;
@@ -33,7 +35,7 @@
   font-size: clamp(30px, 3.25vw, 54px);
   margin: 0;
   text-wrap: balance;
-  transition: color 0.6s ease;
+  transition: color 0.5s ease;
 }
 .cap.hero .cap-t {
   font-size: clamp(38px, 5.2vw, 80px);
@@ -41,7 +43,7 @@
   line-height: 1.03;
 }
 .cap.port .cap-t {
-  font-size: clamp(24px, 6.4vw, 31px);
+  font-size: clamp(23px, 6.2vw, 31px);
 }
 .cap.port.hero .cap-t {
   font-size: clamp(34px, 9.6vw, 46px);
@@ -52,22 +54,22 @@
   line-height: 1.55;
   max-width: 31ch;
   text-wrap: pretty;
-  transition: color 0.6s ease;
+  transition: color 0.5s ease;
 }
 .cap.hero .cap-b {
   max-width: 46ch;
   margin-top: 20px;
 }
 .cap.port .cap-b {
-  margin-top: 10px;
-  font-size: 15px;
-  line-height: 1.5;
+  margin-top: 9px;
+  font-size: 14.8px;
+  line-height: 1.48;
   max-width: 40ch;
 }
 .cap .w {
   display: inline-block;
   opacity: 0;
-  transform: translateY(0.38em);
+  transform: translate3d(0, 0.38em, 0);
   transition:
     opacity 0.2s ease,
     transform 0.3s ease;
@@ -76,12 +78,16 @@
   opacity: 1;
   transform: none;
   transition:
-    opacity 0.7s ease var(--d),
-    transform 0.95s cubic-bezier(0.16, 1, 0.3, 1) var(--d);
+    opacity 0.65s ease var(--d),
+    transform 0.88s var(--e-out) var(--d);
+  @starting-style {
+    opacity: 0;
+    transform: translate3d(0, 0.38em, 0);
+  }
 }
 .cap .b {
   opacity: 0;
-  transform: translateY(10px);
+  transform: translate3d(0, 10px, 0);
   transition:
     opacity 0.2s ease,
     transform 0.3s ease;
@@ -90,8 +96,22 @@
   opacity: 1;
   transform: none;
   transition:
-    opacity 0.8s ease 0.26s,
-    transform 1s cubic-bezier(0.16, 1, 0.3, 1) 0.26s;
+    opacity 0.72s ease 0.22s,
+    transform 0.92s var(--e-out) 0.22s;
+  @starting-style {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+}
+[data-lite="1"] .cap.on .w {
+  transition:
+    opacity 0.38s ease,
+    transform 0.45s var(--e-out);
+}
+[data-lite="1"] .cap.on .b {
+  transition:
+    opacity 0.42s ease 0.08s,
+    transform 0.48s var(--e-out) 0.08s;
 }
 .cap-cta {
   display: flex;

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { OS_LABEL } from "$lib/site/downloads";
+  import { OS_LABEL } from "$lib/site/os";
   import { router } from "$lib/site/router.svelte";
   import { platform } from "$lib/utils/platform.svelte";
   import type { Layout } from "./layout";
@@ -15,8 +15,7 @@
 
 <div
   class={cls}
-  style:left="{L.text.x}px"
-  style:top="{L.text.y}px"
+  style:transform="translate3d({L.text.x}px, {L.text.y}px, 0)"
   style:width="{L.text.w}px"
   style:height="{L.text.h}px"
   style:color={ink.i}
@@ -35,7 +34,7 @@
   {#if step.hero}
     <div class="cap-cta b">
       <a class="btn btn-accent" href={router.href("download")} tabindex={on ? 0 : -1}>Download for {OS_LABEL[platform.os]}</a>
-      <a class="btn btn-ghost" href={GH} tabindex={on ? 0 : -1}>View on GitHub</a>
+      <a class="btn btn-ghost" href={GH} tabindex={on ? 0 : -1} rel="noopener noreferrer">View on GitHub</a>
     </div>
   {/if}
 </div>

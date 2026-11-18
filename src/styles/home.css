@@ -1,0 +1,223 @@
+.home-wrap {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding-right: 24px;
+  padding-left: 24px;
+}
+.home-hero {
+  display: flex;
+  align-items: center;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 92px 0 48px;
+}
+.hero-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  align-items: center;
+  gap: clamp(36px, 4.5vw, 70px);
+}
+.hero-copy h1,
+.showcase-heading h2,
+.feature-copy h3,
+.home-pitch h2 {
+  font-family: Literata, Georgia, serif;
+  font-weight: 540;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+  text-wrap: balance;
+}
+.hero-copy h1 {
+  font-size: clamp(48px, 5.05vw, 70px);
+}
+.hero-copy h1 span {
+  display: block;
+}
+.hero-description {
+  max-width: 410px;
+  margin-top: 22px;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.7;
+}
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-top: 28px;
+}
+.hero-actions svg {
+  width: 17px;
+  height: 17px;
+}
+.home-other {
+  padding: 12px 4px;
+  font-size: 14px;
+  font-weight: 550;
+}
+.home-other:hover {
+  color: var(--accent);
+}
+.hero-footnote {
+  margin-top: 16px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.hero-footnote span {
+  margin: 0 5px;
+  color: var(--accent);
+}
+.home-preview {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--bg);
+  box-shadow: var(--win-shadow);
+  isolation: isolate;
+}
+.home-preview-window {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1536px;
+  height: 960px;
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+.showcase {
+  padding-top: 96px;
+  scroll-margin-top: 80px;
+}
+.showcase-heading {
+  padding-bottom: 25px;
+}
+.showcase-heading h2 {
+  max-width: 640px;
+  font-size: clamp(32px, 3.3vw, 45px);
+}
+.feature-row {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  align-items: center;
+  gap: clamp(42px, 6vw, 84px);
+  padding: 82px 0;
+}
+.feature-row.reverse {
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+}
+.feature-row.reverse .feature-copy {
+  order: 2;
+}
+.feature-kicker {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  color: var(--accent);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.feature-kicker-line {
+  width: 25px;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.55;
+}
+.feature-copy h3 {
+  margin-top: 20px;
+  font-size: clamp(30px, 3vw, 41px);
+}
+.feature-copy > p {
+  max-width: 390px;
+  margin-top: 16px;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.72;
+}
+.feature-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 23px;
+  padding: 0;
+  list-style: none;
+}
+.feature-details li {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 550;
+  line-height: 1.4;
+}
+.feature-details li + li::before {
+  content: "·";
+  margin-right: 10px;
+  color: var(--accent);
+}
+.home-pitch {
+  padding-top: 100px;
+}
+.home-pitch h2 {
+  font-size: clamp(32px, 3.3vw, 45px);
+}
+.home-pitch p {
+  max-width: 510px;
+  margin-top: 16px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+@media (max-width: 800px) {
+  .hero-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 34px;
+  }
+  .hero-copy h1 {
+    font-size: clamp(44px, 7vw, 60px);
+  }
+  .hero-inner > .home-preview {
+    align-self: flex-end;
+    max-width: 620px;
+  }
+  .feature-row,
+  .feature-row.reverse {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding: 58px 0;
+  }
+  .feature-row.reverse .feature-copy {
+    order: 0;
+  }
+}
+@media (max-width: 560px) {
+  .home-hero {
+    min-height: auto;
+    padding: 120px 0 50px;
+  }
+  .hero-inner {
+    gap: 30px;
+  }
+  .hero-copy h1 {
+    font-size: clamp(36px, 10vw, 44px);
+  }
+  .hero-description {
+    max-width: 350px;
+    margin-top: 14px;
+    font-size: 14.5px;
+  }
+  .hero-actions {
+    margin-top: 20px;
+  }
+  .showcase {
+    padding-top: 65px;
+  }
+  .home-pitch {
+    padding-top: 65px;
+  }
+}

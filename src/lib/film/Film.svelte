@@ -37,8 +37,12 @@
   let scrollBonus = 0;
   let stretch = 0;
   let rise = 0;
+  let riseTarget = 0;
+  let rafId = 0;
+  let lastFrame = 0;
+  let gliding = false;
+  let glideTimer = 0;
   let muted = optedOut();
-  const seen: number[] = [];
 
   let vp = $state({ w: window.innerWidth, h: window.innerHeight });
   let active = $state(0);
@@ -62,20 +66,23 @@
   // A hard scroll carries the clip with it; a slow one lets it play out.
   const pace = () => (reduced ? 0.7 : Math.min(3.2, 1 + vel * 2.6));
 
-  // A take that has not played yet holds the reel still until it has.
+  // Each take holds the reel at its start until the demo plays out.
   const engageHold = () => {
-    if (hold >= 0 || muted || active <= 0 || seen.includes(active)) return;
+    if (hold >= 0 || muted || active <= 0 || gliding) return;
     hold = active;
     lockY = window.scrollY;
     scrollBonus = 0;
     stretch = 0;
     rise = 0;
+    riseTarget = 0;
     if (riseEl !== null) riseEl.style.setProperty("--rise", "0");
-    hint = true;
+    if (rafId === 0) {
+      lastFrame = performance.now();
+      rafId = requestAnimationFrame(frame);
+    }
   };
 
   const unlock = () => {
-    if (hold >= 0 && !seen.includes(hold)) seen.push(hold);
     hold = -1;
     hint = false;
   };
@@ -88,6 +95,7 @@
   // Scroll while held does not move the reel; it pulls the arrow up.
   const feedScroll = (dy: number) => {
     if (hold < 0 || dy === 0) return;
+    hint = true;
     vel = vel * 0.55 + Math.min(1, Math.abs(dy) / 100) * 0.45;
     scrollBonus = Math.max(0, Math.min(1, scrollBonus + dy / (window.innerHeight * 2.2)));
     stretch = Math.max(-0.04, Math.min(0.14, stretch + dy * 0.00035));
@@ -101,6 +109,20 @@
       /* private mode: the choice just won't stick */
     }
     unlock();
+  };
+
+  // The arrow eases toward its target every frame, so it glides, never steps.
+  const frame = (t: number) => {
+    if (hold < 0) {
+      rafId = 0;
+      return;
+    }
+    rafId = requestAnimationFrame(frame);
+    const dt = Math.min(50, t - lastFrame);
+    lastFrame = t;
+    rise += (riseTarget - rise) * (1 - Math.exp(-dt / 80));
+    stretch *= Math.exp(-dt / 90);
+    if (riseEl !== null) riseEl.style.setProperty("--rise", String(Math.min(1, Math.max(0, rise + stretch))));
   };
 
   $effect(() => {
@@ -136,7 +158,6 @@
       let i = 0;
       while (i < N - 1 && p >= bounds[i + 1]) i++;
       active = i;
-      engageHold();
       scrollFill = Math.min(1, p * 1.002);
       draw();
     };
@@ -152,9 +173,11 @@
     read();
     window.addEventListener("scroll", on, { passive: true });
     window.addEventListener("resize", on);
+    window.addEventListener("scrollend", endGlide);
     return () => {
       window.removeEventListener("scroll", on);
       window.removeEventListener("resize", on);
+      window.removeEventListener("scrollend", endGlide);
       cancelAnimationFrame(raf);
     };
   });
@@ -217,6 +240,7 @@
 
   $effect(() => {
     if (!near) return;
+    engageHold();
     const s = STEPS[active];
     const last = s.frames.length - 1;
     tl = { step: active, frame: 0 };
@@ -230,7 +254,6 @@
         held = 0;
         if (f >= last) {
           if (hold === active) releaseHold(true);
-          else if (!seen.includes(active)) seen.push(active);
           if (!s.loop) {
             window.clearInterval(tick);
           } else {
@@ -246,11 +269,8 @@
       playFill = Math.min(1, (active + frac) / N);
       draw();
       if (hold >= 0) {
-        const target = Math.min(1, frac + scrollBonus);
-        rise += (target - rise) * 0.25;
-        stretch *= 0.8;
-        if (riseEl !== null) riseEl.style.setProperty("--rise", String(Math.min(1, Math.max(0, rise + stretch))));
-        if (target >= 1) releaseHold(true);
+        riseTarget = Math.min(1, frac + scrollBonus);
+        if (riseTarget >= 1) releaseHold(true);
       }
     }, TICK);
     return () => {
@@ -276,8 +296,18 @@
     snapNext = false;
   });
 
+  const endGlide = () => {
+    if (!gliding) return;
+    gliding = false;
+    window.clearTimeout(glideTimer);
+    engageHold();
+  };
+
   const jump = (i: number) => {
     unlock();
+    gliding = true;
+    window.clearTimeout(glideTimer);
+    glideTimer = window.setTimeout(endGlide, 1200);
     const p = (bounds[i] + bounds[i + 1]) / 2;
     window.scrollTo({ top: top() + p * span(), behavior: reduced ? "auto" : "smooth" });
   };

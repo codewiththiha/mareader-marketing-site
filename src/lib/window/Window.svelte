@@ -17,8 +17,23 @@
   import TitleBar from "$lib/chrome/TitleBar.svelte";
   import WordCard from "$lib/chrome/WordCard.svelte";
   import type { Anchor } from "$lib/chrome/anchor";
+  import { EVERYTHING, type Reach } from "./reach";
 
-  let { st, site, active, bake = false }: { st: WinState; site: Site; active: boolean; bake?: boolean } = $props();
+  let {
+    st,
+    site,
+    active,
+    reach = EVERYTHING,
+    quick = false,
+    lite = false,
+  }: {
+    st: WinState;
+    site: Site;
+    active: boolean;
+    reach?: Reach;
+    quick?: boolean;
+    lite?: boolean;
+  } = $props();
 
   const PW = 612;
   const PW2 = PW * 2;
@@ -42,8 +57,8 @@
     () => active && st.player,
     () => 1400,
   );
-  const chunk = $derived(bake ? 6 : 3 + (tick() % (CH6_CHUNKS - 3)));
-  const track = $derived(bake ? 34 : Math.min(96, 30 + tick() * 2.2));
+  const chunk = $derived(3 + (tick() % (CH6_CHUNKS - 3)));
+  const track = $derived(Math.min(96, 30 + tick() * 2.2));
 
   const els = $state({ pane: null as HTMLDivElement | null, sel: null as HTMLElement | null });
   let anchor = $state(null as Anchor | null);
@@ -76,7 +91,13 @@
   const low = $derived(st.titlebar && st.panes === 1 && !st.popover);
 </script>
 
-<div class="mr-win look" class:bake style="{varsOf(chrome)};width:{WIN_W}px;height:{WIN_H}px" data-dark={chrome.dark}>
+<div
+  class="mr-win look"
+  data-quick={quick}
+  data-lite={lite}
+  style="{varsOf(chrome)};width:{WIN_W}px;height:{WIN_H}px"
+  data-dark={chrome.dark}
+>
   <Pane r={P} lk={looks[0]} on title="Pride and Prejudice, by Jane Austen" count={prideCount} {low} bind:elBind={els.pane}>
     <div class="pv" style="opacity:{wide && st.pride === 'opening' ? 1 : 0};transform:translate({oX}px, {oY}px) scale({sO})">
       <OpeningSpread
@@ -92,20 +113,30 @@
     <div class="pv" style="opacity:{wide ? 0 : 1};transform:translate({x1}px, {y1}px) scale({s1})">
       <Page12 />
     </div>
-    <WordCard open={st.card && !!anchor} at={anchor} roomW={P.w} />
+    {#if reach.card}<WordCard open={st.card && !!anchor} at={anchor} roomW={P.w} />{/if}
   </Pane>
-  <Pane r={rects[1]} lk={looks[1]} on={st.panes >= 2} title="CHAPTER I. Down the Rabbit-Hole" count="42 / 498" low={false} divL>
-    <Alice />
-  </Pane>
-  <Pane r={rects[2]} lk={looks[2]} on={st.panes >= 3} title="COMMENT ON THE POEM." count="29 / 190" low={false} divL divT>
-    <Raven w={rects[2].w} />
-  </Pane>
-  <Pane r={rects[3]} lk={looks[3]} on={st.panes >= 4} title="紅樓夢" count="87 / 7386" low={false} divL divT>
-    <Chamber />
-  </Pane>
-  <Sidebar open={st.sidebar} />
-  <TitleBar shown={st.titlebar} title="Pride and Prejudice, by Jane Austen" lit={st.lit} />
-  <Popover shown={st.popover !== null} mode={st.popover ?? "themes"} sel={resolve(st.preset, site)} perPane={st.perPane} lit={st.lit} />
-  <Player shown={st.player} t={track} />
-  <Settings page={st.settings} lit={st.lit} voice={st.voice} {active} />
+  {#if reach.panes >= 2}
+    <Pane r={rects[1]} lk={looks[1]} on={st.panes >= 2} title="CHAPTER I. Down the Rabbit-Hole" count="42 / 498" low={false} divL>
+      <Alice />
+    </Pane>
+  {/if}
+  {#if reach.panes >= 3}
+    <Pane r={rects[2]} lk={looks[2]} on={st.panes >= 3} title="COMMENT ON THE POEM." count="29 / 190" low={false} divL divT>
+      <Raven w={rects[2].w} />
+    </Pane>
+  {/if}
+  {#if reach.panes >= 4}
+    <Pane r={rects[3]} lk={looks[3]} on={st.panes >= 4} title="紅樓夢" count="87 / 7386" low={false} divL divT>
+      <Chamber />
+    </Pane>
+  {/if}
+  {#if reach.sidebar}<Sidebar open={st.sidebar} />{/if}
+  {#if reach.titlebar}
+    <TitleBar shown={st.titlebar} title="Pride and Prejudice, by Jane Austen" lit={st.lit} />
+  {/if}
+  {#if reach.popover}
+    <Popover shown={st.popover !== null} mode={st.popover ?? "themes"} sel={resolve(st.preset, site)} perPane={st.perPane} lit={st.lit} />
+  {/if}
+  {#if reach.player}<Player shown={st.player} t={track} />{/if}
+  {#if reach.settings}<Settings page={st.settings} lit={st.lit} voice={st.voice} {active} />{/if}
 </div>

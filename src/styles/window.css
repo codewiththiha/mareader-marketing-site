@@ -10,22 +10,22 @@
 }
 .look {
   transition:
-    --p 0.6s ease,
-    --k 0.6s ease,
-    --u 0.6s ease,
-    --m 0.6s ease,
-    --s 0.6s ease,
-    --l 0.6s ease,
-    --a 0.6s ease,
-    --as 0.6s ease,
-    --ai 0.6s ease,
-    --c 0.6s ease,
-    --hl 0.6s ease,
-    --lk 0.6s ease,
-    --mk 0.6s ease,
-    --mks 0.6s ease,
-    --th 0.6s ease,
-    --tx 0.6s ease;
+    --p var(--look-ms) ease,
+    --k var(--look-ms) ease,
+    --u var(--look-ms) ease,
+    --m var(--look-ms) ease,
+    --s var(--look-ms) ease,
+    --l var(--look-ms) ease,
+    --a var(--look-ms) ease,
+    --as var(--look-ms) ease,
+    --ai var(--look-ms) ease,
+    --c var(--look-ms) ease,
+    --hl var(--look-ms) ease,
+    --lk var(--look-ms) ease,
+    --mk var(--look-ms) ease,
+    --mks var(--look-ms) ease,
+    --th var(--look-ms) ease,
+    --tx var(--look-ms) ease;
 }
 .pane {
   position: absolute;
@@ -33,25 +33,25 @@
   background: var(--p);
   color: var(--k);
   transition:
-    left 0.8s var(--e-pane),
-    top 0.8s var(--e-pane),
-    width 0.8s var(--e-pane),
-    height 0.8s var(--e-pane),
+    left var(--pane-ms) var(--e-pane),
+    top var(--pane-ms) var(--e-pane),
+    width var(--pane-ms) var(--e-pane),
+    height var(--pane-ms) var(--e-pane),
     opacity 0.5s ease,
-    --p 0.6s ease,
-    --k 0.6s ease,
-    --u 0.6s ease,
-    --m 0.6s ease,
-    --s 0.6s ease,
-    --l 0.6s ease,
-    --a 0.6s ease,
-    --as 0.6s ease,
-    --c 0.6s ease,
-    --hl 0.6s ease,
-    --lk 0.6s ease,
-    --mk 0.6s ease,
-    --mks 0.6s ease,
-    --tx 0.6s ease;
+    --p var(--look-ms) ease,
+    --k var(--look-ms) ease,
+    --u var(--look-ms) ease,
+    --m var(--look-ms) ease,
+    --s var(--look-ms) ease,
+    --l var(--look-ms) ease,
+    --a var(--look-ms) ease,
+    --as var(--look-ms) ease,
+    --c var(--look-ms) ease,
+    --hl var(--look-ms) ease,
+    --lk var(--look-ms) ease,
+    --mk var(--look-ms) ease,
+    --mks var(--look-ms) ease,
+    --tx var(--look-ms) ease;
 }
 .tex {
   position: absolute;
@@ -121,4 +121,17 @@
   top: 0;
   height: 1px;
   background: var(--l);
+}
+
+/* the timings live here: a demo beat snaps looks over as panes glide */
+.mr-win {
+  --look-ms: 0.6s;
+  --pane-ms: 0.8s;
+}
+[data-quick] {
+  --look-ms: 0.24s;
+}
+/* weak devices skip the blended paper texture, the biggest paint of all */
+[data-lite] .tex {
+  display: none;
 }

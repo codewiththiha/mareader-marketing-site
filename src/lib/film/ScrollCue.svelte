@@ -7,11 +7,13 @@
     active,
     total,
     done,
+    settling,
+    overrideArrow,
+    leaving,
     progress,
     pull,
     nudge,
     nudgePulse,
-    speed,
     commitSeq,
     ink,
     surface,
@@ -22,11 +24,13 @@
     active: number;
     total: number;
     done: boolean;
+    settling: boolean;
+    overrideArrow: boolean;
+    leaving: boolean;
     progress: number;
     pull: number;
     nudge: boolean;
     nudgePulse: number;
-    speed: number;
     commitSeq: number;
     ink: { i: string; m: string };
     surface: string;
@@ -53,37 +57,33 @@
   $effect(() => {
     const id = window.setTimeout(() => {
       mounted = true;
-    }, 280);
+    }, 260);
     return () => {
       window.clearTimeout(id);
     };
   });
 
-  // Gentle 3.5px cushion bob when a light early scroll meets a first-play demo.
+  // Soft upward cushion bob whenever scrolling meets a held progress pill.
   let lastPulse = 0;
   $effect(() => {
     const p = nudgePulse;
     if (p === 0 || p === lastPulse) return;
     lastPulse = p;
-    untrack(() => {
-      if (!done && pull <= 0.03) {
-        commitMode = false;
-        commitT = 0;
-        apexAt = 0;
-        visPull = 0;
-        visVel = 0;
-      }
-      if (perf.reduced) return;
+    if (perf.reduced) return;
+    bob = false;
+    const raf = requestAnimationFrame(() => {
       bob = true;
     });
     const id = window.setTimeout(() => {
       bob = false;
-    }, 320);
+    }, 300);
     return () => {
+      cancelAnimationFrame(raf);
       window.clearTimeout(id);
     };
   });
 
+  // Two-phase commit: arrow touches the top crown, releases with a soft halo, then morphs into progress.
   let lastSeq = 0;
   let settleUntil = 0;
   $effect(() => {
@@ -100,42 +100,42 @@
         apexAt = 0;
         return;
       }
-      const start = Math.max(visPull, 0.16);
+      const start = Math.max(visPull, 0.22);
       visPull = start;
       commitMode = true;
       apexAt = start >= 0.985 ? now : 0;
       commitT = start >= 0.985 ? 0.002 : 0;
-      settleUntil = now + 560;
+      settleUntil = now + 460;
     });
   });
 
-  const targetPull = $derived(clamp(Math.max(pull, hover && done && !commitMode ? 0.28 : 0), 0, 1));
-  const showRiser = $derived(done || pull > 0.03 || visPull > 0.02 || commitMode || commitT > 0);
-  const fast = $derived(!done && (speed >= 1.42 || pull > 0.03));
+  const wantArrow = $derived((done && !settling) || overrideArrow);
+  const showArrow = $derived(wantArrow || commitMode || (commitT > 0 && commitT < 1));
+  const mode = $derived<"arrow" | "progress" | "nudge">(showArrow ? "arrow" : !done && !settling && nudge ? "nudge" : "progress");
+  const targetPull = $derived(clamp(Math.max(pull, hover && done && !settling && !commitMode ? 0.26 : 0), 0, 1));
 
   let liveTarget = 0;
-  let liveDone = true;
+  let liveReady = true;
   let liveHover = false;
   let liveCommit = false;
   let wakeLoop: (() => void) | null = null;
 
   $effect(() => {
     liveTarget = targetPull;
-    liveDone = done;
+    liveReady = done && !settling;
     liveHover = hover;
     liveCommit = commitMode;
     wakeLoop?.();
   });
 
   $effect(() => {
-    const activeLoop = showRiser && !perf.reduced && !perf.hidden;
+    const activeLoop = showArrow && !perf.reduced && !perf.hidden;
     if (!activeLoop) {
       untrack(() => {
-        visPull = perf.reduced ? liveTarget : 0;
+        visPull = perf.reduced && showArrow ? liveTarget : 0;
         visVel = 0;
         breathe = 0;
         commitMode = false;
-        commitT = 0;
         apexAt = 0;
       });
       return;
@@ -145,6 +145,12 @@
     let breathTimer = 0;
     let breathStart = 0;
     let last = performance.now();
+    // Reset finished commitT cleanly only when returning to live arrow mode.
+    if (!liveCommit && untrack(() => commitT) >= 1) {
+      untrack(() => {
+        commitT = 0;
+      });
+    }
     let p = untrack(() => visPull);
     let v = untrack(() => visVel);
     let b = 0;
@@ -153,7 +159,7 @@
       if (breathTimer || perf.lite) return;
       breathTimer = window.setTimeout(() => {
         breathTimer = 0;
-        if (!liveDone || liveHover || liveCommit || liveTarget > 0.02) return;
+        if (!liveReady || liveHover || liveCommit || liveTarget > 0.02) return;
         breathStart = performance.now();
         start();
       }, delayMs);
@@ -176,7 +182,7 @@
         cancelBreath();
         const hit = untrack(() => apexAt);
         if (hit === 0) {
-          const stepUp = Math.max(dt * 6.2, (1 - p) * (1 - Math.exp(-21 * dt)));
+          const stepUp = Math.max(dt * 6.8, (1 - p) * (1 - Math.exp(-23 * dt)));
           v = Math.min(3.0, (stepUp / Math.max(dt, 0.008)) * 0.34);
           p = Math.min(1, p + stepUp);
           visPull = p;
@@ -190,17 +196,19 @@
         } else {
           p = 1;
           visPull = 1;
-          const nextC = clamp((now - hit) / 360, 0.002, 1);
+          const nextC = clamp((now - hit) / 280, 0.002, 1);
           commitT = nextC;
           if (nextC >= 1) {
             liveCommit = false;
             commitMode = false;
             apexAt = 0;
-            commitT = 0;
+            // Hold commitT=1 when folding into progress so the faded arrow never flashes at rest.
+            commitT = untrack(() => wantArrow) ? 0 : 1;
             p = 0;
             v = 0;
             visPull = 0;
             visVel = 0;
+            if (!untrack(() => wantArrow)) return;
           }
         }
         if (b !== 0) {
@@ -211,8 +219,8 @@
         return;
       }
 
-      const tgt = now < settleUntil ? 0 : liveTarget;
-      const stiff = tgt > p ? 275 : 172;
+      const tgt = now < settleUntil && liveReady ? 0 : liveTarget;
+      const stiff = tgt > p ? 270 : 172;
       const damp = tgt > p ? 25.5 : 19.5;
       v += ((tgt - p) * stiff - v * damp) * dt;
       p = clamp(p + v * dt, 0, 1);
@@ -224,7 +232,7 @@
       if (Math.abs(v - untrack(() => visVel)) > 0.004) visVel = v;
 
       let nextB = 0;
-      const canBreathe = liveDone && tgt < 0.02 && !liveHover && now >= settleUntil && !perf.lite;
+      const canBreathe = liveReady && tgt < 0.02 && !liveHover && now >= settleUntil && !perf.lite;
       if (canBreathe && breathStart > 0) {
         const u = (now - breathStart) / 1260;
         if (u < 1) nextB = Math.pow(Math.sin(u * Math.PI), 1.45);
@@ -255,7 +263,7 @@
     };
 
     wakeLoop = start;
-    if (liveDone && liveTarget < 0.02 && !liveCommit) scheduleBreath(950);
+    if (liveReady && liveTarget < 0.02 && !liveCommit) scheduleBreath(950);
     start();
     return () => {
       wakeLoop = null;
@@ -266,8 +274,8 @@
 
   const g = $derived(arrowGeometry(visPull, visVel, commitT, breathe));
   const whisper = $derived.by(() => {
-    if (commitMode || commitT > 0) return "";
-    if (!done) return fast ? "Speeding up" : "";
+    if (commitMode || commitT > 0 || mode !== "arrow") return "";
+    if (overrideArrow && !done) return "Speeding up";
     if (visPull > 0.34) return "";
     if (active === 0) return perf.coarse ? "Swipe up" : "Scroll to tour";
     if (active === 1 && !taughtNext) return perf.coarse ? "Swipe up" : "Scroll for next";
@@ -275,7 +283,7 @@
     return "";
   });
 
-  // Retain last non-empty whisper briefly so its fade-out stays smooth, then clear cleanly.
+  // Hold whisper text briefly while its opacity fades out, then clear it cleanly.
   let shownWhisper = $state("");
   $effect(() => {
     const w = whisper;
@@ -285,49 +293,49 @@
     }
     const id = window.setTimeout(() => {
       shownWhisper = "";
-    }, 300);
+    }, 260);
     return () => {
       window.clearTimeout(id);
     };
   });
 
-  const stretchActive = $derived((visPull > 0.06 && commitT === 0) || (commitMode && apexAt === 0));
-  const exiting = $derived(commitT > 0.48);
-  const showStill = $derived(!showRiser && !done && nudge);
+  const stretchActive = $derived(mode === "arrow" && ((visPull > 0.06 && commitT === 0) || (commitMode && apexAt === 0)));
+  const fillScale = $derived(clamp(progress, 0.06, 1).toFixed(3));
 </script>
 
 <div
   class="cue-slot"
   class:in={mounted}
   class:pulling={stretchActive}
-  class:fast={fast && !commitMode}
-  class:out={exiting}
+  class:fast={overrideArrow && !done && !commitMode}
+  class:out={leaving && commitT > 0.45}
   data-cue-dark={dark}
   style:--cue-ink={ink.i}
   style:--cue-muted={ink.m}
   style:--cue-bg={surface}
-  style:--cue-pull={visPull.toFixed(3)}
+  style:--cue-pull={mode === "arrow" ? visPull.toFixed(3) : "0"}
 >
-  {#if showRiser}
-    <button
-      type="button"
-      class="cue-riser-wrap"
-      aria-label={nextLabel}
-      onmouseenter={() => {
-        hover = true;
-      }}
-      onmouseleave={() => {
-        hover = false;
-      }}
-      onfocus={() => {
-        hover = true;
-      }}
-      onblur={() => {
-        hover = false;
-      }}
-      onclick={onAdvance}
-    >
-      <span class="cue-riser" aria-hidden="true">
+  <button
+    type="button"
+    class="cue-btn"
+    data-mode={mode}
+    aria-label={nextLabel}
+    onmouseenter={() => {
+      hover = true;
+    }}
+    onmouseleave={() => {
+      hover = false;
+    }}
+    onfocus={() => {
+      hover = true;
+    }}
+    onblur={() => {
+      hover = false;
+    }}
+    onclick={onAdvance}
+  >
+    <span class="cue-pill" class:bob={bob && mode !== "arrow"} class:settling={settling && mode === "progress"}>
+      <span class="cue-arrow-layer" aria-hidden="true">
         <svg viewBox="0 0 34 54" width="34" height="54" fill="none">
           <path
             d="M 11.4 {g.yTop.toFixed(2)} Q 17 {(g.yTop - g.topBow).toFixed(2)} 22.6 {g.yTop.toFixed(2)}"
@@ -379,17 +387,16 @@
           </g>
         </svg>
       </span>
-      <span class="cue-whisper" class:on={!!whisper} aria-hidden={!whisper} aria-live="polite">{shownWhisper}</span>
-    </button>
-  {:else}
-    <button type="button" class="cue-watch" class:nudge={showStill} class:bob aria-label={nextLabel} onclick={onAdvance}>
-      <span class="cue-dot" aria-hidden="true"></span>
-      <span class="cue-bar" aria-hidden="true">
-        <i style:transform="scaleX({clamp(progress, 0.05, 1).toFixed(3)})"></i>
+
+      <span class="cue-track-layer" aria-hidden={mode !== "nudge"}>
+        <span class="cue-dot" aria-hidden="true"></span>
+        <span class="cue-bar" aria-hidden="true">
+          <i style:transform="scaleX({fillScale})"></i>
+        </span>
+        <span class="cue-note" aria-live="polite">{mode === "nudge" ? "Still playing" : ""}</span>
       </span>
-      <span class="cue-note-clip" class:on={showStill} aria-live="polite">
-        <span class="cue-note">{showStill ? "Still playing" : ""}</span>
-      </span>
-    </button>
-  {/if}
+    </span>
+
+    <span class="cue-whisper" class:on={!!whisper} aria-hidden={!whisper} aria-live="polite">{shownWhisper}</span>
+  </button>
 </div>

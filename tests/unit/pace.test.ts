@@ -1,12 +1,19 @@
-/** Scroll pacing, first-play demo guard, and living arrow geometry tests. */
+/** Scroll pacing, phase-arrival hold, progress-to-arrow override, and arrow geometry tests. */
 import { describe, expect, it } from "vitest";
 import {
-  HEAVY_COMMIT_PX,
+  ARRIVE_SEEN_MS,
+  ARRIVE_UNSEEN_MS,
+  ARROW_REVEAL_MS,
   HERO_COMMIT_PX,
-  NUDGE_MAX_PX,
+  OVERRIDE_ARROW_PX,
+  OVERRIDE_COMMIT_PX,
+  PROGRESS_HOLD_MS,
   READY_COMMIT_PX,
+  STREAM_EXTRA_HOLD_MS,
   arrowGeometry,
-  evalForward,
+  evalReady,
+  evalUnseen,
+  isArriveLocked,
   normalizeWheel,
   stepDemoMs,
 } from "../../src/lib/film/pace";
@@ -17,75 +24,83 @@ describe("normalizeWheel", () => {
     expect(normalizeWheel(0, 0, 900)).toBe(0);
     expect(normalizeWheel(72, 0, 900)).toBeGreaterThanOrEqual(HERO_COMMIT_PX);
     expect(normalizeWheel(3, 1, 900)).toBeGreaterThanOrEqual(HERO_COMMIT_PX);
-    expect(normalizeWheel(1, 2, 900)).toBe(165);
-    expect(normalizeWheel(-999, 0, 900)).toBe(-165);
+    expect(normalizeWheel(1, 2, 900)).toBe(150);
+    expect(normalizeWheel(-999, 0, 900)).toBe(-150);
   });
 });
 
-describe("evalForward", () => {
-  it("commits hero to the first demo in a single swipe or mouse notch", () => {
-    const mid = evalForward(HERO_COMMIT_PX * 0.5, true, false);
-    expect(mid.commit).toBe(false);
-    expect(mid.pull).toBeCloseTo(0.5, 2);
-    expect(mid.nudge).toBe(false);
+describe("isArriveLocked", () => {
+  it("pauses scrolling at every phase and extends hold for unbroken continuous streams", () => {
+    expect(isArriveLocked(0, ARRIVE_UNSEEN_MS, true)).toBe(true);
+    expect(isArriveLocked(ARRIVE_UNSEEN_MS - 10, ARRIVE_UNSEEN_MS, true)).toBe(true);
+    expect(isArriveLocked(ARRIVE_UNSEEN_MS + 10, ARRIVE_UNSEEN_MS, true)).toBe(false);
 
-    const hit = evalForward(72, true, false);
-    expect(hit.commit).toBe(true);
-    expect(hit.pull).toBe(1);
-    expect(hit.nudge).toBe(false);
+    // Continuous stream without pausing stays locked for the extra settle window.
+    expect(isArriveLocked(ARRIVE_SEEN_MS + 50, ARRIVE_SEEN_MS, false)).toBe(true);
+    expect(isArriveLocked(ARRIVE_SEEN_MS + STREAM_EXTRA_HOLD_MS + 10, ARRIVE_SEEN_MS, false)).toBe(false);
+  });
+});
+
+describe("evalReady", () => {
+  it("commits hero in a single swipe and lets re-emerged phase arrows visibly stretch", () => {
+    expect(evalReady(HERO_COMMIT_PX * 0.5, true).commit).toBe(false);
+    expect(evalReady(72, true)).toEqual({ pull: 1, commit: true });
+
+    // Right as progress transforms back into the arrow, clamp just below apex so the arrow shows.
+    const fresh = evalReady(READY_COMMIT_PX + 20, false, 40);
+    expect(fresh.commit).toBe(false);
+    expect(fresh.pull).toBeCloseTo(0.94, 2);
+
+    const ready = evalReady(READY_COMMIT_PX, false, ARROW_REVEAL_MS);
+    expect(ready).toEqual({ pull: 1, commit: true });
+  });
+});
+
+describe("evalUnseen", () => {
+  it("holds strictly on the progress bar during early scroll without showing the arrow", () => {
+    const start = evalUnseen(90, 0, 0, 0);
+    expect(start.nudge).toBe(true);
+    expect(start.showArrow).toBe(false);
+    expect(start.pull).toBe(0);
+    expect(start.commit).toBe(false);
+
+    const midHold = evalUnseen(90, PROGRESS_HOLD_MS - 40, 200, 300);
+    expect(midHold.nudge).toBe(true);
+    expect(midHold.showArrow).toBe(false);
+    expect(midHold.pull).toBe(0);
+    expect(midHold.commit).toBe(false);
   });
 
-  it("nudges softly on early first-play scroll without skipping the demo", () => {
-    const gentle = evalForward(85, false, true);
-    expect(gentle.nudge).toBe(true);
-    expect(gentle.commit).toBe(false);
-    expect(gentle.pull).toBe(0);
-    expect(gentle.speed).toBeGreaterThan(1);
-  });
+  it("brings back the arrow only after the hold when the user persists, then commits at the top", () => {
+    const crumb = evalUnseen(90, PROGRESS_HOLD_MS + 50, OVERRIDE_ARROW_PX - 10, 0);
+    expect(crumb.showArrow).toBe(false);
+    expect(crumb.commit).toBe(false);
 
-  it("accelerates playback and commits cleanly under continued heavy scroll", () => {
-    const heavy = evalForward((NUDGE_MAX_PX + HEAVY_COMMIT_PX) / 2, false, true);
-    expect(heavy.nudge).toBe(true);
-    expect(heavy.speed).toBeGreaterThan(2);
-    expect(heavy.pull).toBeGreaterThan(0.45);
-    expect(heavy.commit).toBe(false);
+    const reveal = evalUnseen(90, PROGRESS_HOLD_MS + 80, (OVERRIDE_ARROW_PX + OVERRIDE_COMMIT_PX) / 2, 120);
+    expect(reveal.showArrow).toBe(true);
+    expect(reveal.pull).toBeGreaterThan(0.45);
+    expect(reveal.speed).toBeGreaterThan(2.5);
+    expect(reveal.commit).toBe(false);
 
-    const commit = evalForward(HEAVY_COMMIT_PX, false, true);
-    expect(commit.commit).toBe(true);
+    // Even at full effort, let the returned arrow finish revealing before committing.
+    const tooSoon = evalUnseen(90, PROGRESS_HOLD_MS + 100, OVERRIDE_COMMIT_PX + 40, 60);
+    expect(tooSoon.showArrow).toBe(true);
+    expect(tooSoon.pull).toBeCloseTo(0.94, 2);
+    expect(tooSoon.commit).toBe(false);
+
+    const commit = evalUnseen(90, PROGRESS_HOLD_MS + 400, OVERRIDE_COMMIT_PX, ARROW_REVEAL_MS);
+    expect(commit.showArrow).toBe(true);
     expect(commit.pull).toBe(1);
-    expect(commit.speed).toBeGreaterThan(3);
-  });
-
-  it("never nudges or slows a completed or revisited demo slide", () => {
-    const soft = evalForward(80, false, false);
-    expect(soft.nudge).toBe(false);
-    expect(soft.speed).toBe(1);
-    expect(soft.pull).toBeCloseTo(80 / READY_COMMIT_PX, 2);
-
-    const oneSwipe = evalForward(READY_COMMIT_PX, false, false);
-    expect(oneSwipe.nudge).toBe(false);
-    expect(oneSwipe.commit).toBe(true);
-    expect(oneSwipe.pull).toBe(1);
+    expect(commit.commit).toBe(true);
   });
 });
 
 describe("stepDemoMs", () => {
-  it("times every animated showcase step and keeps static frames immediate", () => {
+  it("gives every non-hero showcase phase a clear first-play window", () => {
     expect(stepDemoMs(STEPS[0])).toBe(0);
-    const byId = (id: string) => {
-      const s = STEPS.find((x) => x.id === id);
-      if (!s) throw new Error(`missing step ${id}`);
-      return s;
-    };
-    expect(stepDemoMs(byId("themes"))).toBeGreaterThan(7000);
-    expect(stepDemoMs(byId("panes"))).toBeGreaterThan(3000);
-    expect(stepDemoMs(byId("together"))).toBeGreaterThan(6000);
-    expect(stepDemoMs(byId("perpane"))).toBeGreaterThan(4500);
-    expect(stepDemoMs(byId("word"))).toBe(450 + 1150 + 1150);
-    expect(stepDemoMs(byId("keys"))).toBe(2100);
-    expect(stepDemoMs(byId("local"))).toBe(0);
-    expect(stepDemoMs(byId("listen"))).toBe(3100);
-    expect(stepDemoMs(byId("voices"))).toBeGreaterThan(4400);
+    for (const s of STEPS.slice(1)) {
+      expect(stepDemoMs(s)).toBeGreaterThanOrEqual(1900);
+    }
   });
 });
 

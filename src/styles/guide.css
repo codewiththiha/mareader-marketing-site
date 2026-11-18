@@ -1,4 +1,4 @@
-/* Film chapter rail and living scroll guide — warm editorial ink matching site chrome. */
+/* Film chapter rail and morphing arrow-to-progress scroll guide. */
 .film-rail {
   position: absolute;
   left: max(12px, env(safe-area-inset-left, 0px) + 10px);
@@ -61,7 +61,7 @@
   transform: scaleX(2.4);
 }
 .rail-tick.active.playing > i {
-  background: var(--site-accent);
+  background: var(--accent);
 }
 
 @media (max-width: 820px), (orientation: portrait) {
@@ -70,18 +70,23 @@
   }
 }
 
-/* Living bottom-center scroll cue */
+/* Bottom-center slot housing the unified morphing arrow <-> progress capsule */
 .cue-slot {
+  --cue-accent: #7a4e06;
   position: absolute;
   left: 50%;
-  bottom: max(14px, env(safe-area-inset-bottom, 0px) + 10px);
+  bottom: max(28px, env(safe-area-inset-bottom, 0px) + 22px);
   transform: translate3d(-50%, 8px, 0);
   z-index: 4;
+  contain: layout style;
   opacity: 0;
   pointer-events: none;
   transition:
-    opacity 0.56s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.56s cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 0.54s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.54s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cue-slot[data-cue-dark="true"] {
+  --cue-accent: #e3a55b;
 }
 .cue-slot.in {
   opacity: 1;
@@ -95,8 +100,8 @@
     transform 0.34s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* Slender vertical arrow channel (34x54 pill) + editorial micro-caption */
-.cue-riser-wrap {
+.cue-btn {
+  position: relative;
   pointer-events: auto;
   appearance: none;
   border: 0;
@@ -105,136 +110,132 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 5px;
+  justify-content: flex-end;
   cursor: pointer;
   color: var(--cue-ink);
   -webkit-tap-highlight-color: transparent;
-  animation: cue-rise-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
-.cue-riser-wrap:focus-visible {
+.cue-btn:focus-visible {
   outline: none;
 }
-.cue-riser-wrap:focus-visible .cue-riser {
-  outline: 2px solid var(--site-accent);
+.cue-btn:focus-visible .cue-pill {
+  outline: 2px solid var(--cue-accent);
   outline-offset: 3px;
 }
 
-.cue-riser {
+/* Single capsule that morphs smoothly between vertical arrow (34x54) and horizontal progress */
+.cue-pill {
+  position: relative;
+  display: block;
   width: 34px;
   height: 54px;
   border-radius: 999px;
+  overflow: hidden;
+  contain: layout style paint;
   border: 1px solid color-mix(in srgb, var(--cue-ink) 14%, transparent);
-  background: color-mix(in srgb, var(--cue-bg) 86%, transparent);
+  background: color-mix(in srgb, var(--cue-bg) 87%, transparent);
   box-shadow:
     0 6px 20px -10px rgba(24, 18, 10, 0.24),
     0 1px 2px rgba(24, 18, 10, 0.05),
     inset 0 1px 0 rgba(255, 255, 255, 0.28);
-  display: grid;
-  place-items: center;
   color: var(--cue-ink);
+  opacity: 1;
   transform: translate3d(0, calc(var(--cue-pull, 0) * -3px), 0);
   transition:
+    width 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.32s ease,
     background-color 0.34s ease,
-    border-color 0.32s ease,
+    border-color 0.3s ease,
     color 0.32s ease,
     box-shadow 0.32s ease;
 }
-.cue-slot[data-cue-dark="true"] .cue-riser,
-.cue-slot[data-cue-dark="true"] .cue-watch,
+
+.cue-btn[data-mode="progress"] .cue-pill {
+  width: 72px;
+  height: 26px;
+  opacity: 0.84;
+  border-color: color-mix(in srgb, var(--cue-ink) 13%, transparent);
+  background: color-mix(in srgb, var(--cue-bg) 86%, transparent);
+}
+.cue-btn[data-mode="nudge"] .cue-pill {
+  width: 152px;
+  height: 28px;
+  opacity: 1;
+  background: color-mix(in srgb, var(--cue-bg) 95%, transparent);
+  border-color: color-mix(in srgb, var(--cue-accent) 44%, transparent);
+}
+.cue-pill.bob {
+  transform: translate3d(0, -4px, 0);
+  opacity: 0.98;
+  border-color: color-mix(in srgb, var(--cue-accent) 42%, transparent);
+}
+
+.cue-slot[data-cue-dark="true"] .cue-pill,
 .cue-slot[data-cue-dark="true"] .cue-whisper {
   box-shadow:
     0 8px 22px -10px rgba(0, 0, 0, 0.52),
     inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
-.cue-riser-wrap:hover .cue-riser {
+.cue-btn:hover .cue-pill {
+  opacity: 0.98;
   border-color: color-mix(in srgb, var(--cue-ink) 24%, transparent);
   background: color-mix(in srgb, var(--cue-bg) 93%, transparent);
 }
-.cue-slot.pulling .cue-riser {
+.cue-slot.pulling .cue-pill {
   border-color: color-mix(in srgb, var(--cue-ink) 26%, transparent);
   background: color-mix(in srgb, var(--cue-bg) 94%, transparent);
 }
-.cue-slot.fast .cue-riser {
-  border-color: color-mix(in srgb, var(--site-accent) 44%, transparent);
-}
-.cue-riser svg {
-  display: block;
-  overflow: visible;
+.cue-slot.fast .cue-pill {
+  border-color: color-mix(in srgb, var(--cue-accent) 48%, transparent);
 }
 
-.cue-whisper {
-  font-family: var(--font-ui);
-  font-size: 10.5px;
-  font-weight: 500;
-  letter-spacing: 0.02em;
-  line-height: 1;
-  color: var(--cue-muted);
-  white-space: nowrap;
-  padding: 4px 8px;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--cue-bg) 82%, transparent);
-  border: 1px solid color-mix(in srgb, var(--cue-ink) 8%, transparent);
-  opacity: 0;
-  transform: translate3d(0, 3px, 0);
-  pointer-events: none;
-  transition:
-    opacity 0.28s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.32s cubic-bezier(0.22, 1, 0.36, 1),
-    color 0.28s ease;
-}
-.cue-whisper.on {
-  opacity: 0.94;
-  transform: translate3d(0, 0, 0);
-}
-.cue-whisper:empty {
-  display: none;
-}
-
-/* First-play watching pill — calm progress hairline that softly reveals "Still playing" */
-.cue-watch {
-  pointer-events: auto;
-  appearance: none;
-  border: 1px solid color-mix(in srgb, var(--cue-ink) 12%, transparent);
-  background: color-mix(in srgb, var(--cue-bg) 84%, transparent);
-  color: var(--cue-ink);
-  border-radius: 999px;
-  height: 26px;
-  padding: 0 11px;
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  cursor: pointer;
-  opacity: 0.78;
-  transform: translate3d(0, 0, 0);
-  box-shadow:
-    0 4px 16px -8px rgba(24, 18, 10, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.22);
-  -webkit-tap-highlight-color: transparent;
-  animation: cue-watch-in 0.36s cubic-bezier(0.22, 1, 0.36, 1) both;
-  transition:
-    opacity 0.32s ease,
-    transform 0.32s cubic-bezier(0.22, 1, 0.36, 1),
-    border-color 0.3s ease,
-    background-color 0.32s ease,
-    padding 0.32s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.cue-watch:hover,
-.cue-watch:focus-visible {
-  opacity: 0.96;
-  border-color: color-mix(in srgb, var(--cue-ink) 22%, transparent);
-  outline: none;
-}
-.cue-watch:focus-visible {
-  outline: 2px solid var(--site-accent);
-  outline-offset: 2px;
-}
-.cue-watch.nudge {
+/* Arrow layer: rises smoothly inside the vertical slot, tucks inward when morphing to progress */
+.cue-arrow-layer {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
   opacity: 1;
-  background: color-mix(in srgb, var(--cue-bg) 94%, transparent);
-  border-color: color-mix(in srgb, var(--site-accent) 38%, transparent);
+  transform: translate3d(0, 0, 0) scale(1);
+  transition:
+    opacity 0.28s cubic-bezier(0.22, 1, 0.36, 1) 0.07s,
+    transform 0.38s cubic-bezier(0.22, 1, 0.36, 1) 0.04s;
 }
-.cue-watch.bob {
-  transform: translate3d(0, -3.5px, 0);
+.cue-btn:not([data-mode="arrow"]) .cue-arrow-layer {
+  opacity: 0;
+  transform: translate3d(0, 3px, 0) scale(0.62);
+  transition:
+    opacity 0.18s ease,
+    transform 0.24s cubic-bezier(0.32, 0, 0.67, 0);
+}
+.cue-arrow-layer svg {
+  display: block;
+  flex: none;
+}
+
+/* Progress layer: unfurls horizontally from the arrow, folds back inward when arrow returns */
+.cue-track-layer {
+  position: absolute;
+  inset: 0;
+  padding: 0 11px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 7px;
+  opacity: 0;
+  transform: scale(0.76);
+  transition:
+    opacity 0.18s ease,
+    transform 0.24s cubic-bezier(0.32, 0, 0.67, 0);
+}
+.cue-btn:not([data-mode="arrow"]) .cue-track-layer {
+  opacity: 1;
+  transform: scale(1);
+  transition:
+    opacity 0.28s cubic-bezier(0.22, 1, 0.36, 1) 0.08s,
+    transform 0.36s cubic-bezier(0.22, 1, 0.36, 1) 0.05s;
 }
 
 .cue-dot {
@@ -243,16 +244,17 @@
   border-radius: 50%;
   flex: none;
   background: var(--cue-muted);
-  opacity: 0.75;
+  opacity: 0.8;
   transition:
-    background-color 0.28s ease,
-    transform 0.3s ease,
-    opacity 0.28s ease;
+    background-color 0.26s ease,
+    transform 0.28s ease,
+    opacity 0.26s ease;
 }
-.cue-watch.nudge .cue-dot {
-  background: var(--site-accent);
+.cue-btn[data-mode="nudge"] .cue-dot,
+.cue-pill.bob .cue-dot {
+  background: var(--cue-accent);
   opacity: 1;
-  transform: scale(1.18);
+  transform: scale(1.2);
 }
 
 .cue-bar {
@@ -261,7 +263,7 @@
   height: 2px;
   border-radius: 999px;
   flex: none;
-  background: color-mix(in srgb, var(--cue-ink) 15%, transparent);
+  background: color-mix(in srgb, var(--cue-ink) 16%, transparent);
   overflow: hidden;
 }
 .cue-bar > i {
@@ -270,97 +272,111 @@
   height: 100%;
   border-radius: inherit;
   background: var(--cue-ink);
-  opacity: 0.78;
+  opacity: 0.82;
   transform-origin: left center;
   transition:
-    transform 0.14s linear,
-    background-color 0.28s ease;
+    transform 0.12s linear,
+    background-color 0.26s ease;
 }
-.cue-watch.nudge .cue-bar > i {
-  background: var(--site-accent);
-  opacity: 0.95;
+.cue-btn[data-mode="nudge"] .cue-bar > i,
+.cue-pill.bob .cue-bar > i {
+  background: var(--cue-accent);
+  opacity: 0.96;
 }
 
-.cue-note-clip {
-  display: inline-grid;
-  grid-template-columns: 0fr;
-  opacity: 0;
-  margin-left: -7px;
-  transition:
-    grid-template-columns 0.34s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.26s ease,
-    margin-left 0.34s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.cue-note-clip.on {
-  grid-template-columns: 1fr;
-  opacity: 1;
-  margin-left: 1px;
-}
 .cue-note {
-  overflow: hidden;
+  flex: none;
+  margin-left: 1px;
   font-family: var(--font-ui);
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.01em;
   line-height: 1;
+  color: var(--cue-ink);
+  white-space: nowrap;
+  opacity: 0;
+  transform: translate3d(5px, 0, 0);
+  transition:
+    opacity 0.24s ease,
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cue-btn[data-mode="nudge"] .cue-note {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition-delay: 0.06s;
+}
+
+.cue-whisper {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 50%;
+  font-family: var(--font-ui);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1;
   color: var(--cue-muted);
   white-space: nowrap;
+  padding: 3.5px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--cue-bg) 84%, transparent);
+  border: 1px solid color-mix(in srgb, var(--cue-ink) 8%, transparent);
+  opacity: 0;
+  transform: translate3d(-50%, 2px, 0);
+  pointer-events: none;
+  transition:
+    opacity 0.26s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.28s ease;
 }
-.cue-watch.nudge .cue-note {
-  color: var(--cue-ink);
+.cue-whisper.on {
+  opacity: 0.94;
+  transform: translate3d(-50%, 0, 0);
 }
-
-@keyframes cue-rise-in {
-  from {
-    opacity: 0;
-    transform: translate3d(0, 6px, 0) scale(0.92);
-  }
-  to {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-}
-
-@keyframes cue-watch-in {
-  from {
-    opacity: 0;
-    transform: translate3d(0, 4px, 0) scale(0.95);
-  }
-  to {
-    opacity: 0.78;
-    transform: translate3d(0, 0, 0) scale(1);
-  }
+.cue-whisper:empty {
+  display: none;
 }
 
 @media (max-width: 640px) {
   .cue-slot {
-    bottom: max(10px, env(safe-area-inset-bottom, 0px) + 8px);
+    bottom: max(24px, env(safe-area-inset-bottom, 0px) + 18px);
   }
-  .cue-riser {
+  .cue-pill {
     width: 32px;
     height: 48px;
   }
-  .cue-riser svg {
+  .cue-arrow-layer svg {
     width: 32px;
     height: 48px;
+  }
+  .cue-btn[data-mode="progress"] .cue-pill {
+    width: 68px;
+    height: 25px;
+  }
+  .cue-btn[data-mode="nudge"] .cue-pill {
+    width: 146px;
+    height: 27px;
   }
   .cue-whisper {
     font-size: 10px;
-    padding: 3.5px 7px;
+    padding: 3px 7px;
   }
 }
 
 @media (max-height: 680px) and (orientation: portrait) {
   .cue-slot {
-    bottom: max(6px, env(safe-area-inset-bottom, 0px) + 5px);
+    bottom: max(12px, env(safe-area-inset-bottom, 0px) + 8px);
   }
-  .cue-riser {
+  .cue-pill {
     width: 30px;
-    height: 44px;
+    height: 42px;
   }
-  .cue-riser svg {
+  .cue-arrow-layer svg {
     width: 30px;
-    height: 44px;
+    height: 42px;
+  }
+  .cue-whisper {
+    display: none;
   }
 }
 
@@ -369,12 +385,13 @@
   .rail-tick,
   .rail-tick > i,
   .cue-slot,
-  .cue-riser,
-  .cue-whisper,
-  .cue-watch,
+  .cue-pill,
+  .cue-arrow-layer,
+  .cue-track-layer,
   .cue-dot,
   .cue-bar > i,
-  .cue-note-clip {
+  .cue-note,
+  .cue-whisper {
     transition: none;
     animation: none;
   }

@@ -8,7 +8,25 @@
   import ScrollCue from "./ScrollCue.svelte";
   import { Camera } from "./camera";
   import { camOf, layoutOf, maskFor, type Layout, type Side } from "./layout";
-  import { BACK_PULL_PX, HEAVY_COMMIT_PX, clamp, evalForward, frameDur, normalizeWheel, stepDemoMs } from "./pace";
+  import {
+    ARRIVE_BACK_MS,
+    ARRIVE_SEEN_MS,
+    ARRIVE_UNSEEN_MS,
+    ARROW_REVEAL_MS,
+    BACK_PULL_PX,
+    NUDGE_MIN_PX,
+    OVERRIDE_ARROW_PX,
+    OVERRIDE_COMMIT_PX,
+    PROGRESS_HOLD_MS,
+    STREAM_QUIET_MS,
+    clamp,
+    evalReady,
+    evalUnseen,
+    frameDur,
+    isArriveLocked,
+    normalizeWheel,
+    stepDemoMs,
+  } from "./pace";
   import { STEPS, bakeKey, stateOf } from "./steps";
 
   let { site }: { site: Site } = $props();
@@ -35,7 +53,11 @@
   let tl = $state({ step: 0, frame: 0 });
 
   const seen = new SvelteSet<number>([0]);
-  let progress = $state(1);
+  let demoProgress = $state(1);
+  let settling = $state(false);
+  let settleProgress = $state(1);
+  let overrideArrow = $state(false);
+  let leaving = $state(false);
   let pull = $state(0);
   let nudge = $state(false);
   let nudgePulse = $state(0);
@@ -100,115 +122,234 @@
     return Math.round(el.offsetTop + (bounds[i] + (bounds[i + 1] - bounds[i]) * 0.45) * span);
   };
 
+  // Phase arrival & gesture state (non-reactive hot-path fields).
   let syncUntil = 0;
   let syncTarget = -1;
   let leavingUntil = 0;
-  let lastBobAt = 0;
-  let effort = 0;
+  let wasBelow = false;
+
+  let arriveAt = -1e9;
+  let arriveBaseMs = 0;
+  let streamBroken = true;
+  let lastInputAt = -1e9;
+  let lastKeyAt = -1e9;
+  let lastBobAt = -1e9;
+
+  let inertiaUntil = 0;
+  let inertiaTail = 0;
+  let inertiaDir = 0;
+
+  let readyEffort = 0;
   let backEffort = 0;
-  let touchBank = 0;
+  let preEffort = 0;
+  let postEffort = 0;
+  let holdStartedAt = 0;
+  let arrowShownAt = 0;
+  let readyArrowAt = -1e9;
+  let touchPostBank = 0;
+
   let relaxTimer = 0;
   let nudgeTimer = 0;
-  let bankTimer = 0;
-  let shieldHard = 0;
-  let shieldSoft = 0;
-  let shieldTail = 0;
-  let shieldDir = 0;
-  let lastWheelAt = 0;
+  let holdResetTimer = 0;
+  let settleTimer = 0;
 
-  const clearTimers = () => {
+  const clearInputTimers = () => {
     window.clearTimeout(relaxTimer);
     window.clearTimeout(nudgeTimer);
-    window.clearTimeout(bankTimer);
+    window.clearTimeout(holdResetTimer);
   };
 
-  const resetPull = () => {
-    clearTimers();
-    effort = 0;
+  const clearAllTimers = () => {
+    clearInputTimers();
+    window.clearInterval(settleTimer);
+  };
+
+  const resetEffort = () => {
+    clearInputTimers();
+    readyEffort = 0;
     backEffort = 0;
-    touchBank = 0;
+    preEffort = 0;
+    postEffort = 0;
+    holdStartedAt = 0;
+    arrowShownAt = 0;
+    touchPostBank = 0;
     pull = 0;
     nudge = false;
+    overrideArrow = false;
     speed = 1;
   };
 
-  const armShield = (dir: number, sampleAbs: number) => {
+  const pulseBob = (minGap = 310) => {
     const now = performance.now();
-    shieldDir = dir;
-    shieldTail = Math.max(12, sampleAbs);
-    shieldHard = now + 330;
-    shieldSoft = now + 980;
+    if (now - lastBobAt < minGap) return;
+    lastBobAt = now;
+    nudgePulse++;
+  };
+
+  const armInertiaGuard = (dir: number, sampleAbs: number) => {
+    inertiaDir = dir;
+    inertiaTail = Math.max(14, sampleAbs);
+    inertiaUntil = performance.now() + 1250;
+  };
+
+  // Starts the brief arrival-settle progress sweep so continuous scrolling stops at every phase.
+  const beginArrival = (idx: number, dir: number, fromContinuous: boolean) => {
+    window.clearInterval(settleTimer);
+    const now = performance.now();
+    const isSeen = seen.has(idx);
+    arriveAt = now;
+    streamBroken = !fromContinuous;
+    arriveBaseMs = idx === 0 ? 480 : dir < 0 ? ARRIVE_BACK_MS : isSeen ? ARRIVE_SEEN_MS : ARRIVE_UNSEEN_MS;
+
+    if (idx === 0 || !isSeen) {
+      settling = false;
+      settleProgress = 1;
+      return;
+    }
+
+    settling = true;
+    settleProgress = 0.08;
+    settleTimer = window.setInterval(() => {
+      const t = performance.now();
+      const elapsed = t - arriveAt;
+      if (t - lastInputAt >= STREAM_QUIET_MS) streamBroken = true;
+      settleProgress = clamp(elapsed / Math.max(1, arriveBaseMs), 0.08, 1);
+      if (!isArriveLocked(elapsed, arriveBaseMs, streamBroken)) {
+        window.clearInterval(settleTimer);
+        settling = false;
+        settleProgress = 1;
+        readyArrowAt = t;
+      }
+    }, 65);
   };
 
   const setStepScroll = (idx: number) => {
     const top = stepScrollY(idx);
     syncTarget = top;
-    syncUntil = performance.now() + 180;
+    syncUntil = performance.now() + 200;
     window.scrollTo({ top, behavior: "auto" });
   };
 
-  const jumpTo = (idx: number, animateCue = false) => {
+  const enterPhase = (idx: number, dir: number, animateCue: boolean, fromContinuous: boolean) => {
     const next = clamp(idx, 0, STEPS.length - 1);
-    resetPull();
+    leaving = false;
+    resetEffort();
     if (animateCue) commitSeq++;
-    if (next === active) return;
-    active = next;
-    setStepScroll(next);
-  };
-
-  const commitNext = () => {
-    seen.add(active);
-    commitSeq++;
-    resetPull();
-    if (active < STEPS.length - 1) {
-      const next = active + 1;
+    if (next !== active) {
       active = next;
       setStepScroll(next);
+    }
+    beginArrival(next, dir, fromContinuous);
+  };
+
+  const jumpTo = (idx: number) => {
+    const next = clamp(idx, 0, STEPS.length - 1);
+    if (next === active) return;
+    enterPhase(next, next > active ? 1 : -1, false, false);
+  };
+
+  const commitNext = (fromContinuous = true) => {
+    seen.add(active);
+    if (active < STEPS.length - 1) {
+      enterPhase(active + 1, 1, true, fromContinuous);
       return;
     }
     const el = filmEl;
     if (!el) return;
+    window.clearInterval(settleTimer);
+    settling = false;
+    leaving = true;
+    commitSeq++;
+    resetEffort();
     const now = performance.now();
     syncTarget = -1;
-    syncUntil = now + 720;
-    leavingUntil = now + 720;
+    syncUntil = now + 780;
+    leavingUntil = now + 780;
     const target = Math.max(0, el.offsetTop + el.offsetHeight - Math.round(window.innerHeight * 0.14));
     window.scrollTo({ top: target, behavior: perf.reduced ? "auto" : "smooth" });
   };
 
-  const commitPrev = () => {
-    resetPull();
+  const commitPrev = (fromContinuous = true) => {
     if (active <= 0) return;
-    const prev = active - 1;
-    active = prev;
-    setStepScroll(prev);
+    enterPhase(active - 1, -1, false, fromContinuous);
   };
 
-  const scheduleRelax = (ms = 270) => {
+  const handleCueClick = () => {
+    const now = performance.now();
+    const elapsed = now - arriveAt;
+    // Absorb accidental double-taps right as a new phase lands.
+    if (settling || elapsed < Math.min(460, arriveBaseMs)) {
+      pulseBob(220);
+      return;
+    }
+    const readyNow = active === 0 || seen.has(active) || overrideArrow;
+    if (readyNow) {
+      commitNext(false);
+      return;
+    }
+    // On an unseen phase, first click highlights progress; clicking again while trying reveals arrow & continues.
+    if (holdStartedAt === 0) {
+      preEffort = NUDGE_MIN_PX + 10;
+      holdStartedAt = now;
+      speed = 1.45;
+      holdNudge(true, 1750);
+      scheduleHoldReset(2800);
+      return;
+    }
+    if (now - holdStartedAt < 360) {
+      pulseBob(180);
+      return;
+    }
+    overrideArrow = true;
+    pull = 0.65;
+    commitNext(false);
+  };
+
+  const scheduleReadyRelax = (ms = 320) => {
     window.clearTimeout(relaxTimer);
     relaxTimer = window.setTimeout(() => {
-      effort = 0;
+      readyEffort = 0;
       backEffort = 0;
+      pull = 0;
+    }, ms);
+  };
+
+  const scheduleOverrideRelax = (ms = 560) => {
+    window.clearTimeout(relaxTimer);
+    relaxTimer = window.setTimeout(() => {
+      postEffort = 0;
+      touchPostBank = 0;
+      arrowShownAt = 0;
+      overrideArrow = false;
       pull = 0;
       speed = 1;
     }, ms);
   };
 
-  const holdNudge = (softBob = false, ms = 1450) => {
-    nudge = true;
-    if (softBob) {
-      const now = performance.now();
-      if (now - lastBobAt > 280) {
-        lastBobAt = now;
-        nudgePulse++;
-      }
-    }
-    window.clearTimeout(nudgeTimer);
-    nudgeTimer = window.setTimeout(() => {
-      nudge = false;
+  const scheduleHoldReset = (ms = 2200) => {
+    window.clearTimeout(holdResetTimer);
+    holdResetTimer = window.setTimeout(() => {
+      preEffort = 0;
+      postEffort = 0;
+      touchPostBank = 0;
+      holdStartedAt = 0;
+      arrowShownAt = 0;
+      overrideArrow = false;
+      pull = 0;
+      speed = 1;
     }, ms);
   };
 
+  const holdNudge = (bob = false, ms = 1600) => {
+    nudge = true;
+    if (bob) pulseBob();
+    window.clearTimeout(nudgeTimer);
+    nudgeTimer = window.setTimeout(() => {
+      if (!overrideArrow) nudge = false;
+    }, ms);
+  };
+
+  // Scroll reader handles scrollbar drags, programmatic jumps, and re-entry from below-the-fold sections.
   $effect(() => {
     let raf = 0;
     const read = () => {
@@ -218,16 +359,26 @@
       const r = el.getBoundingClientRect();
       const vh = window.innerHeight;
       inView = r.bottom > 0 && r.top < vh;
+      const below = r.bottom < vh - 3;
+      const reentered = wasBelow && !below && r.top <= 3;
+      wasBelow = below;
+      if (!below && leaving) leaving = false;
       const now = performance.now();
       if (now < leavingUntil) return;
+      if (reentered) {
+        lastInputAt = now;
+        beginArrival(active, -1, true);
+      }
       if (now < syncUntil && syncTarget >= 0 && Math.abs(window.scrollY - syncTarget) <= 6) return;
       const span = Math.max(1, el.offsetHeight - vh);
       const p = clamp(-r.top / span, 0, 0.99999);
       let i = 0;
       while (i < STEPS.length - 1 && p >= bounds[i + 1]) i++;
       if (i !== active) {
-        resetPull();
+        resetEffort();
+        const dir = i > active ? 1 : -1;
         active = i;
+        beginArrival(i, dir, false);
       }
     };
     const on = () => {
@@ -243,6 +394,7 @@
     };
   });
 
+  // Wheel, touch, and keyboard choreography with mandatory arrival pause and progress-first hold.
   $effect(() => {
     const el = filmEl;
     if (!el) return;
@@ -270,53 +422,126 @@
       e.preventDefault();
       const abs = Math.abs(dy);
       const dir = dy > 0 ? 1 : -1;
-      const gap = now - lastWheelAt;
-      lastWheelAt = now;
+      const gap = now - lastInputAt;
+      if (gap >= STREAM_QUIET_MS) streamBroken = true;
+      lastInputAt = now;
 
-      if (dir === shieldDir && now < shieldSoft) {
-        if (now < shieldHard || (gap < 115 && abs <= shieldTail * 1.34 + 8)) {
-          shieldTail = Math.min(shieldTail * 0.97 + 1, abs);
-          return;
-        }
-        shieldSoft = 0;
+      // Track and swallow decaying trackpad momentum carried over from the previous phase.
+      const isInertiaTail = dir === inertiaDir && now < inertiaUntil && gap < 135 && abs <= inertiaTail * 1.28 + 6;
+      if (isInertiaTail) inertiaTail = Math.min(inertiaTail * 0.97 + 1, abs);
+      else if (gap >= STREAM_QUIET_MS || dir !== inertiaDir || abs > inertiaTail * 1.45 + 14) inertiaUntil = 0;
+
+      // Mandatory phase-arrival pause: stop continuous scroll cleanly while showing the progress pill.
+      const arriveElapsed = now - arriveAt;
+      if (isArriveLocked(arriveElapsed, arriveBaseMs, streamBroken)) {
+        if (!isInertiaTail && dir > 0 && active > 0 && arriveElapsed > 360) pulseBob(340);
+        return;
       }
+      if (settling) {
+        window.clearInterval(settleTimer);
+        settling = false;
+        settleProgress = 1;
+        readyArrowAt = now;
+      }
+      if (isInertiaTail) return;
 
+      // Forward scrolling
       if (dy > 0) {
         backEffort = 0;
-        if (gap > 420) effort *= 0.25;
         const firstUnseen = active > 0 && !seen.has(active);
-        const boost = firstUnseen && abs > 68 ? 1.24 : 1;
-        effort += dy * boost;
-        const ev = evalForward(effort, active === 0, firstUnseen);
-        pull = ev.pull;
-        speed = ev.speed;
-        if (ev.nudge) holdNudge(ev.pull <= 0.03);
-        if (ev.commit) {
-          armShield(1, abs);
-          commitNext();
+
+        if (!firstUnseen) {
+          if (gap > 420) readyEffort = 0;
+          readyEffort += dy;
+          const ev = evalReady(readyEffort, active === 0, now - readyArrowAt);
+          pull = ev.pull;
+          if (ev.commit) {
+            armInertiaGuard(1, abs);
+            commitNext(true);
+            return;
+          }
+          scheduleReadyRelax(320);
           return;
         }
-        scheduleRelax(280);
-        return;
-      }
 
-      if (effort > 6) {
-        effort = Math.max(0, effort + dy * 1.4);
-        const ev = evalForward(effort, active === 0, active > 0 && !seen.has(active));
+        // Unseen demo: Stage 1 stops scrolling & shows progress for PROGRESS_HOLD_MS.
+        if (holdStartedAt === 0) {
+          preEffort += dy;
+          if (preEffort < NUDGE_MIN_PX) {
+            scheduleHoldReset(600);
+            return;
+          }
+          holdStartedAt = now;
+          const ev = evalUnseen(preEffort, 0, 0, 0);
+          speed = ev.speed;
+          holdNudge(true);
+          scheduleHoldReset(2400);
+          return;
+        }
+
+        const holdElapsed = now - holdStartedAt;
+        if (holdElapsed < PROGRESS_HOLD_MS) {
+          const ev = evalUnseen(preEffort, holdElapsed, 0, 0);
+          overrideArrow = false;
+          pull = 0;
+          speed = ev.speed;
+          holdNudge(true);
+          scheduleHoldReset(2400);
+          return;
+        }
+
+        // Stage 2: user is STILL scrolling after the progress hold — bring back arrow & stretch to top.
+        if (gap > 560) postEffort *= 0.35;
+        postEffort += dy;
+        const willShow = postEffort >= OVERRIDE_ARROW_PX;
+        if (willShow && arrowShownAt === 0) arrowShownAt = now;
+        const shownMs = arrowShownAt > 0 ? now - arrowShownAt : 0;
+        const ev = evalUnseen(preEffort, holdElapsed, postEffort, shownMs);
+        overrideArrow = ev.showArrow;
         pull = ev.pull;
         speed = ev.speed;
-        scheduleRelax(240);
+        holdNudge(!ev.showArrow);
+        if (ev.commit) {
+          armInertiaGuard(1, abs);
+          commitNext(true);
+          return;
+        }
+        scheduleOverrideRelax(560);
+        scheduleHoldReset(2500);
         return;
       }
 
-      if (gap > 360) backEffort = 0;
-      backEffort += abs;
-      if (backEffort >= BACK_PULL_PX) {
-        armShield(-1, abs);
-        commitPrev();
+      // Backward scrolling: first relax any active forward pull before stepping back a phase.
+      if (readyEffort > 6) {
+        readyEffort = Math.max(0, readyEffort + dy * 1.4);
+        pull = evalReady(readyEffort, active === 0).pull;
+        scheduleReadyRelax(260);
         return;
       }
-      scheduleRelax(250);
+      if (postEffort > 6 || overrideArrow) {
+        postEffort = Math.max(0, postEffort + dy * 1.5);
+        if (postEffort < OVERRIDE_ARROW_PX) {
+          arrowShownAt = 0;
+          overrideArrow = false;
+          pull = 0;
+          speed = 1;
+        } else {
+          const ev = evalUnseen(preEffort, PROGRESS_HOLD_MS + 1, postEffort, 0);
+          pull = ev.pull;
+          speed = ev.speed;
+        }
+        scheduleOverrideRelax(420);
+        return;
+      }
+
+      if (gap > 380) backEffort = 0;
+      backEffort += abs;
+      if (backEffort >= BACK_PULL_PX) {
+        armInertiaGuard(-1, abs);
+        commitPrev(true);
+        return;
+      }
+      scheduleReadyRelax(280);
     };
 
     let tId = -1;
@@ -326,6 +551,8 @@
     let lt = 0;
     let vy = 0;
     let axis: "" | "x" | "y" = "";
+    let touchBlocked = false;
+    let touchHoldAnchorY: number | null = null;
 
     const onTouchStart = (e: TouchEvent) => {
       if (e.touches.length !== 1 || performance.now() < leavingUntil) {
@@ -341,14 +568,19 @@
         tId = -1;
         return;
       }
+      const now = performance.now();
+      if (now - lastInputAt >= STREAM_QUIET_MS) streamBroken = true;
+      lastInputAt = now;
       const t = e.touches[0];
       tId = t.identifier;
       sx = t.clientX;
       sy = t.clientY;
       ly = t.clientY;
-      lt = performance.now();
+      lt = now;
       vy = 0;
       axis = "";
+      touchHoldAnchorY = null;
+      touchBlocked = isArriveLocked(now - arriveAt, arriveBaseMs, streamBroken);
       window.clearTimeout(relaxTimer);
     };
 
@@ -369,80 +601,153 @@
       e.preventDefault();
       const now = performance.now();
       const dt = Math.max(4, now - lt);
-      const instV = (ly - t.clientY) / dt;
-      vy = vy * 0.55 + instV * 0.45;
+      vy = vy * 0.55 + ((ly - t.clientY) / dt) * 0.45;
       ly = t.clientY;
       lt = now;
+      lastInputAt = now;
+
+      // Absorb swipes begun during the mandatory phase-arrival pause.
+      if (touchBlocked || isArriveLocked(now - arriveAt, arriveBaseMs, streamBroken)) {
+        if (dy > 20 && active > 0 && now - arriveAt > 320) pulseBob(340);
+        return;
+      }
+      if (settling) {
+        window.clearInterval(settleTimer);
+        settling = false;
+        settleProgress = 1;
+        readyArrowAt = now;
+      }
 
       if (dy <= 0) {
         pull = 0;
-        speed = 1;
+        if (!overrideArrow) speed = 1;
         return;
       }
       if (active === 0) {
-        pull = clamp(dy / 54, 0, 1);
+        pull = clamp(dy / 52, 0, 1);
         return;
       }
       if (seen.has(active)) {
-        pull = clamp(dy / 94, 0, 1);
-        if (dy >= 122) {
+        pull = clamp(dy / 96, 0, 1);
+        if (dy >= 126) {
           tId = -1;
-          commitNext();
+          commitNext(false);
         }
         return;
       }
-      const ev = evalForward(touchBank + dy * 1.45, false, true);
+
+      // First-play unseen touch: hold strictly on progress first; only bring back arrow after PROGRESS_HOLD_MS.
+      if (holdStartedAt === 0) {
+        if (dy < 16) return;
+        preEffort = NUDGE_MIN_PX + dy;
+        holdStartedAt = now;
+        touchHoldAnchorY = t.clientY;
+        speed = 1.22;
+        holdNudge(true, 1750);
+        scheduleHoldReset(3200);
+        return;
+      }
+
+      const holdElapsed = now - holdStartedAt;
+      if (holdElapsed < PROGRESS_HOLD_MS) {
+        touchHoldAnchorY = t.clientY;
+        overrideArrow = false;
+        pull = 0;
+        speed = evalUnseen(preEffort, holdElapsed, 0, 0).speed;
+        holdNudge(true, 1750);
+        scheduleHoldReset(3200);
+        return;
+      }
+
+      const baseY = touchHoldAnchorY ?? sy;
+      const postDy = Math.max(0, baseY - t.clientY);
+      const eff = touchPostBank + postDy * 2.15;
+      if (eff >= OVERRIDE_ARROW_PX && arrowShownAt === 0) arrowShownAt = now;
+      const shownMs = arrowShownAt > 0 ? now - arrowShownAt : 0;
+      const ev = evalUnseen(preEffort, holdElapsed, eff, shownMs);
+      overrideArrow = ev.showArrow;
       pull = ev.pull;
       speed = ev.speed;
-      if (ev.nudge) holdNudge(ev.pull <= 0.03, 1550);
+      holdNudge(!ev.showArrow, 1750);
+      scheduleHoldReset(3200);
       if (ev.commit) {
         tId = -1;
-        commitNext();
+        commitNext(false);
       }
     };
 
     const onTouchEnd = () => {
       if (tId < 0) return;
+      const now = performance.now();
       const dy = sy - ly;
       const flick = vy;
       const wasY = axis === "y";
+      const blocked = touchBlocked;
+      const anchorY = touchHoldAnchorY;
       tId = -1;
       axis = "";
-      if (!wasY) return;
+      touchBlocked = false;
+      touchHoldAnchorY = null;
+      streamBroken = true;
+      if (!wasY || blocked) return;
 
-      if (dy <= -50 || (dy <= -22 && flick <= -0.36)) {
-        commitPrev();
+      if (dy <= -56 || (dy <= -26 && flick <= -0.38)) {
+        commitPrev(false);
         return;
       }
       if (dy <= 0) {
-        scheduleRelax(80);
+        scheduleReadyRelax(120);
         return;
       }
       if (active === 0) {
-        if (dy >= 32 || (dy >= 14 && flick >= 0.26)) commitNext();
-        else scheduleRelax(90);
+        if (dy >= 34 || (dy >= 16 && flick >= 0.28)) commitNext(false);
+        else scheduleReadyRelax(120);
         return;
       }
       if (seen.has(active)) {
-        if (dy >= 56 || (dy >= 22 && flick >= 0.36)) commitNext();
-        else scheduleRelax(90);
+        if (dy >= 62 || (dy >= 26 && flick >= 0.38)) commitNext(false);
+        else scheduleReadyRelax(120);
         return;
       }
-      const energy = touchBank + dy * 1.5 + Math.max(0, flick) * 105;
-      if (energy >= HEAVY_COMMIT_PX * 0.8) {
-        commitNext();
+
+      // First swipe on unseen phase ended during progress hold — stay stopped on progress pill.
+      if (holdStartedAt === 0 || now - holdStartedAt < PROGRESS_HOLD_MS) {
+        if (dy >= 18) {
+          if (holdStartedAt === 0) {
+            preEffort = NUDGE_MIN_PX + dy;
+            holdStartedAt = now;
+          }
+          holdNudge(true, 1750);
+          scheduleHoldReset(3200);
+        }
+        pull = 0;
+        overrideArrow = false;
+        speed = 1;
         return;
       }
-      if (dy >= 20) {
-        touchBank = Math.min(220, touchBank + dy * 1.45 + Math.max(0, flick) * 65);
-        holdNudge(true, 1550);
-        window.clearTimeout(bankTimer);
-        bankTimer = window.setTimeout(() => {
-          touchBank = 0;
-        }, 1900);
+
+      // Post-hold swipe: only commit once the arrow has actually returned and been pulled up.
+      const postDy = Math.max(0, (anchorY ?? sy) - ly);
+      const eff = touchPostBank + postDy * 2.15 + Math.max(0, flick) * 85;
+      const shownMs = arrowShownAt > 0 ? now - arrowShownAt : 0;
+      if (overrideArrow && eff >= OVERRIDE_COMMIT_PX && shownMs >= Math.min(180, ARROW_REVEAL_MS)) {
+        commitNext(false);
+        return;
       }
-      pull = 0;
-      speed = 1;
+      if (postDy >= 18) {
+        touchPostBank = Math.min(OVERRIDE_COMMIT_PX * 0.72, touchPostBank + postDy * 1.75);
+        if (touchPostBank >= OVERRIDE_ARROW_PX) {
+          overrideArrow = true;
+          if (arrowShownAt === 0) arrowShownAt = now;
+          pull = clamp(evalUnseen(preEffort, PROGRESS_HOLD_MS + 1, touchPostBank, 0).pull, 0.14, 0.65);
+          scheduleOverrideRelax(950);
+        } else {
+          holdNudge(true, 1750);
+        }
+        scheduleHoldReset(3200);
+        return;
+      }
+      scheduleOverrideRelax(480);
     };
 
     const onKey = (e: KeyboardEvent) => {
@@ -450,14 +755,19 @@
       const tag = (e.target as HTMLElement | null)?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
       if (!pinnedState().pinned) return;
+      const now = performance.now();
       if (e.key === "ArrowDown" || e.key === "PageDown" || (e.key === " " && !e.shiftKey)) {
         if (e.key === " " && (tag === "A" || tag === "BUTTON")) return;
         e.preventDefault();
-        commitNext();
+        if (now - lastKeyAt < 420) return;
+        lastKeyAt = now;
+        commitNext(false);
       } else if (e.key === "ArrowUp" || e.key === "PageUp" || (e.key === " " && e.shiftKey)) {
         if (active <= 0) return;
         e.preventDefault();
-        commitPrev();
+        if (now - lastKeyAt < 420) return;
+        lastKeyAt = now;
+        commitPrev(false);
       }
     };
 
@@ -468,7 +778,7 @@
     el.addEventListener("touchcancel", onTouchEnd, { passive: true });
     window.addEventListener("keydown", onKey);
     return () => {
-      clearTimers();
+      clearAllTimers();
       window.removeEventListener("wheel", onWheel);
       el.removeEventListener("touchstart", onTouchStart);
       el.removeEventListener("touchmove", onTouchMove);
@@ -495,7 +805,7 @@
 
     const totalMs = stepDemoMs(s);
     const alreadySeen = untrack(() => seen.has(idx));
-    progress = alreadySeen || totalMs <= 0 ? 1 : 0;
+    demoProgress = alreadySeen || totalMs <= 0 ? 1 : 0;
     if (totalMs <= 0 && !alreadySeen) untrack(() => seen.add(idx));
 
     let f = 0;
@@ -534,14 +844,16 @@
         demoSpent += (now - meterStamp) * Math.max(0.5, playRate);
         meterStamp = now;
         const k = clamp(demoSpent / totalMs, 0, 1);
-        progress = k;
+        demoProgress = k;
         if (k >= 1) {
           window.clearInterval(meterTimer);
           seen.add(idx);
+          readyArrowAt = now;
           nudge = false;
+          overrideArrow = false;
           speed = 1;
         }
-      }, 140);
+      }, 120);
     }
 
     return () => {
@@ -557,6 +869,7 @@
   const frame = $derived(tl.step === active ? tl.frame : 0);
   const st = $derived(stateOf(active, frame));
   const done = $derived(seen.has(active));
+  const progress = $derived(settling ? settleProgress : demoProgress);
 
   $effect(() => {
     const target = camOf(L);
@@ -698,17 +1011,19 @@
       {active}
       total={STEPS.length}
       {done}
+      {settling}
+      {overrideArrow}
+      {leaving}
       {progress}
       {pull}
       {nudge}
       {nudgePulse}
-      {speed}
       {commitSeq}
       {ink}
       surface={cueSurface}
       dark={cueDark}
       {nextLabel}
-      onAdvance={commitNext}
+      onAdvance={handleCueClick}
     />
   </div>
 </section>
